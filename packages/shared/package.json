@@ -1,0 +1,16 @@
+{
+  "name": "@bbdash/shared",
+  "version": "1.0.0",
+  "description": "Shared types and code between BBDash modules",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": "BBL Opposition",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}

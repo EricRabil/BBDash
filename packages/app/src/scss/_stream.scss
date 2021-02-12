@@ -1,0 +1,48 @@
+@import "variables";
+
+.data-cell {
+    padding: 0 !important;
+
+    &:not(:last-child) .data-cell--inner {
+        border-bottom: 1px solid $main-background;
+        margin-bottom: 1px;
+    }
+
+    .data-cell--inner {
+        display: grid !important;
+        padding: 15px 10px;
+        grid-template-columns: minmax(0, 1fr);
+        grid-auto-flow: row !important;
+        row-gap: 5px;
+        overflow: visible;
+        
+        --muted-size: 0.8em;
+
+        .data-cell--muted {
+            font-size: var(--muted-size);
+        }
+
+        .data-cell--header {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+
+            .data-cell--header-title {
+                flex: 1;
+            }
+        }
+
+        .data-cell--description {
+            font-size: 0.9em;
+            word-wrap: break-word;
+
+            text-overflow: ellipsis;
+
+            overflow-y: scroll;
+        }
+
+        .data-cell--strong {
+            font-weight: 500;
+        }
+    }
+}

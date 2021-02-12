@@ -1,0 +1,58 @@
+@use "column";
+@use "stream";
+@import "variables";
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.App {
+    height: 100vh;
+    width: 100vw;
+
+    display: grid;
+    grid-template-columns: 60px minmax(0, 1fr);
+    column-gap: 5px;
+
+    background: $main-background;
+
+    &>.sidebar {
+        background: $sidebar-background;
+
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: 20px;
+        padding: 20px 10px;
+        justify-items: center;
+        --icon-size: 45%;
+
+        & > svg {
+            width: var(--icon-size);
+            height: auto;
+            color: white;
+            cursor: pointer;
+        }
+    }
+}
+
+:focus {
+    outline: none;
+}
+
+.grid-track-root {
+    overflow-x: scroll;
+}
+
+.column-track {
+    height: 100%;
+    width: 100%;
+}
+
+label {
+    font-size: 0.8rem;
+}

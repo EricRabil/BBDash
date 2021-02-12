@@ -1,0 +1,45 @@
+&.settings-cell {
+    padding: 0 10px;
+
+    transition: height 0.2s;
+    overflow: hidden;
+
+    user-select: none;
+
+    .settings-cell-body {
+        flex: 1;
+        display: flex;
+        flex-flow: column;
+
+        label > input[type=text] {
+            display: block;
+        }
+
+        &:not(:empty) {
+            padding: 10px 0;
+        }
+    }
+
+    .settings-cell-footer {
+        display: flex;
+        flex-flow: row-reverse;
+
+        padding: 15px 0;
+
+        .settings-cell-footer--action {
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            column-gap: 5px;
+            align-items: center;
+            cursor: pointer;
+
+            &.danger {
+                color: red;
+            }
+
+            svg {
+                font-size: 0.9em;
+            }
+        }
+    }
+}
