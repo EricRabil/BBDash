@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@bbdash/chrome-remote-objects": "^1.0.0",
-    "@bbdash/shared": "^1.0.0",
+    "@bbdash/chrome-remote-objects": "workspace:*",
+    "@bbdash/shared": "workspace:*",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@fortawesome/react-fontawesome": "^0.1.14",
@@ -44,7 +44,7 @@
     ]
   },
   "devDependencies": {
-    "@bbdash/bb-api": "^1.0.0",
+    "@bbdash/bb-api": "workspace:*",
     "@types/chrome": "0.0.100",
     "@types/classnames": "^2.2.11",
     "@types/luxon": "^1.25.1",

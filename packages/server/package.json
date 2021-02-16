@@ -11,7 +11,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@bbdash/bb-api": "^1.0.0",
+    "@bbdash/bb-api": "workspace:*",
     "axios": "^0.21.1",
     "axios-cookiejar-support": "^1.0.1",
     "cors": "^2.8.5",

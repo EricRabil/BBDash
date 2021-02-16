@@ -1,3 +1,14 @@
+# Output Emits
 dist/
+
+# CJS
 node_modules/
+
+# Yarn
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
 yarn-error.log
