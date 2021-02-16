@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "ts:build": "tsc -b",
-    "ts:watch": "yarn ts:build --watch"
+    "ts:watch": "yarn ts:build --watch",
+    "crx:build": "cd packages/chrome-extension && yarn build",
+    "crx:watch": "cd packages/chrome-extension && yarn watch"
   },
   "devDependencies": {
     "lerna": "^3.22.1",
