@@ -2,5 +2,6 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true,
         "source.organizeImports": true
-    }
+    },
+    "discord.enabled": true
 }

@@ -1,4 +1,5 @@
 export * from "./activity"
+export * from "./content"
 export * from "./course"
 export * from "./foundation"
 export * from "./grades"

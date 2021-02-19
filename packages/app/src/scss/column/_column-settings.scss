@@ -15,6 +15,15 @@
             display: block;
         }
 
+        .column-settings-list--body {
+            display: flex;
+            flex-flow: column;
+        }
+
+        .column-settings-list--header {
+            font-weight: bold;
+        }
+
         &:not(:empty) {
             padding: 10px 0;
         }

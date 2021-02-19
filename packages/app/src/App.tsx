@@ -1,27 +1,53 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
+import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
+import { ColumnOptions } from "./components/Column";
 import ColumnGrid from "./components/ColumnGrid";
 import "./scss/_index.scss";
 import usePersistentColumns from "./storage/column-items";
 
+type ExtractColumnOptionType<T> = T extends ColumnOptions<infer U> ? U : never;
+
+interface ColumnDefinition {
+    icon: IconProp;
+    component: React.FunctionComponentFactory<any>;
+    id: string;
+}
+
+type x = typeof GradesColumn
+
+const columns: ColumnDefinition[] = [
+    {
+        icon: "align-left",
+        component: StreamColumn,
+        id: "stream"
+    },
+    {
+        icon: "percent",
+        component: GradesColumn,
+        id: "grades"
+    },
+    {
+        icon: "database",
+        component: CourseContentsColumn,
+        id: "contents"
+    }
+];
+
+const findColumnByID: (id: string) => ColumnDefinition | null = id => columns.find(c => c.id === id) || null;
+
 function App() {
     const [columnItems, setColumnItems, { addColumn, removeColumn, updatePreferences }] = usePersistentColumns();
-
-    function StreamAdder() {
-        return <FontAwesomeIcon icon="align-left" onClick={() => addColumn("stream")} />;
-    }
-
-    function GradesAdder() {
-        return <FontAwesomeIcon icon="percent" onClick={() => addColumn("grades")} />;
-    }
 
     return (
         <div className="App">
             <div className="sidebar">
-                <StreamAdder />
-                <GradesAdder />
+                {columns.map(({ icon, id }) => (
+                    <FontAwesomeIcon icon={icon} key={id} onClick={() => addColumn(id)} />
+                ))}
             </div>
             <ColumnGrid
                 columnItems={columnItems}
@@ -41,18 +67,9 @@ function App() {
                 }}
             >
                 {columnItems.map((item, index) => {
-                    let Element: React.FunctionComponentFactory<any>;
+                    const Element = findColumnByID(item.id)?.component;
 
-                    switch (item.id) {
-                    case "grades":
-                        Element = GradesColumn;
-                        break;
-                    case "stream":
-                        Element = StreamColumn;
-                        break;
-                    default:
-                        return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
-                    }
+                    if (!Element) return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
 
                     return <Element
                         key={index}

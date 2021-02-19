@@ -118,7 +118,7 @@ export default class BackgroundController {
             focused: true
         })
         else chrome.windows.create({
-            url: chrome.runtime.getURL("popup.html"),
+            url: chrome.runtime.getURL("index.html"),
             type: "popup"
         }, window => this.popupWindow = window!)
     }

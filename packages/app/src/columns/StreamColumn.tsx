@@ -1,46 +1,103 @@
-import { StreamEntry } from "@bbdash/shared";
-import React, { useEffect, useMemo, useState } from "react";
+import { ContentCategories, ContentType, StreamEntry } from "@bbdash/shared";
+import React, { useMemo } from "react";
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from "react-virtualized";
 import "react-virtualized/styles.css";
 import StreamEntryCell from "../cells/StreamEntryCell";
 import Column, { BasePreferences, ColumnOptions } from "../components/Column";
-import ColumnSettingsField from "../components/ColumnSettingsField";
+import { ColumnSettingsListField } from "../components/ColumnSettingsField";
 import useCourses from "../composables/useCourses";
-import { useDefaultPreferences, useMergePreferences } from "../composables/useDefaultPreferences";
+import { useDefaultPreferences } from "../composables/useDefaultPreferences";
 import useStream from "../composables/useStream";
+import { SortOrder } from "../utils/feeds";
+import { activeKeys } from "../utils/prefs";
 
-interface Filter {
-    defaultName?: string;
-    transform: (entries: StreamEntry[]) => StreamEntry[];
+enum SortBy {
+    dueDate = "dueDate",
+    timestamp = "timestamp",
+    title = "title"
 }
 
-const filters: Record<string, Filter["transform"]> = {};
-
-function registerFilter({ id, ...filter }: Filter & { id: string }) {
-    filters[id] = filter.transform;
+function always<T extends Function>(fn: T): T {
+    return Object.assign(fn, {
+        __always_apply__: true
+    });
 }
 
-const contentHandlerCategories = {
-    assignment: ["resource/x-bb-asmt-test-link", "resource/x-bb-assignment"]
+function alwaysApplies<T extends Function>(fn: T): boolean {
+    return "__always_apply__" in fn;
+}
+
+const filters: Record<string, (entry: StreamEntry) => boolean> = {
+    ...Object.entries(ContentCategories).reduce((acc, [ name, types ]) => Object.assign(acc, {
+        [name]: (entry: StreamEntry) => types.includes(entry.itemSpecificData.contentDetails?.contentHandler as ContentType)
+    }), {}),
+    noContentHandler: entry => typeof entry.itemSpecificData?.contentDetails?.contentHandler === "undefined",
+    announcement: entry => "ann_type" in entry.extraAttribs && entry.extraAttribs.ann_type !== null && !entry.itemSpecificData.notificationDetails?.dueDate,
+    upcomingOnly: always(entry => entryDueDate(entry) > new Date())
 };
 
-registerFilter({
-    id: "assignments",
-    transform: (entries) => {
-        return entries.filter(entry => contentHandlerCategories.assignment.includes(entry.itemSpecificData.contentDetails?.contentHandler));
+function determineDateFunction(sortBy: SortBy, order: SortOrder): (entry: StreamEntry) => Date {
+    switch (sortBy) {
+    case SortBy.dueDate:
+        switch (order) {
+        case SortOrder.descending:
+            // This pins items without a due date to the end by inverting the default value for dueDate
+            return entryDueDateInvertedDefault;
+        case SortOrder.ascending:
+        default:
+            // This extracts the due date with the standard -Infinity default value
+            return entryDueDate;
+        }
+    case SortBy.timestamp:
+    default:
+        // This extracts the se_timestamp
+        return entryDate;
     }
-});
+}
 
-registerFilter({
-    id: "announcements",
-    transform: entries => entries.filter(entry => "ann_type" in entry.extraAttribs && entry.extraAttribs.ann_type !== null && !entry.itemSpecificData.notificationDetails?.dueDate)
-});
+function sort<T extends StreamEntry>(entries: T[], by: SortBy, order: SortOrder): T[] {
+    const dateFn = determineDateFunction(by, order);
+
+    switch (by) {
+    case SortBy.dueDate:
+    case SortBy.timestamp:
+        return entries.sort((e1, e2) => {
+            const e1Date = dateFn(e1);
+            const e2Date = dateFn(e2);
+
+            switch (order) {
+            case SortOrder.ascending:
+                return +e1Date - +e2Date;
+            case SortOrder.descending:
+                return +e2Date - +e1Date;
+            }
+        });
+    case SortBy.title:
+        return entries.sort((e1, e2) => ((order === SortOrder.descending ? e2 : e1).itemSpecificData.title || "").localeCompare((order === SortOrder.descending ? e1 : e2).itemSpecificData.title || ""));
+    default:
+        return entries;
+    }
+}
+
+function filter<T extends StreamEntry>(entries: T[], filterIDs: string[]): T[] {
+    const filterFunctions = filterIDs.map(id => filters[id]);
+    const alwaysFilters = filterFunctions.filter(alwaysApplies);
+    const optionalFilters = filterFunctions.filter(fn => !alwaysApplies(fn));
+
+    console.log({
+        entries,
+        filterIDs,
+        alwaysFilters,
+        optionalFilters
+    });
+
+    return entries.filter((entry: T) => optionalFilters.some(filter => filter(entry)) && alwaysFilters.every(filter => filter(entry)));
+}
 
 interface Preferences extends BasePreferences {
-    assignments: boolean;
-    announcements: boolean;
-    upcoming: boolean;
-    sortUpcoming: boolean;
+    filters: Record<keyof typeof filters, boolean>;
+    sortBy: SortBy;
+    sortOrder: SortOrder;
     name: string;
 }
 
@@ -49,73 +106,59 @@ export interface StreamColumnOptions extends ColumnOptions<Preferences> {
 }
 
 const defaults: Preferences = {
-    assignments: false,
-    announcements: false,
-    upcoming: false,
-    sortUpcoming: false,
+    filters: Object.keys(filters).reduce((acc, filter) => Object.assign(acc, {
+        [filter]: false
+    }), {}),
+    sortBy: SortBy.timestamp,
+    sortOrder: SortOrder.descending,
     name: "Stream"
 };
 
-const entryDate = (entry: StreamEntry) => new Date(entry.itemSpecificData.notificationDetails?.dueDate || entry.se_timestamp);
+const entryDueDate = ({ itemSpecificData: { notificationDetails } }: StreamEntry, defaultMs = -Infinity) => new Date(notificationDetails?.dueDate || defaultMs);
+const entryDueDateInvertedDefault = (entry: StreamEntry) => entryDueDate(entry, Infinity);
+const entryDate = (entry: StreamEntry) => new Date(entry.se_timestamp);
 
-export default function StreamColumn({
-    id, ...props
-}: StreamColumnOptions) {
+export default function StreamColumn(props: StreamColumnOptions) {
     const courses = useCourses();
     const allEntries = useStream();
     const entries = useMemo(() => allEntries.filter(entry => courses[entry.se_courseId]), [
         allEntries
     ]);
-
-    const [renderEntries, setRenderEntries] = useState([] as StreamEntry[]);
-
-    const merge = useMergePreferences(props);
+    
     useDefaultPreferences(props, defaults);
 
-    const cache = new CellMeasurerCache({
+    const entriesSignature = JSON.stringify(entries);
+
+    const cache = useMemo(() => new CellMeasurerCache({
         fixedWidth: true
-    });
+    }), [entriesSignature]);
 
-    useEffect(() => {
-        let baseEntries = entries;
+    const activeFilters = useMemo(() => activeKeys(Object.assign({}, defaults.filters, props.preferences.filters), ["upcomingOnly"]), [props.preferences.filters]);
 
-        if (props.preferences.assignments) baseEntries = filters.assignments(baseEntries);
-        if (props.preferences.announcements) baseEntries = filters.announcements(baseEntries);
+    const dedupedEntries = useMemo(() => entries.filter((entry, index, entries) => {
+        if (entry.itemSpecificData.courseContentId) {
+            return entries.findIndex(entryCmp => entry.itemSpecificData.courseContentId === entryCmp.itemSpecificData.courseContentId) === index;
+        } else return true;
+    }), [entriesSignature]);
 
-        const filteredEntries = baseEntries.filter((entry, index, entries) => {
-            if (props.preferences.upcoming) {
-                const after = entryDate(entry) > new Date();
-
-                if (!after) return false;
-            }
-
-            if (entries.findIndex(entryCmp => entry.se_itemUri === entryCmp.se_itemUri) !== index) return false;
-            
-            return true;
-        });
-
-        if (props.preferences.sortUpcoming) {
-            filteredEntries.sort((e1, e2) => +entryDate(e1) - +entryDate(e2));
-        }
-
-        setRenderEntries(filteredEntries);
-    }, [props.preferences, entries]);
+    const renderEntries = useMemo(() => {
+        return sort(filter(dedupedEntries, activeFilters), props.preferences.sortBy, props.preferences.sortOrder);
+    }, [props.preferences.filters, props.preferences.sortBy, props.preferences.sortOrder, dedupedEntries]);
 
     return (
         <Column header={<div>{props.preferences.name}</div>} settings={(
             <React.Fragment>
-                <ColumnSettingsField type="checkbox" labelText={(
-                    <React.Fragment>Show assignments only</React.Fragment>
-                )} prefKey="assignments" {...props} />
-                <ColumnSettingsField type="checkbox" labelText={(
-                    <React.Fragment>Show upcoming items only</React.Fragment>
-                )} prefKey="upcoming" {...props} />
-                <ColumnSettingsField type="checkbox" labelText={(
-                    <React.Fragment>Sort by upcoming due date</React.Fragment>
-                )} prefKey="sortUpcoming" {...props} />
-                <ColumnSettingsField type="checkbox" labelText={(
-                    <React.Fragment>Show announcements only</React.Fragment>
-                )} prefKey="announcements" {...props} />
+                <ColumnSettingsListField type="list" multi={true} values={Object.keys(filters)} labelText={id => <React.Fragment>{id}</React.Fragment>} prefKey="filters" header={<React.Fragment>Filters</React.Fragment>} {...props} />
+                <ColumnSettingsListField type="list" multi={false} values={Object.values(SortBy)} prefKey="sortBy" labelText={sorter => (
+                    <React.Fragment>
+                        {sorter}
+                    </React.Fragment>
+                )} header={<React.Fragment>Sort By</React.Fragment>} {...props} />
+                <ColumnSettingsListField type="list" multi={false} values={Object.values(SortOrder)} prefKey="sortOrder" labelText={sorter => (
+                    <React.Fragment>
+                        {sorter}
+                    </React.Fragment>
+                )} header={<React.Fragment>Sort Order</React.Fragment>} {...props} />
             </React.Fragment>
         )} {...props}>
             <AutoSizer>

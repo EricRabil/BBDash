@@ -63,6 +63,10 @@ interface SubcontentsQuery extends CourseContentsQuery {
     contentID: string;
 }
 
+type Cachable<T extends object> = T & {
+    cache?: boolean;
+}
+
 /**
  * API layer for interacting with course objects
  */
@@ -70,7 +74,10 @@ export class CourseLayer extends APILayer {
     private cache: {
         enrollments?: CourseEnrollment[];
         grades?: GradeMapping;
-    } = {}
+        contents: Record<string, CourseContentItem[]>;
+    } = {
+        contents: {}
+    }
 
     /**
      * Returns all enrollments for the current user
@@ -116,10 +123,14 @@ export class CourseLayer extends APILayer {
      * Returns all sidebar contents for a given course
      * @param query query to apply when fetching the sidebar contents
      */
-    async contents(query: CourseContentsQuery): Promise<CourseContentItem[]> {
+    async contents(query: Cachable<CourseContentsQuery>): Promise<CourseContentItem[]> {
+        if (query.cache && this.cache.contents[query.courseID]) return this.cache.contents[query.courseID];
+
+        console.log(query.cache)
+        
         try {
             // Attempt to recursively list the contents of the course
-            return await this.fetchContents({
+            return this.cache.contents[query.courseID] = await this.fetchContents({
                 ...query,
                 recursive: true
             });
@@ -144,7 +155,7 @@ export class CourseLayer extends APILayer {
                     }).catch(() => [] as CourseContentItem[]);
                 }));
                 
-                return subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
+                return this.cache.contents[query.courseID] = subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
             } else throw e;
         }
     }
@@ -178,7 +189,7 @@ export class CourseLayer extends APILayer {
      * @param activeCourses whether to only fetch for active courses. default is true
      * @param query query to apply to the sidebar lookup
      */
-    async allContents(activeCourses = true, query: BaseContentsQuery = {}): Promise<Record<string, CourseContentItem[]>> {
+    async allContents(activeCourses = true, query: Cachable<BaseContentsQuery> = {}): Promise<Record<string, CourseContentItem[]>> {
         const courses = await (activeCourses ? this.activeCourses() : this.all());
 
         const contents = await Promise.all(courses.map(async course => {

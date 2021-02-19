@@ -1,3 +1,4 @@
+import { ContentHandler } from "./content";
 import { Term } from "./scheduling";
 
 export interface Course {
@@ -38,10 +39,7 @@ export interface Course {
 
 export interface CourseContentItem {
     body: string;
-    contentHandler: {
-        id: string;
-        discussionId: string;
-    };
+    contentHandler: ContentHandler;
     id: string;
     links: Array<{
         href: string;
@@ -49,6 +47,8 @@ export interface CourseContentItem {
         title: string;
         type: string;
     }>;
+    created?: string;
+    modified?: string;
     position: number;
     title: string;
 }

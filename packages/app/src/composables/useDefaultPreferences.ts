@@ -2,12 +2,15 @@ import { useEffect } from "react";
 import { BasePreferences, ColumnOptions } from "../components/Column";
 
 export function useDefaultPreferences<Preferences extends BasePreferences>(props: ColumnOptions<Preferences>, defaults: Preferences) {
-    useEffect(() => {
+    function inspect() {
         if (!Object.keys(defaults).every(key => key in props.preferences)) {
-            console.log("FUCK");
-            props.updatePreferences(Object.assign({}, defaults, props.preferences));
+            props.updatePreferences(Object.assign({}, Object.entries(defaults).filter(([ key ]) => !(key in props.preferences)).reduce((acc, [key, value]) => Object.assign(acc, {
+                [key]: value
+            }), {}), props.preferences));
         }
-    }, [props.preferences]);
+    }
+
+    useEffect(() => inspect());
 }
 
 export function useMergePreferences<Preferences extends BasePreferences>(props: ColumnOptions<Preferences>) {

@@ -2,19 +2,12 @@ import { Course, StreamEntry } from "@bbdash/shared";
 import { DateTime } from "luxon";
 import React from "react";
 import ColumnCell from "../components/ColumnCell";
+import { courseLink } from "../utils/courses";
 
 const renderBlacklist = [
     "resource/x-osv-kaltura/mashup",
     "resource/x-bb-externallink"
 ];
-
-const courseLink = (course: Course, legacyURL?: string) => {
-    const url = new URL(course.externalAccessUrl);
-
-    if (legacyURL) url.searchParams.set("legacyUrl", legacyURL);
-
-    return url.toString();
-};
 
 export default class StreamEntryCell extends React.Component<{
     course: Course;
