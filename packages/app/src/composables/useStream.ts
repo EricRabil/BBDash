@@ -1,6 +1,9 @@
 import { useQuery } from "react-query";
 import apiClient from "../api";
 
+/**
+ * Links to activity stream data for the authenticated user
+ */
 export default function useStream() {
     const { data } = useQuery("stream", () => apiClient.stream.allEntries());
 

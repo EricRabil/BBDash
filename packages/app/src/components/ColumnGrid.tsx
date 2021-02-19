@@ -12,6 +12,10 @@ const COLUMN_WIDTH = 345;
 
 const GRID_WIDTH = (COLUMNS * COLUMN_WIDTH) + (COLUMNS * HORIZONTAL_MARGIN);
 
+/**
+ * Presents a track where columns can be placed and moved around
+ * @param opts options to pass to the grid layout
+ */
 export default function ColumnGrid({ onLayoutChange, children, columnItems }: PropsWithChildren<{ onLayoutChange(layout: GridLayout.Layout[]): void, columnItems: ColumnItem[] }>) {
     return <div className="grid-track-root">
         <AutoSizer>

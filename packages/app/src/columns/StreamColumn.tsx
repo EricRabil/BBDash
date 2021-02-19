@@ -118,6 +118,10 @@ const entryDueDate = ({ itemSpecificData: { notificationDetails } }: StreamEntry
 const entryDueDateInvertedDefault = (entry: StreamEntry) => entryDueDate(entry, Infinity);
 const entryDate = (entry: StreamEntry) => new Date(entry.se_timestamp);
 
+/**
+ * Renders all entries from the Blackboard activity stream
+ * @param props column preferences and options
+ */
 export default function StreamColumn(props: StreamColumnOptions) {
     const courses = useCourses();
     const allEntries = useStream();
@@ -127,23 +131,25 @@ export default function StreamColumn(props: StreamColumnOptions) {
     
     useDefaultPreferences(props, defaults);
 
-    const entriesSignature = JSON.stringify(entries);
-
-    const cache = useMemo(() => new CellMeasurerCache({
-        fixedWidth: true
-    }), [entriesSignature]);
-
+    // memoized filters, updates when preferences changes
     const activeFilters = useMemo(() => activeKeys(Object.assign({}, defaults.filters, props.preferences.filters), ["upcomingOnly"]), [props.preferences.filters]);
 
+    // memoized entries, deduping them by courseContentId (assignments are usually duplicated), updates when entries do
     const dedupedEntries = useMemo(() => entries.filter((entry, index, entries) => {
         if (entry.itemSpecificData.courseContentId) {
             return entries.findIndex(entryCmp => entry.itemSpecificData.courseContentId === entryCmp.itemSpecificData.courseContentId) === index;
         } else return true;
-    }), [entriesSignature]);
+    }), [JSON.stringify(entries)]);
 
+    // memoized render entries, updates when preferences or entries change
     const renderEntries = useMemo(() => {
         return sort(filter(dedupedEntries, activeFilters), props.preferences.sortBy, props.preferences.sortOrder);
     }, [props.preferences.filters, props.preferences.sortBy, props.preferences.sortOrder, dedupedEntries]);
+    
+    // memoized measurer cache, updates when the entries change
+    const cache = useMemo(() => new CellMeasurerCache({
+        fixedWidth: true
+    }), [JSON.stringify(renderEntries)]);
 
     return (
         <Column header={<div>{props.preferences.name}</div>} settings={(

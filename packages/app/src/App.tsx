@@ -4,20 +4,15 @@ import React from "react";
 import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
-import { ColumnOptions } from "./components/Column";
 import ColumnGrid from "./components/ColumnGrid";
 import "./scss/_index.scss";
 import usePersistentColumns from "./storage/column-items";
-
-type ExtractColumnOptionType<T> = T extends ColumnOptions<infer U> ? U : never;
 
 interface ColumnDefinition {
     icon: IconProp;
     component: React.FunctionComponentFactory<any>;
     id: string;
 }
-
-type x = typeof GradesColumn
 
 const columns: ColumnDefinition[] = [
     {
@@ -37,6 +32,10 @@ const columns: ColumnDefinition[] = [
     }
 ];
 
+/**
+ * Finds the definition of a column with the given identifier
+ * @param id identifier of the column to lookup
+ */
 const findColumnByID: (id: string) => ColumnDefinition | null = id => columns.find(c => c.id === id) || null;
 
 function App() {

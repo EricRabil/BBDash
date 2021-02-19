@@ -5,16 +5,26 @@ interface APIRequest<API extends object, Layer extends keyof API = keyof API, Me
     args?: Method extends (...args: any[]) => any ? Parameters<Method> : never;
 }
 
+/**
+ * Serves an API object over the chrome port system
+ */
 export class RemoteObjectServer<API extends object> {
     constructor(public api: API) {
         
     }
 
+    /**
+     * Middleware when processing a request
+     */
     public middleware: Array<(req: APIRequest<API>) => Promise<void>> = [];
 
     private boundHandleRuntimeConnect = this.handleRuntimeConnect.bind(this)
     private boundHandleRuntimeMessage = this.handleRuntimeMessage.bind(this)
 
+    /**
+     * Returns true if a value represents a proper API request
+     * @param req value to inspect
+     */
     private isAPIRequest(req: any): req is APIRequest<API> {
         return typeof req === "object"
             && "id" in req
@@ -29,6 +39,10 @@ export class RemoteObjectServer<API extends object> {
             && (typeof req.args === "object" ? Array.isArray(req.args) : true)
     }
 
+    /**
+     * Handles a remote-object connection
+     * @param port port sending the request
+     */
     async handleRuntimeConnect(port: chrome.runtime.Port) {
         switch (port.name) {
             case "remote-objects":
@@ -36,7 +50,13 @@ export class RemoteObjectServer<API extends object> {
         }
     }
     
+    /**
+     * Handles a request from the remote-object channel
+     * @param request request
+     * @param port originating port
+     */
     async handleRuntimeMessage(request: any, port: chrome.runtime.Port) {
+        // drop the request if it is invalid
         if (!this.isAPIRequest(request)) return;
 
         const response = await this.handleRequest(request);
@@ -47,6 +67,10 @@ export class RemoteObjectServer<API extends object> {
         })
     }
 
+    /**
+     * Routes an API request and resolves with the result
+     * @param request request to route and resolve
+     */
     async handleRequest(request: APIRequest<API>) {
         for (const handler of this.middleware) {
             await handler(request);

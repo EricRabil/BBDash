@@ -2,19 +2,19 @@ import { Course, GradebookEntry, GradebookStatus } from "@bbdash/shared";
 import React from "react";
 import ColumnCell from "../components/ColumnCell";
 
-function num(numbers: (number | null | undefined)[], fallback: number): number {
-    const existing = numbers.find(num => typeof num === "number");
-    if (typeof existing === "number") return existing;
-    else return fallback;
-}
-
 const pointsEarned = (entry: GradebookEntry) => typeof entry.manualGrade === "number" ? entry.manualGrade : typeof entry.displayGrade?.score === "number" ? entry.displayGrade.score : null;
 
+/**
+ * Presents one unit of grade data
+ */
 export default class GradeCell extends React.Component<{
     course: Course;
     grades: GradebookEntry[];
     hideIfNA: boolean;
 }> {
+    /**
+     * Computes an absolute URL pointing to the gradebook for the given entry
+     */
     gradebookURL() {
         const url = new URL(this.props.course.externalAccessUrl);
 
@@ -23,6 +23,9 @@ export default class GradeCell extends React.Component<{
         return url.toString();
     }
 
+    /**
+     * Computes the grade in the current course
+     */
     grade() {
         const { actual, possible } = this.props.grades.filter(g => g.status === GradebookStatus.GRADED).reduce(({ actual, possible }, grade) => {
             const earned = pointsEarned(grade);
@@ -35,6 +38,7 @@ export default class GradeCell extends React.Component<{
 
         const percentage = (actual / possible) * 100;
 
+        // Prettify NaN. Return null if the user doesn't want to see N/A entries
         if (isNaN(percentage)) return this.props.hideIfNA ? null : "N/A";
         else return `${percentage.toFixed(2)}%`;
     }

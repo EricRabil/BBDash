@@ -28,11 +28,13 @@ export function ColumnSettingsListField<Preferences extends BasePreferences>({ m
     type Ledger = Record<string, boolean>;
     type PrefValue = Preferences[keyof Preferences];
 
+    // dictionary representing the states of the various possible values
     const ledger = useMemo(() => values.reduce((acc, key) => Object.assign(acc, {
         // @ts-ignore
         [key]: expectedType === "string" ? preferences[prefKey] === key : !!(preferences[prefKey] || {})[key]
     }), {} as Ledger), [preferences, preferences[prefKey]]);
 
+    // ensures the value of preferences[prefKey] is in the proper format, otherwise correcting it
     function assure() {
         if (typeof preferences[prefKey] !== expectedType) {
             switch (expectedType) {
@@ -90,15 +92,24 @@ export function ColumnSettingsListField<Preferences extends BasePreferences>({ m
     );
 }
 
+/**
+ * Lower-level component for configuring a section of the preferences object. Can be overridden to delegate read/writes to a HOC
+ * @param props options for the columnn settings
+ */
 export default function ColumnSettingsField<Preferences extends BasePreferences>(props: ColumnSettingsFieldOptions<Preferences>) {
     const merge = useMergePreferences(props);
     const preferenceValue = props.prefKey ? props.preferences[props.prefKey] : (props.value || false);
 
+    /**
+     * Updates or delegates an updates value
+     * @param value new value
+     */
     function apply(value: unknown) {
         if (props.prefKey) merge({ [props.prefKey]: value } as Partial<Preferences>);
         else props.onUpdate!(value);
     }
 
+    // whether this is a selectable input
     const isCheckable = useMemo(() => ["checkbox", "radio"].includes(props.type), [props.type]);
 
     return (

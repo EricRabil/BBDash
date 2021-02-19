@@ -9,20 +9,32 @@ const renderBlacklist = [
     "resource/x-bb-externallink"
 ];
 
+/**
+ * Displays one unit of activity stream data
+ */
 export default class StreamEntryCell extends React.Component<{
     course: Course;
     entry: StreamEntry;
     style?: React.CSSProperties | undefined;
     rootRef?: ((element: Element) => void) | undefined;
 }> {
+    /**
+     * Computes the content of the title label
+     */
     title() {
         return this.props.entry.itemSpecificData.title || this.props.entry.itemSpecificData.notificationDetails?.announcementTitle;
     }
 
+    /**
+     * Computes the content of the description component
+     */
     description() {
         return this.props.entry.itemSpecificData.contentExtract;
     }
 
+    /**
+     * Computes the due date for this entry, if it is an assignment
+     */
     dueDate() {
         const dueDate = this.props.entry.itemSpecificData.notificationDetails?.dueDate;
 
@@ -30,12 +42,18 @@ export default class StreamEntryCell extends React.Component<{
         else return null;
     }
 
+    /**
+     * Computes the text for the posted date label
+     */
     postedDate() {
         const timestamp = this.props.entry.se_timestamp;
 
         return DateTime.fromMillis(timestamp).toLocaleString(DateTime.DATE_SHORT);
     }
 
+    /**
+     * Computes the url for the title link
+     */
     link() {
         if (!this.props.entry.se_itemUri) return null;
 
@@ -49,6 +67,7 @@ export default class StreamEntryCell extends React.Component<{
 
         if (!title && !description) return null;
 
+        // use <a> if there's a link, otherwise <div>
         const HeaderTitle = link ? "a" : "div";
 
         return (

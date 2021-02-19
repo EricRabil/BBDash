@@ -1,3 +1,6 @@
-import ChromeAPIProvider from "./api-clients/chrome";
+import BlackboardAPI from "@bbdash/bb-api";
+import { RemoteObjectFactory } from "@bbdash/chrome-remote-objects";
 
-export default ChromeAPIProvider;
+const ChromeBlackboardAPI = RemoteObjectFactory.createFactory<BlackboardAPI>();
+
+export default ChromeBlackboardAPI;

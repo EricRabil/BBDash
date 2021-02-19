@@ -3,11 +3,17 @@ import { DateTime } from "luxon";
 import React from "react";
 import ColumnCell from "../components/ColumnCell";
 
+/**
+ * Displays one unit of course content
+ */
 export default class CourseContentCell extends React.Component<{
     course: Course;
     content: CourseContentItem;
     style?: React.CSSProperties;
 }> {
+    /**
+     * Computed date label for this cell
+     */
     date() {
         const timeString = this.props.content.modified || this.props.content.created;
 
@@ -15,6 +21,9 @@ export default class CourseContentCell extends React.Component<{
         else return DateTime.fromISO(timeString).toLocaleString(DateTime.DATE_SHORT);
     }
 
+    /**
+     * Computed hyperlink for the title label
+     */
     link() {
         const [ link ] = this.props.content.links || [];
 

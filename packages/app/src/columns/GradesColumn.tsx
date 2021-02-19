@@ -1,12 +1,9 @@
 import React from "react";
-// import { useSelector } from "react-redux";
-// import { getCourses } from "../app/slices/courses";
-// import { getGrades } from "../app/slices/grades";
 import GradeCell from "../cells/GradeCell";
 import Column, { BasePreferences, ColumnOptions } from "../components/Column";
 import ColumnSettingsField from "../components/ColumnSettingsField";
 import useCourses from "../composables/useCourses";
-import { useDefaultPreferences, useMergePreferences } from "../composables/useDefaultPreferences";
+import { useDefaultPreferences } from "../composables/useDefaultPreferences";
 import useGrades from "../composables/useGrades";
 
 export interface GradesPreferences extends BasePreferences {
@@ -18,12 +15,15 @@ const defaults: GradesPreferences = {
     name: "Grades"
 };
 
+/**
+ * Lays out grade cells. Pulls grade data from BBAPI
+ * @param props column options
+ */
 export default function GradesColumn(props: ColumnOptions<GradesPreferences>) {
     const courses = useCourses();
     const grades = useGrades();
 
     useDefaultPreferences(props, defaults);
-    const merge = useMergePreferences(props);
 
     return <Column header={<div>Grades</div>} settings={(
         <React.Fragment>

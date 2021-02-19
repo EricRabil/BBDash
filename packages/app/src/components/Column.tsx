@@ -15,14 +15,22 @@ export interface ColumnOptions<Preferences extends BasePreferences> extends Prop
     remove: Function;
 }
 
+/**
+ * Higher-order component that provides a suite of common functions for columns, includes preferences APIs and standard layout
+ * @param props column options
+ */
 export default function Column<Preferences extends BasePreferences>(props: PropsWithChildren<{
     header?: ReactNode;
     settings?: ReactNode;
     className?: string;
 } & ColumnOptions<Preferences>>) {
+    // whether the settings drawer is open
     const [showingSettings, setShowingSettings] = useState(false);
+    // whether we are currently transitioning
     const [transitioning, setTransitioning] = useState(false);
+    // reference to the settings drawer container element
     const [settingsCell, setSettingsCell] = useState(null as HTMLDivElement | null);
+    // manages the height of the settings drawer, for determining if it is open or closed
     const [settingsHeight, setSettingsHeight] = useState(0);
 
     const { children, className, settings, remove, ...divProps } = props;

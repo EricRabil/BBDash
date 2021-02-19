@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import { BasePreferences, ColumnOptions } from "../components/Column";
 
+/**
+ * Assigns default preference values if they are missing
+ */
 export function useDefaultPreferences<Preferences extends BasePreferences>(props: ColumnOptions<Preferences>, defaults: Preferences) {
     function inspect() {
         if (!Object.keys(defaults).every(key => key in props.preferences)) {
@@ -13,6 +16,10 @@ export function useDefaultPreferences<Preferences extends BasePreferences>(props
     useEffect(() => inspect());
 }
 
+/**
+ * Returns a merging function for updating preferences in a declarative syntax
+ * @param props options passed to the column
+ */
 export function useMergePreferences<Preferences extends BasePreferences>(props: ColumnOptions<Preferences>) {
     return function(partial: Partial<Preferences>) {
         props.updatePreferences(Object.assign({}, props.preferences, partial));

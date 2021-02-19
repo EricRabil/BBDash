@@ -69,28 +69,43 @@ function filter<T extends CourseContentItem>(contents: T[], categories: string[]
     return contents.filter(content => categories.some(categoryID => category(categoryID).includes(content.contentHandler?.id || ContentType.blank)));
 }
 
+/**
+ * Presents contents for all courses in a streamlined column
+ * @param props column options
+ */
 export default function CourseContentsColumn(props: ColumnOptions<CourseContentsPreferences>) {
     const courses = useCourses();
     const contents = useCourseContents();
 
     useDefaultPreferences(props, defaults);
 
+    /**
+     * Creates a memoized reference to a checklist-style preference object
+     * @param keys all possible keys
+     * @param ledger preference object
+     * @param otherDeps any other dependencies to pass to the useMemo dependencies
+     */
     const useMemoizedActiveKeys = <T extends string | number | symbol>(keys: T[], ledger: Record<T, boolean>, otherDeps: unknown[] = []) => useMemo(() => activeKeys(hydratePreferenceLedger(keys, ledger)), [ledger, ...otherDeps]);
 
+    // all courseIDs to include
     const activeCourseIDs = useMemoizedActiveKeys(Object.keys(contents), props.preferences.includedCourseIDs, [contents]);
+    // all categories to include
     const activeCategories = useMemoizedActiveKeys(Object.keys(ContentCategories), props.preferences.includedCategories);
 
+    // sorted/filtered array of course contents
     const renderContents = useMemo(() => {
         const courseContents = activeCourseIDs.flatMap(courseID => (contents[courseID] || []).map(item => Object.assign({}, item, { courseID })));
 
         return sort(filter(courseContents, activeCategories), props.preferences.sortBy, props.preferences.sortOrder);
     }, [activeCourseIDs, activeCategories, contents, props.preferences.sortBy, props.preferences.sortOrder]);
 
+    // all courseIDs that should be visible in the preferences
     const allCourseIDs = useMemo(() => Array.from(new Set([
         ...Object.keys(contents),
         ...activeCourseIDs
     ])), [contents, activeCourseIDs]);
 
+    // render cache, updates when the contents change
     const cache = useMemo(() => new CellMeasurerCache({
         fixedWidth: true
     }), [renderContents]);
