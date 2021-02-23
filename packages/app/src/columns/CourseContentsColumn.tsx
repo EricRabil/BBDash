@@ -36,7 +36,7 @@ const defaults: CourseContentsPreferences = {
     includedCategories: {},
     includedCourseIDs: {},
     sortBy: SortBy.modified,
-    sortOrder: SortOrder.descending
+    sortOrder: SortOrder.ascending
 };
 
 const itemDate: (date: string | undefined) => Date = date => new Date(date || Date.now());

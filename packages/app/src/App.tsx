@@ -5,7 +5,6 @@ import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
 import ColumnGrid from "./components/ColumnGrid";
-import "./scss/_index.scss";
 import usePersistentColumns from "./storage/column-items";
 
 interface ColumnDefinition {
@@ -45,18 +44,13 @@ function App() {
         <div className="App">
             <div className="sidebar">
                 {columns.map(({ icon, id }) => (
-                    <FontAwesomeIcon icon={icon} key={id} onClick={() => addColumn(id)} />
+                    <FontAwesomeIcon icon={icon} key={id} onClick={() => addColumn(id)} title={id} />
                 ))}
             </div>
             <ColumnGrid
                 columnItems={columnItems}
                 onLayoutChange={layout => {
                     const newColumnItems = columnItems.slice();
-
-                    console.log({
-                        layout,
-                        newColumnItems
-                    });
 
                     layout.forEach(entry => {
                         newColumnItems[+entry.i].column = entry.x;
