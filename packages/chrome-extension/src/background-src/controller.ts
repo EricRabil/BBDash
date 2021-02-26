@@ -1,5 +1,6 @@
 import BlackboardAPI from "@bbdash/bb-api";
 import WebStorageCookieStore from "tough-cookie-web-storage-store";
+import ReauthController from "./reauth-controller";
 
 const persistent: Record<string, string> = new Proxy(JSON.parse(localStorage.getItem('bb-controller-config') || '{}'), {
     set(target, prop, value) {
@@ -47,8 +48,14 @@ export default class BackgroundController {
 
     headers: Record<string, string> = {};
 
-    private reloadObservers = new AsyncObserver<void>();
+    public reloadObservers = new AsyncObserver<void>();
     public loginObservers = new AsyncObserver<void>();
+
+    #droppedReload = false
+
+    static shared = new BackgroundController()
+
+    private constructor() {}
 
     api = new BlackboardAPI({
         instanceURL: "https://learn.dcollege.net",
@@ -60,30 +67,14 @@ export default class BackgroundController {
                 throw new Error("Method not implemented.")
             },
             relogin: async () => {
-                throw new Error("Method not implemented.")
-                if (this.loginObservers.isOpen) return await this.loginObservers.observe();
-
-                this.loginObservers.open();
-
-                try {
-                    const tab: chrome.tabs.Tab = await new Promise(resolve => chrome.tabs.create({
-                        url: this.api.instanceOrigin
-                    }, resolve));
-                    
-                    await this.waitForSuccessfulReload();
-    
-                    await new Promise(resolve => chrome.tabs.discard(tab.id, resolve));
-    
-                    this.loginObservers.resolve();
-                } catch (e) {
-                    this.loginObservers.reject(e);
-                    throw e;
-                }
+                await ReauthController.shared.relogin()
             },
             userID: () => {
                 return persistent.userID;
             },
-            userChanged: () => this.reloadUserID()
+            userChanged: async () => {
+                console.log("she changed")
+            }
         }
     })
 
@@ -99,15 +90,18 @@ export default class BackgroundController {
     }
 
     async reloadUserID() {
-        if (this.reloadObservers.isOpen) return this.reloadObservers.observe();
+        if (this.reloadObservers.isOpen && !this.#droppedReload) return this.reloadObservers.observe();
+
+        this.#droppedReload = false
 
         this.reloadObservers.open();
 
         try {
+            console.log("MORE")
             persistent.userID = (await this.api.users.me()).id;
         } catch (e) {
-            this.reloadObservers.reject(e);
-            throw e;
+            this.#droppedReload = true
+            return this.reloadObservers.observe();
         }
 
         this.reloadObservers.resolve();

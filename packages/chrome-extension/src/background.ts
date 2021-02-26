@@ -3,7 +3,7 @@ import BackgroundController from "./background-src/controller";
 import { setupCookieWatcher } from "./background-src/cookie-watcher";
 import { setupHeaderInjector } from "./background-src/header-injector";
 
-const controller = new BackgroundController();
+const controller = BackgroundController.shared
 
 chrome.browserAction.onClicked.addListener(function(tab) {
   controller.openWindow();
