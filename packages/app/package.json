@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "WRITE_TO_DISK=true WDS_SOCKET_HOST=localhost WDS_SOCKET_PORT=3000 react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=/ react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
