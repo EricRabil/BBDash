@@ -1,13 +1,15 @@
 # BBDash
 BBDash is an app that aims to aggregate commonly accessed data from Blackboard into a customizable dashboard.
 
+Wanna chat? Hop into our [Discord](https://discord.gg/mf2UrHFvRb)!
+
 ## Developing
 
 ### Prerequisites
 Building BBDash requires [NodeJS](https://nodejs.org/en/download/) v14 or later, and [yarn v2](https://yarnpkg.com/)
 
 ### Setup
-1. Clone the repo using `git clone git@gitlab.cci.drexel.edu:fds21/70bblopposition/bbdash.git`
+1. Clone the repo using `git clone https://github.com/EricRabil/BBDash.git`
 
 2. In the base directory, execute `yarn` to install all dependencies for the project. We use [Yarn Workspaces](https://yarnpkg.com/features/workspaces) for managing our packages.
 
