@@ -29,7 +29,7 @@ jobs:
     - run: cd packages/chrome-extension/dist && touch bbdash-nightly.tar.gz && tar --exclude=bbdash-nightly.tar.gz -cvzf bbdash-nightly.tar.gz . && mv bbdash-nightly.tar.gz ../../..
     - run: cd ../../..
     - name: Deploy Nightly
-      uses: marvinpinto/action-automatic-releases@v1.1.0
+      uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
