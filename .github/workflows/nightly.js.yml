@@ -1,0 +1,40 @@
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: yarn
+    - run: yarn build
+    - run: cd packages/chrome-extension/dist && tar -cvzf bbdash-nightly.tar.gz . && mv bbdash-nightly.tar.gz ../..
+    - run: cd ../..
+    - name: Deploy Nightly
+      # You may pin to the exact commit or the version.
+      # uses: WebFreak001/deploy-nightly@c25135b42f3c555fd914ad3e22821d2f5a8d45c2
+      uses: WebFreak001/deploy-nightly@v1.1.0
+      with:
+        upload_url: https://uploads.github.com/repos/EricRabil/BBDash/releases/39295762/assets{?name,label}
+        release_id: 39295762
+        asset_path: bbdash-nightly.tar.gz
+        asset_name: bbdash-nightly-$$.tar.gz
+        asset_content_type: application/gzip
+        max_releases: 7
