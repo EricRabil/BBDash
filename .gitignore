@@ -16,3 +16,4 @@ node_modules/
 !.yarn/versions
 .pnp.*
 yarn-error.log
+cookies.json
