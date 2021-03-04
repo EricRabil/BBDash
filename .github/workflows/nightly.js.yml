@@ -28,15 +28,12 @@ jobs:
     - run: yarn build
     - run: cd packages/chrome-extension/dist && touch bbdash-nightly.tar.gz && tar --exclude=bbdash-nightly.tar.gz -cvzf bbdash-nightly.tar.gz . && mv bbdash-nightly.tar.gz ../../..
     - run: cd ../../..
-    - name: Get current date
-      id: date
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
     - name: Deploy Nightly
       uses: marvinpinto/action-automatic-releases@v1.1.0
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         automatic_release_tag: latest
         prerelease: true
-        title: "Nightly Build ${{ steps.date.outputs.date }}"
+        title: "Nightly Build ${{ github.sha }}"
         files: |
           bbdash-nightly.tar.gz
