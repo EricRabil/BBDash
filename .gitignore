@@ -4,6 +4,10 @@ dist/
 # CJS
 node_modules/
 
+# IDE
+.idea
+.vscode
+
 # Yarn
 .yarn/*
 !.yarn/releases
