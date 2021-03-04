@@ -6,7 +6,9 @@
     "ts:watch": "yarn ts:build --watch",
     "crx:build": "cd packages/chrome-extension && yarn build",
     "crx:watch": "cd packages/chrome-extension && yarn watch",
-    "app:watch": "cd packages/app && yarn start"
+    "app:watch": "cd packages/app && yarn start",
+    "app:build": "cd packages/app && yarn build",
+    "build": "yarn ts:build && yarn app:build && yarn crx:build"
   },
   "devDependencies": {
     "@types/react-color": "^3.0.4",
