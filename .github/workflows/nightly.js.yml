@@ -32,6 +32,8 @@ jobs:
       # You may pin to the exact commit or the version.
       # uses: WebFreak001/deploy-nightly@c25135b42f3c555fd914ad3e22821d2f5a8d45c2
       uses: WebFreak001/deploy-nightly@v1.1.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatically provided by github actions
       with:
         upload_url: https://uploads.github.com/repos/EricRabil/BBDash/releases/39295762/assets{?name,label}
         release_id: 39295762
