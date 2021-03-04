@@ -123,41 +123,45 @@ export class CourseLayer extends APILayer {
      * Returns all sidebar contents for a given course
      * @param query query to apply when fetching the sidebar contents
      */
-    async contents(query: Cachable<CourseContentsQuery>): Promise<CourseContentItem[]> {
+    async contents(query: Cachable<CourseContentsQuery>, stripStyles = true): Promise<CourseContentItem[]> {
         if (query.cache && this.cache.contents[query.courseID]) return this.cache.contents[query.courseID];
-
-        console.log(query.cache)
         
-        try {
-            // Attempt to recursively list the contents of the course
-            return this.cache.contents[query.courseID] = await this.fetchContents({
-                ...query,
-                recursive: true
-            });
-        } catch (e) {
-            if (isAxiosError(e) && e.response?.status === 403) {
-                // Blackboard API doesn't have a good way to handle recursively
-                // querying the sidebar contents when some items are not available.
-                // As a result, we must manually retrieve subchildren if a recursive lookup fails.
-
-                const topLevel = await this.fetchContents({
+        const result = await (async () => {
+            try {
+                // Attempt to recursively list the contents of the course
+                return await this.fetchContents({
                     ...query,
-                    recursive: false
+                    recursive: true
                 });
+            } catch (e) {
+                if (isAxiosError(e) && e.response?.status === 403) {
+                    // Blackboard API doesn't have a good way to handle recursively
+                    // querying the sidebar contents when some items are not available.
+                    // As a result, we must manually retrieve subchildren if a recursive lookup fails.
+    
+                    const topLevel = await this.fetchContents({
+                        ...query,
+                        recursive: false
+                    });
+    
+                    const parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
+    
+                    const subcontents = await Promise.all(parents.map(parent => {
+                        if (parent.availability.available === "No") return [];
+                        else return this.fetchSubcontents({
+                            contentID: parent.id,
+                            ...query
+                        }).catch(() => [] as CourseContentItem[]);
+                    }));
+                    
+                    return subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
+                } else throw e;
+            }
+        })();
 
-                const parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
+        if (stripStyles) result.forEach(r => r.body = r.body?.replace(/\s?(width|float|clear|height|font-size|(margin|padding)(-(top|left|bottom|right))?):\s?[\d|\w|%|.]+;?/g, ""));
 
-                const subcontents = await Promise.all(parents.map(parent => {
-                    if (parent.availability.available === "No") return [];
-                    else return this.fetchSubcontents({
-                        contentID: parent.id,
-                        ...query
-                    }).catch(() => [] as CourseContentItem[]);
-                }));
-                
-                return this.cache.contents[query.courseID] = subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
-            } else throw e;
-        }
+        return this.cache.contents[query.courseID] = result;
     }
 
     /**

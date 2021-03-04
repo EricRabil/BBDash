@@ -5,13 +5,19 @@
     "ts:build": "tsc -b",
     "ts:watch": "yarn ts:build --watch",
     "crx:build": "cd packages/chrome-extension && yarn build",
-    "crx:watch": "cd packages/chrome-extension && yarn watch"
+    "crx:watch": "cd packages/chrome-extension && yarn watch",
+    "app:watch": "cd packages/app && yarn start"
   },
   "devDependencies": {
+    "@types/react-color": "^3.0.4",
     "lerna": "^3.22.1",
     "typescript": "^4.1.3"
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "react-color": "^2.19.3",
+    "react-contexify": "^5.0.0"
+  }
 }

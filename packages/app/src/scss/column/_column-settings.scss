@@ -7,9 +7,13 @@
     user-select: none;
 
     .settings-cell-body {
+        $spacing: 10px;
+
         flex: 1;
-        display: flex;
-        flex-flow: column;
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: $spacing;
+        margin: $spacing 0;
 
         label > input[type=text] {
             display: block;

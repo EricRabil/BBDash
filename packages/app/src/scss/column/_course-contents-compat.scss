@@ -1,0 +1,36 @@
+.course-contents--compatibility-mode {
+    .hidden {
+        display: none;
+    }
+
+    a[href] {
+        text-decoration: underline !important;
+    }
+
+    ul {
+        padding: 0;
+    }
+
+    iframe {
+        height:max-content;
+        width:max-content;
+
+        &[name="KalturaIframe"] {
+            height: 200px;
+        }
+    }
+
+    video {
+        height: 100%;
+        width: 100%;
+    }
+
+    img {
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    object[type="application/x-oleobject"] {
+        display: block;
+    }
+}

@@ -1,4 +1,6 @@
 @import "../variables";
+@import "context-menus/course-color-coding";
+@import "./course-contents-compat";
 
 .column-container {
   display: grid;
@@ -46,6 +48,10 @@
 
       background: white;
       padding: 15px 10px;
+
+      & > .data-cell--inner {
+        background-color: var(--cellBackground);
+      }
 
       a {
         font-weight: 500;

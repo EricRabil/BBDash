@@ -9,6 +9,7 @@ import useCourses from "../composables/useCourses";
 import { useDefaultPreferences } from "../composables/useDefaultPreferences";
 import useStream from "../composables/useStream";
 import { SortOrder } from "../utils/feeds";
+import { categoryNames } from "../utils/identifier-names";
 import { activeKeys } from "../utils/prefs";
 
 enum SortBy {
@@ -34,6 +35,13 @@ const filters: Record<string, (entry: StreamEntry) => boolean> = {
     noContentHandler: entry => typeof entry.itemSpecificData?.contentDetails?.contentHandler === "undefined",
     announcement: entry => "ann_type" in entry.extraAttribs && entry.extraAttribs.ann_type !== null && !entry.itemSpecificData.notificationDetails?.dueDate,
     upcomingOnly: always(entry => entryDueDate(entry) > new Date())
+};
+
+const filterNames: Record<string, string> = {
+    ...categoryNames,
+    noContentHandler: "Unhandled",
+    announcement: "Announcements",
+    upcomingOnly: "Due Soon"
 };
 
 function determineDateFunction(sortBy: SortBy, order: SortOrder): (entry: StreamEntry) => Date {
@@ -83,13 +91,6 @@ function filter<T extends StreamEntry>(entries: T[], filterIDs: string[]): T[] {
     const filterFunctions = filterIDs.map(id => filters[id]);
     const alwaysFilters = filterFunctions.filter(alwaysApplies);
     const optionalFilters = filterFunctions.filter(fn => !alwaysApplies(fn));
-
-    console.log({
-        entries,
-        filterIDs,
-        alwaysFilters,
-        optionalFilters
-    });
 
     return entries.filter((entry: T) => optionalFilters.some(filter => filter(entry)) && alwaysFilters.every(filter => filter(entry)));
 }
@@ -154,7 +155,7 @@ export default function StreamColumn(props: StreamColumnOptions) {
     return (
         <Column header={<div>{props.preferences.name}</div>} settings={(
             <React.Fragment>
-                <ColumnSettingsListField type="list" multi={true} values={Object.keys(filters)} labelText={id => <React.Fragment>{id}</React.Fragment>} prefKey="filters" header={<React.Fragment>Filters</React.Fragment>} {...props} />
+                <ColumnSettingsListField type="list" multi={true} values={Object.keys(filters)} labelText={id => <React.Fragment>{filterNames[id] || id}</React.Fragment>} prefKey="filters" header={<React.Fragment>Filters</React.Fragment>} {...props} />
                 <ColumnSettingsListField type="list" multi={false} values={Object.values(SortBy)} prefKey="sortBy" labelText={sorter => (
                     <React.Fragment>
                         {sorter}

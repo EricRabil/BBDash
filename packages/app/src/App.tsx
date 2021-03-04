@@ -1,10 +1,11 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
 import ColumnGrid from "./components/ColumnGrid";
+import { ColorCodingContext, loadCourseColorLedger, writeCourseColorLedger } from "./contexts/color-coding-context";
 import usePersistentColumns from "./storage/column-items";
 
 interface ColumnDefinition {
@@ -40,6 +41,20 @@ const findColumnByID: (id: string) => ColumnDefinition | null = id => columns.fi
 function App() {
     const [columnItems, setColumnItems, { addColumn, removeColumn, updatePreferences }] = usePersistentColumns();
 
+    const [courseColorCoding, setCourseColorCoding] = useState(loadCourseColorLedger());
+
+    useEffect(() => {
+        writeCourseColorLedger(courseColorCoding);
+    }, [courseColorCoding]);
+    
+    const updateColorCodingForCourse = (courseID: string, value: string | null | false) => {
+        const updated = Object.assign({}, courseColorCoding, {
+            [courseID]: value
+        });
+
+        setCourseColorCoding(updated);
+    };
+
     return (
         <div className="App">
             <div className="sidebar">
@@ -47,32 +62,34 @@ function App() {
                     <FontAwesomeIcon icon={icon} key={id} onClick={() => addColumn(id)} title={id} />
                 ))}
             </div>
-            <ColumnGrid
-                columnItems={columnItems}
-                onLayoutChange={layout => {
-                    const newColumnItems = columnItems.slice();
+            <ColorCodingContext.Provider value={{ courses: courseColorCoding, updateColorCodingForCourse }}>
+                <ColumnGrid
+                    columnItems={columnItems}
+                    onLayoutChange={layout => {
+                        const newColumnItems = columnItems.slice();
 
-                    layout.forEach(entry => {
-                        newColumnItems[+entry.i].column = entry.x;
-                    });
+                        layout.forEach(entry => {
+                            newColumnItems[+entry.i].column = entry.x;
+                        });
 
-                    setColumnItems(newColumnItems);
-                }}
-            >
-                {columnItems.map((item, index) => {
-                    const Element = findColumnByID(item.id)?.component;
+                        setColumnItems(newColumnItems);
+                    }}
+                >
+                    {columnItems.map((item, index) => {
+                        const Element = findColumnByID(item.id)?.component;
 
-                    if (!Element) return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
+                        if (!Element) return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
 
-                    return <Element
-                        key={index}
-                        data-grid={{ x: item.column, y: 0, w: 1, h: 1 }}
-                        id={index}
-                        preferences={item.preferences}
-                        updatePreferences={(preferences: object) => updatePreferences(index, preferences)}
-                        remove={() => removeColumn(index)} />;
-                })}
-            </ColumnGrid>
+                        return <Element
+                            key={index}
+                            data-grid={{ x: item.column, y: 0, w: 1, h: 1 }}
+                            id={index}
+                            preferences={item.preferences}
+                            updatePreferences={(preferences: object) => updatePreferences(index, preferences)}
+                            remove={() => removeColumn(index)} />;
+                    })}
+                </ColumnGrid>
+            </ColorCodingContext.Provider>
         </div>
     );
 }

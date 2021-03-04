@@ -8,6 +8,7 @@ import useCourseContents from "../composables/useCourseContents";
 import useCourses from "../composables/useCourses";
 import { useDefaultPreferences } from "../composables/useDefaultPreferences";
 import { SortOrder } from "../utils/feeds";
+import { categoryNames } from "../utils/identifier-names";
 import { activeKeys } from "../utils/prefs";
 
 enum SortBy {
@@ -119,7 +120,7 @@ export default function CourseContentsColumn(props: ColumnOptions<CourseContents
             )} header={<React.Fragment>Courses</React.Fragment>} {...props} />
             <ColumnSettingsListField type="list" multi={true} values={Object.keys(ContentCategories)} prefKey="includedCategories" labelText={id => (
                 <React.Fragment>
-                    {id}
+                    {categoryNames[id as keyof typeof ContentCategories]}
                 </React.Fragment>
             )} header={<React.Fragment>Content Categories</React.Fragment>} {...props} />
             <ColumnSettingsListField type="list" multi={false} values={Object.values(SortBy)} prefKey="sortBy" labelText={sorter => (
@@ -150,7 +151,9 @@ export default function CourseContentsColumn(props: ColumnOptions<CourseContents
                             rowIndex={index}
                             parent={parent}
                         >
-                            <CourseContentCell key={renderContents[index].id} course={courses[renderContents[index].courseID]} content={renderContents[index]} style={style} />
+                            {({ registerChild, measure }) => (
+                                <CourseContentCell rootRef={registerChild} measure={measure} key={renderContents[index].id} course={courses[renderContents[index].courseID]} content={renderContents[index]} style={style} />
+                            )}
                         </CellMeasurer>
                     )}
                 ></List>

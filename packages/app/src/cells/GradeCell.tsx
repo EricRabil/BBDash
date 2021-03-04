@@ -48,7 +48,7 @@ export default class GradeCell extends React.Component<{
 
         if (grade === null) return null;
 
-        return <ColumnCell className="data-cell">
+        return <ColumnCell className="data-cell" course={this.props.course}>
             <div className="data-cell--inner">
                 <div className="data-cell--header">
                     <a href={this.gradebookURL()} className="data-cell--header-title" target="_blank" rel="noreferrer">{this.props.course.displayName}</a>

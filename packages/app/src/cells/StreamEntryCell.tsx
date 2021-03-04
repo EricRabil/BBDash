@@ -71,7 +71,7 @@ export default class StreamEntryCell extends React.Component<{
         const HeaderTitle = link ? "a" : "div";
 
         return (
-            <ColumnCell rootRef={this.props.rootRef as any} className="data-cell" style={this.props.style}>
+            <ColumnCell rootRef={this.props.rootRef as any} className="data-cell" style={this.props.style} course={this.props.course}>
                 <div className="data-cell--inner">
                     <div className="data-cell--header">
                         <HeaderTitle href={link!} target={link ? "_blank" : undefined} className="data-cell--header-title">{title}</HeaderTitle>

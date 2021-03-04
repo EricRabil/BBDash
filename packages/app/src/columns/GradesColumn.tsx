@@ -32,7 +32,7 @@ export default function GradesColumn(props: ColumnOptions<GradesPreferences>) {
             )} prefKey="hideNACourses" {...props} />
         </React.Fragment>
     )} {...props}>
-        {Object.entries(grades).map(([ courseID, grades ]) => (
+        {Object.entries(grades).sort(([ courseID1 ], [ courseID2 ]) => courses[courseID1].name.localeCompare(courses[courseID2].name)).map(([ courseID, grades ]) => (
             <GradeCell key={courseID} course={courses[courseID]} grades={grades} hideIfNA={props.preferences.hideNACourses}></GradeCell>
         ))}
     </Column>;
