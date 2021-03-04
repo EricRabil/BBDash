@@ -51,6 +51,8 @@ export default class BackgroundController {
     public reloadObservers = new AsyncObserver<void>();
     public loginObservers = new AsyncObserver<void>();
 
+    opening = false;
+
     #droppedReload = false
 
     static shared = new BackgroundController()
@@ -63,8 +65,8 @@ export default class BackgroundController {
         noStealth: true,
         noCookies: true,
         delegate: {
-            xsrfInvalidated: () => {
-                throw new Error("Method not implemented.")
+            xsrfInvalidated: async () => {
+                await ReauthController.shared.relogin()
             },
             relogin: async () => {
                 await ReauthController.shared.relogin()
