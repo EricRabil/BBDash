@@ -113,9 +113,12 @@ export default class BackgroundController {
         if (this.popupWindow) chrome.windows.update(this.popupWindow.id, {
             focused: true
         })
-        else chrome.windows.create({
-            url: chrome.runtime.getURL("index.html"),
-            type: "popup"
-        }, window => this.popupWindow = window!)
+        else {
+            this.opening = true
+            chrome.windows.create({
+                url: chrome.runtime.getURL("index.html"),
+                type: "popup"
+            }, window => this.popupWindow = window!)
+        }
     }
 }

@@ -10,7 +10,7 @@ export default class ReauthController {
     #completions: Function[] = []
 
     public async relogin() {
-        if (!BackgroundController.shared.popupWindow) throw new Error("Extension must be open.")
+        if (!BackgroundController.shared.popupWindow && !BackgroundController.shared.opening) throw new Error("Extension must be open.")
         if (this.loggingIn) await new Promise(resolve => this.#completions.push(resolve))
         else {
             this.loggingIn = true
