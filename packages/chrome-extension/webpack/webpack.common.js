@@ -51,7 +51,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 { from: ".", to: "../", context: "public" },
-                { from: ".", to: "../", context: "../app/dist" }
+                { from: ".", to: "../", context: process.env.NODE_ENV === "development" ? "../app/dist" : "../app/build" }
             ],
             options: {},
         }),
