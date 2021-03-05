@@ -1,6 +1,3 @@
-// @ts-ignore
-__webpack_public_path__ = "http://127.0.0.1:3000/";
-
 import React from "react";
 import ReactDOM from "react-dom";
 import { QueryClientProvider } from "react-query";
