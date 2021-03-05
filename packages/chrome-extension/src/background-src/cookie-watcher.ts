@@ -4,6 +4,18 @@ import { addListener, mergeDisconnectHandles } from "./listener-lifecycles";
 
 const Log = BBLog("CookieWatcher");
 
+function debounce<T>(func: (arg0: T) => unknown, wait: number, immediate = false) {
+	let timeout: NodeJS.Timeout | null;
+	return function(arg: T) {
+		clearTimeout(timeout!);
+		timeout = setTimeout(function() {
+			timeout = null;
+			if (!immediate) func(arg);
+		}, wait);
+		if (immediate && !timeout) func(arg);
+	};
+}
+
 export function setupCookieWatcher(controller: BackgroundController) {
     const allBlackboardURLs = [new URL("*", controller.api.instanceOrigin).toString()];
     const me = new URL(chrome.runtime.getURL('')).origin;
@@ -29,13 +41,13 @@ export function setupCookieWatcher(controller: BackgroundController) {
             urls: allBlackboardURLs
         }, ["blocking", "responseHeaders"]),
 
-        addListener(chrome.webRequest.onCompleted, async res => {
+        addListener(chrome.webRequest.onCompleted, debounce(async res => {
             await controller.api.cookies.chrome.loadCookies();
 
             Log.debug("Refreshing Blackboard cookies");
             
             controller.headers = await controller.api.stealthHeaders();
-        }, {
+        }, 250), {
             urls: allBlackboardURLs
         })
     ])
