@@ -98,7 +98,6 @@ export class BlackboardAPI {
             if (!isAxiosError(err) || !err.response || ![401].includes(err.response.status)) throw err;
             else {
                 await this.delegate.relogin();
-                console.log(err.config)
                 return this.axios.request(err.config);
             }
         });
