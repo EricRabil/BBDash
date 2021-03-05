@@ -1,3 +1,18 @@
 .no-hover-bg > .react-contexify__item__content {
     background-color: rgba(0, 0, 0, 0) !important;
 }
+
+.course-color-picker {
+    display: grid;
+    grid-auto-rows: max-content;
+    row-gap: 10px;
+
+    .course-color-picker--course-name {
+        font-weight: 500;
+        color: black !important;
+        font-size: 1.1em;
+        max-width: 225px;
+        white-space: pre-wrap;
+        cursor: default !important;
+    }
+}

@@ -11,7 +11,9 @@ export default function CourseColorCoding({ course }: PropsWithoutRef<{ course: 
     };
 
     return (
-        <div>
+        <div className="course-color-picker">
+            <div className="course-color-picker--course-name">{ course.name }</div>
+
             <CirclePicker color={courses[course.id] || undefined} circleSpacing={7} circleSize={21} width={"252px"} onChangeComplete={colorChanged}></CirclePicker>
         </div>
     );
