@@ -16,6 +16,8 @@ server.listen();
 server.middleware.push(() => {
   if (controller.loginObservers.isOpen) {
     return controller.loginObservers.observe();
+  } else if (!controller.userID) {
+    return controller.reloadUserID();
   } else {
     return Promise.resolve();
   }
