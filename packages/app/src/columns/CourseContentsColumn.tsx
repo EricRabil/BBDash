@@ -115,7 +115,7 @@ export default function CourseContentsColumn(props: ColumnOptions<CourseContents
         <React.Fragment>
             <ColumnSettingsListField type="list" multi={true} values={allCourseIDs} prefKey="includedCourseIDs" labelText={id => (
                 <React.Fragment>
-                    {courses[id]?.name || id}
+                    {courses[id]?.displayName || courses[id]?.name || id}
                 </React.Fragment>
             )} header={<React.Fragment>Courses</React.Fragment>} {...props} />
             <ColumnSettingsListField type="list" multi={true} values={Object.keys(ContentCategories)} prefKey="includedCategories" labelText={id => (
