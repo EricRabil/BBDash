@@ -1,11 +1,17 @@
+import { BBLog } from "@bbdash/shared";
 import BackgroundController from "./controller";
+import { addListener } from "./listener-lifecycles";
 
 const origin = new URL(chrome.runtime.getURL('')).origin
 
+const Log = BBLog("HeaderInjector");
+
 export function setupHeaderInjector(controller: BackgroundController) {
-    function handler(req: chrome.webRequest.WebRequestHeadersDetails) {
+    return addListener(chrome.webRequest.onBeforeSendHeaders, req => {
         if (req.initiator !== origin) return;
       
+        Log.debug("Injecting Blackboard headers into request from self");
+
         const headers = controller.headers;
       
         const localHeaders = Object.assign({}, headers);
@@ -14,6 +20,7 @@ export function setupHeaderInjector(controller: BackgroundController) {
       
         newHeaders.forEach(header => {
           if (localHeaders[header.name]) {
+            Log.debug("Matched header with name", header.name);
             header.value = localHeaders[header.name];
             delete localHeaders[header.name];
           }
@@ -29,11 +36,7 @@ export function setupHeaderInjector(controller: BackgroundController) {
         return {
           requestHeaders: newHeaders
         }
-    }
-
-    chrome.webRequest.onBeforeSendHeaders.addListener(handler, {
-        urls: [new URL("*", controller.api.instanceOrigin).toString()]
+    }, {
+      urls: [new URL("*", controller.api.instanceOrigin).toString()]
     }, ['blocking', 'requestHeaders', 'extraHeaders'])
-
-    return () => chrome.webRequest.onBeforeSendHeaders.removeListener(handler);
 }

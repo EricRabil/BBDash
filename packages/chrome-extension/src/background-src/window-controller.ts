@@ -1,3 +1,7 @@
+import { BBLog, DelegateTrait } from "@bbdash/shared";
+import { ControlsObject } from "./controls-object";
+import { addListener, mergeDisconnectHandles } from "./listener-lifecycles";
+
 export type MaybePromise<T> = T | Promise<T>;
 
 export interface WindowControllerDelegate {
@@ -8,63 +12,89 @@ export interface WindowControllerDelegate {
     windowHidden?: (window: chrome.windows.Window) => MaybePromise<void>;
 }
 
-function reveal(windowID: number): Promise<chrome.windows.Window> {
+const Log = BBLog("WindowController::Static");
+
+export function revealWindow(windowID: number): Promise<chrome.windows.Window> {
+    Log.debug("Revealing window with ID", windowID);
     return new Promise(resolve => chrome.windows.update(windowID, {
         focused: true
     }, resolve))
 }
 
-function create(data: chrome.windows.CreateData): Promise<chrome.windows.Window> {
+export function createWindow(data: chrome.windows.CreateData): Promise<chrome.windows.Window> {
+    Log.debug("Creating window with options", data);
     return new Promise((resolve, reject) => chrome.windows.create(data, window => window ? resolve(window) : reject(new Error("Failed to create window."))));
 }
 
-function resolve(windowID: number): Promise<chrome.windows.Window> {
+export function resolveWindow(windowID: number): Promise<chrome.windows.Window> {
+    Log.debug("Resolving window with ID", windowID);
     return new Promise((resolve, reject) => chrome.windows.get(windowID, window => window ? resolve(window) : reject(new Error("Failed to create window."))));
 }
 
-function close(windowID: number) {
+export function closeWindow(windowID: number) {
+    Log.debug("Closing window with ID", windowID);
     return new Promise(resolve => chrome.windows.remove(windowID, resolve));
 }
 
 /**
  * Manages the state of the allocated window, creating a new one when requested or revealing an existing and hidden window.
  */
-export default class WindowController {
+export default class WindowController extends DelegateTrait<WindowControllerDelegate> implements ControlsObject<WindowControllerDelegate> {
     constructor(public delegate: WindowControllerDelegate) {
-        chrome.browserAction.onClicked.addListener(() => this.openWindow());
-        chrome.windows.onRemoved.addListener(async windowID => {
-            if (windowID === this.windowID) {
-                this.windowID = null;
-                await this.maybeFire("windowClosed", windowID);
-            }
-        });
-        chrome.windows.onFocusChanged.addListener(async windowID => {
-            if (windowID === this.windowID) {
-                const window = await resolve(windowID);
-                await this.maybeFire(window.focused ? "windowRevealed" : "windowClosed", window);
-            }
-        });
+        super();
+
+        this.disconnect = mergeDisconnectHandles([
+            addListener(chrome.browserAction.onClicked, async () => {
+                this.#log.debug("Browser action did fire.");
+                await this.open();
+            }),
+    
+            addListener(chrome.windows.onRemoved, async windowID => {
+                if (windowID === this.#windowID) {
+                    this.#windowID = null;
+                    this.#log.debug("Window was closed with ID", windowID);
+                    await this.maybeFire("windowClosed", windowID);
+                }
+            }),
+    
+            addListener(chrome.windows.onFocusChanged, async windowID => {
+                if (windowID === this.#windowID) {
+                    const window = await resolveWindow(windowID);
+                    this.#log.debug("Received focus change. Focused:", window.focused);
+                    await this.maybeFire(window.focused ? "windowRevealed" : "windowClosed", window);
+                }
+            })
+        ]);
     }
 
-    public windowID: number | null = null;
+    #windowID: number | null = null;
 
-    async closeWindow() {
-        if (this.windowID === null) return;
-        await close(this.windowID);
+    #log = BBLog("WindowController");
+    #opening = false;
+
+    public readonly disconnect: () => Promise<void>;
+
+    public async close() {
+        this.#log.debug("Window requested to close.");
+        if (this.#windowID === null) return this.#log.debug("No window is open. No-op for close request");
+        await closeWindow(this.#windowID);
     }
 
-    async openWindow() {
-        if (this.windowID !== null) {
-            const window = await reveal(this.windowID);
+    public async open() {
+        this.#log.debug("Window was requested to open.");
+        if (this.#windowID !== null) {
+            const window = await revealWindow(this.#windowID);
             await this.maybeFire("windowRevealed", window);
         } else {
-            const window = await create(await this.delegate.dataForNewWindow());
-            this.windowID = window.id;
+            this.#opening = true;
+            const window = await createWindow(await this.delegate.dataForNewWindow());
+            this.#windowID = window.id;
+            this.#opening = false;
             await this.maybeFire("windowCreated", window);
         }
     }
 
-    private async maybeFire<K extends keyof WindowControllerDelegate>(key: K, arg0: Parameters<NonNullable<WindowControllerDelegate[K]>>[0]) {
-        if (this.delegate[key]) await this.delegate[key]!(arg0! as any);
+    public get exists(): boolean {
+        return this.#windowID !== null || this.#opening;
     }
 }

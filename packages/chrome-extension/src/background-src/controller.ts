@@ -1,4 +1,5 @@
 import BlackboardAPI from "@bbdash/bb-api";
+import { BBLog } from "@bbdash/shared";
 import WebStorageCookieStore from "tough-cookie-web-storage-store";
 import ReauthController from "./reauth-controller";
 import WindowController from "./window-controller";
@@ -13,7 +14,7 @@ const persistent: Record<string, string> = new Proxy(JSON.parse(localStorage.get
     }
 })
 
-let busy = false;
+const Log = BBLog("BackgroundController");
 
 class AsyncObserver<T> {
     private pool: Array<[(res: T) => void, (err: any) => void]> | null = null;
@@ -43,8 +44,6 @@ class AsyncObserver<T> {
 }
 
 export default class BackgroundController {
-    popupWindow: chrome.windows.Window | null = null;
-
     userID: string | null = null;
 
     headers: Record<string, string> = {};
@@ -67,16 +66,18 @@ export default class BackgroundController {
         noCookies: true,
         delegate: {
             xsrfInvalidated: async () => {
+                Log.info("XSRF was invalidated.");
                 await ReauthController.shared.relogin()
             },
             relogin: async () => {
+                Log.info("BBAPI did request a relogin.");
                 await ReauthController.shared.relogin()
             },
             userID: () => {
                 return persistent.userID;
             },
             userChanged: async () => {
-                console.log("she changed")
+                Log.debug("BBAPI did inform of a user change.");
             }
         }
     })
@@ -89,6 +90,7 @@ export default class BackgroundController {
     })
 
     async reload() {
+        Log.info("Reloading BB cookies/headers");
         await this.api.cookies.chrome.loadCookies();
         this.headers = await this.api.stealthHeaders();
     }
@@ -100,24 +102,27 @@ export default class BackgroundController {
     }
 
     async reloadUserID() {
-        if (this.reloadObservers.isOpen && !this.#droppedReload) return this.reloadObservers.observe();
+        if (this.reloadObservers.isOpen && !this.#droppedReload) {
+            Log.debug("UserID reload requested but we are already reloading. Resolving when complete");
+            return this.reloadObservers.observe();
+        }
+
+        Log.debug("Reloading UserID");
 
         this.#droppedReload = false
 
         this.reloadObservers.open();
 
         try {
-            console.log("MORE")
             persistent.userID = (await this.api.users.me()).id;
+            Log.debug("UserID was reloaded. New ID:", persistent.userID);
         } catch (e) {
+            Log.error("UserID failed to reload with error");
+            console.error(e);
             this.#droppedReload = true
             return this.reloadObservers.observe();
         }
 
         this.reloadObservers.resolve();
-    }
-
-    async openWindow() {
-        await this.windowController.openWindow();
     }
 }
