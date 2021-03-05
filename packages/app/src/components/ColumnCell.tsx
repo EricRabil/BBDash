@@ -40,7 +40,7 @@ export default function ColumnCell({ children, className, rootRef, course, style
 
     return (
         <>
-            <div onContextMenu={show} ref={setReferenceElement} style={{
+            <div onContextMenu={course ? show : undefined} ref={setReferenceElement} style={{
                 "--cellBackground": course && courses[course.id] || undefined,
                 ...(style || {})
             } as CSSProperties & { "--cellBackground": string | undefined }} className={`column-cell${className ? ` ${className}` : ""}`} {...props}>
