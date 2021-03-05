@@ -1,6 +1,7 @@
 import BlackboardAPI from "@bbdash/bb-api";
 import WebStorageCookieStore from "tough-cookie-web-storage-store";
 import ReauthController from "./reauth-controller";
+import WindowController from "./window-controller";
 
 const persistent: Record<string, string> = new Proxy(JSON.parse(localStorage.getItem('bb-controller-config') || '{}'), {
     set(target, prop, value) {
@@ -80,6 +81,13 @@ export default class BackgroundController {
         }
     })
 
+    windowController = new WindowController({
+        dataForNewWindow: () => ({
+            url: chrome.runtime.getURL("index.html"),
+            type: "popup"
+        })
+    })
+
     async reload() {
         await this.api.cookies.chrome.loadCookies();
         this.headers = await this.api.stealthHeaders();
@@ -109,16 +117,7 @@ export default class BackgroundController {
         this.reloadObservers.resolve();
     }
 
-    openWindow() {
-        if (this.popupWindow) chrome.windows.update(this.popupWindow.id, {
-            focused: true
-        })
-        else {
-            this.opening = true
-            chrome.windows.create({
-                url: chrome.runtime.getURL("index.html"),
-                type: "popup"
-            }, window => this.popupWindow = window!)
-        }
+    async openWindow() {
+        await this.windowController.openWindow();
     }
 }

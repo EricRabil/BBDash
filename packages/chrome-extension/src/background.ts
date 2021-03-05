@@ -5,10 +5,6 @@ import { setupHeaderInjector } from "./background-src/header-injector";
 
 const controller = BackgroundController.shared
 
-chrome.browserAction.onClicked.addListener(function(tab) {
-  controller.openWindow();
-});
-
 controller.reload();
 
 setupCookieWatcher(controller);
