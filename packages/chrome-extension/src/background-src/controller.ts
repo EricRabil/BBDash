@@ -115,7 +115,7 @@ export default class BackgroundController {
 
         try {
             persistent.userID = (await this.api.users.me()).id;
-            Log.debug("UserID was reloaded. New ID:", persistent.userID);
+            Log.info("UserID was reloaded. New ID:", persistent.userID);
         } catch (e) {
             Log.error("UserID failed to reload with error");
             console.error(e);
