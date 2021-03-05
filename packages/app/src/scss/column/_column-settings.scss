@@ -28,7 +28,6 @@
         display: grid;
         grid-auto-rows: max-content;
         row-gap: $spacing;
-        margin: $spacing 0;
 
         label > input[type=text] {
             display: block;
