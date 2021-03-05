@@ -113,8 +113,8 @@ export default function ColumnSettingsField<Preferences extends BasePreferences>
     const isCheckable = useMemo(() => ["checkbox", "radio"].includes(props.type), [props.type]);
 
     return (
-        <label>
-            {props.type === "checkbox" ? null : props.labelText}
+        <label for-input-type={props.type}>
+            {(props.type === "checkbox" || props.type === "radio") ? null : props.labelText}
 
             <input type={props.type} checked={isCheckable ? preferenceValue as unknown as boolean : false} name={props.name} value={isCheckable ? undefined : preferenceValue as unknown as string} onChange={event => {
                 switch (props.type) {
@@ -127,7 +127,7 @@ export default function ColumnSettingsField<Preferences extends BasePreferences>
                 }
             }} />
 
-            {props.type === "checkbox" ? props.labelText : null}
+            {(props.type === "checkbox" || props.type === "radio") ? props.labelText : null}
         </label>
     );
 }

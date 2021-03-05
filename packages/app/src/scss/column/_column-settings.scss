@@ -1,7 +1,11 @@
-@mixin focus-border {
+@mixin core-border {
     border: 1px solid rgba(0, 0, 0, 0.2);
-    transition: border 100ms linear;
     border-radius: 5px;
+}
+
+@mixin focus-border {
+    @include core-border;
+    transition: border 100ms linear;
     outline: none;
 
     &:focus, &:active {
@@ -35,15 +39,34 @@
             @include focus-border;
         }
 
-        .column-settings-field--single {
+        .column-settings-list {
             display: grid;
             grid-auto-rows: max-content;
             row-gap: $spacing / 2;
         }
 
+        .column-settings-field--single {
+            display: grid;
+            grid-auto-rows: max-content;
+            row-gap: $spacing / 4;
+        }
+
         .column-settings-list--body {
+            @include core-border;
             display: flex;
             flex-flow: column;
+            padding: 5px 7.5px;
+        }
+        
+        label[for-input-type=checkbox], label[for-input-type=radio] {
+            display: grid;
+            grid-template-columns: min-content 1fr;
+            column-gap: 5px;
+            align-items: center;
+
+            input {
+                margin: 2px 0;
+            }
         }
 
         .column-settings-field--header {
