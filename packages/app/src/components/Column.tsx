@@ -69,10 +69,10 @@ export default function Column<Preferences extends BasePreferences>(props: Props
                     <div className="settings-cell-body">
                         {settings}
 
-                        <label>
-                            Column Name
+                        <label className="column-settings-field--single">
+                            <span className="column-settings-field--header">Column Name</span>
                             
-                            <input type="text" value={props.preferences.name} onChange={event => merge({ name: event.currentTarget.value } as any)} />
+                            <input type="text" placeholder="Column Name" value={props.preferences.name} onChange={event => merge({ name: event.currentTarget.value } as any)} />
                         </label>
                     </div>
                     <div className="settings-cell-footer">

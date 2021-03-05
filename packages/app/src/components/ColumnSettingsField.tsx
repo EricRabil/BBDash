@@ -80,7 +80,7 @@ export function ColumnSettingsListField<Preferences extends BasePreferences>({ m
 
     return (
         <div className="column-settings-list">
-            <div className="column-settings-list--header">
+            <div className="column-settings-field--header">
                 {header}
             </div>
             <div className="column-settings-list--body">
