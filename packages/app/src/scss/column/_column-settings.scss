@@ -81,13 +81,10 @@
         display: flex;
         flex-flow: row-reverse;
 
-        padding: 15px 0;
+        padding: 0 5px 15px 0;
 
         .settings-cell-footer--action {
-            display: grid;
-            grid-template-columns: max-content 1fr;
-            column-gap: 5px;
-            align-items: center;
+            padding: 5px 10px;
             cursor: pointer;
 
             transition: background-color 100ms linear;

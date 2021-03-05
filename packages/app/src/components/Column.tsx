@@ -78,7 +78,6 @@ export default function Column<Preferences extends BasePreferences>(props: Props
                     <div className="settings-cell-footer">
                         <div className="settings-cell-footer--action danger" onClick={() => remove()}>
                             <FontAwesomeIcon icon="trash" />
-                            Delete
                         </div>
                     </div>
                 </ColumnCell>
