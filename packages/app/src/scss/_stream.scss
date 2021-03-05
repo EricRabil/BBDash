@@ -1,11 +1,9 @@
 @import "variables";
 
 .data-cell {
-    padding: 0 !important;
+    padding: 0.5px 0 !important;
 
     &:not(:last-child) .data-cell--inner {
-        border-bottom: 1px solid $main-background;
-        margin-bottom: 1px;
     }
 
     .data-cell--inner {

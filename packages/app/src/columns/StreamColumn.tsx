@@ -149,7 +149,8 @@ export default function StreamColumn(props: StreamColumnOptions) {
     
     // memoized measurer cache, updates when the entries change
     const cache = useMemo(() => new CellMeasurerCache({
-        fixedWidth: true
+        fixedWidth: true,
+        defaultHeight: 61
     }), [JSON.stringify(renderEntries)]);
 
     return (
