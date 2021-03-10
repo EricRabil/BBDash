@@ -9,8 +9,8 @@ export namespace RemoteObjectFactory {
         return result;
      }
 
-    export function createFactory<API extends object>(): API {
-        const port = chrome.runtime.connect({ name: "remote-objects" })
+    export function createFactory<API extends object>(channel = "remote-objects"): API {
+        const port = chrome.runtime.connect({ name: channel })
 
         const resolvers: Record<string, (...args: any[]) => any> = {};
         const proxiedFunctions: Map<string, (...args: any[]) => any> = new Map();

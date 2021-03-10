@@ -9,7 +9,7 @@ interface APIRequest<API extends object, Layer extends keyof API = keyof API, Me
  * Serves an API object over the chrome port system
  */
 export class RemoteObjectServer<API extends object> {
-    constructor(public api: API) {
+    constructor(public api: API, public channel = "remote-objects") {
         
     }
 
@@ -45,7 +45,7 @@ export class RemoteObjectServer<API extends object> {
      */
     async handleRuntimeConnect(port: chrome.runtime.Port) {
         switch (port.name) {
-            case "remote-objects":
+            case this.channel:
                 port.onMessage.addListener(this.boundHandleRuntimeMessage)
         }
     }
