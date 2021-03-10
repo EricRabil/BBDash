@@ -45,11 +45,15 @@ function App() {
 
     const [courseColorCoding, setCourseColorCoding] = useState(loadCourseColorLedger());
 
-    const { addToast } = useToasts();
+    const { addToast, removeToast } = useToasts();
 
     const isShowingToast = useRef(false);
 
-    const confirmRelogin = () => integrationAPI.auth.confirmRelogin();
+    const confirmRelogin = async () => {
+        await integrationAPI.auth.confirmRelogin();
+        isShowingToast.current = false;
+        removeToast("relogin-prompt");
+    };
     const rejectRelogin = async () => {
         await integrationAPI.auth.rejectRelogin();
         isShowingToast.current = false;
@@ -61,7 +65,8 @@ function App() {
         ), {
             appearance: "warning",
             autoDismiss: false,
-            onDismiss: rejectRelogin
+            onDismiss: rejectRelogin,
+            id: "relogin-prompt"
         }));
     });
 
