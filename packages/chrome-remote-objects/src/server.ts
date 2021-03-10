@@ -59,7 +59,7 @@ export class RemoteObjectServer<API extends object> {
         // drop the request if it is invalid
         if (!this.isAPIRequest(request)) return;
 
-        const response = await this.handleRequest(request);
+        const response = await this.handleRequest(request, port);
 
         port.postMessage({
             response,
@@ -71,7 +71,22 @@ export class RemoteObjectServer<API extends object> {
      * Routes an API request and resolves with the result
      * @param request request to route and resolve
      */
-    async handleRequest(request: APIRequest<API>) {
+    async handleRequest(request: APIRequest<API>, port: chrome.runtime.Port) {
+        if (request.args) request.args = request.args.map(arg => {
+            if (!arg || typeof arg !== "object" || !("__fn__" in arg)) return arg;
+            let disconnected = false;
+            port.onDisconnect.addListener(() => disconnected = true);
+            return (...args: any[]) => {
+                if (disconnected) return;
+                try {
+                    port.postMessage({
+                        fnNonce: arg.__fn__,
+                        fnResponse: args
+                    })
+                } finally {}
+            }
+        }) as (typeof request)['args'];
+
         for (const handler of this.middleware) {
             await handler(request);
         }

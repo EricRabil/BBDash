@@ -13,10 +13,12 @@ export namespace RemoteObjectFactory {
         const port = chrome.runtime.connect({ name: "remote-objects" })
 
         const resolvers: Record<string, (...args: any[]) => any> = {};
+        const proxiedFunctions: Map<string, (...args: any[]) => any> = new Map();
 
         port.onMessage.addListener(function(message) {
             if (typeof message !== "object") return;
-            const { id, response } = message;
+            const { id, response, fnNonce, fnResponse } = message;
+            if (fnNonce && proxiedFunctions.has(fnNonce)) proxiedFunctions.get(fnNonce)!(...fnResponse)
             if (!resolvers[id]) return;
             resolvers[id](response)
             delete resolvers[id]
@@ -28,6 +30,16 @@ export namespace RemoteObjectFactory {
                     get(target, method: keyof object) {
                         return target[method] || (target[method] = function(...args: any[]) {
                             const id = makeid(16)
+
+                            args = args.map(arg => {
+                                if (typeof arg === "function") {
+                                    const nonce = makeid(16);
+                                    proxiedFunctions.set(nonce, arg);
+                                    return {
+                                        __fn__: nonce
+                                    }
+                                }
+                            })
 
                             return new Promise(resolve => {
                                 port.postMessage({
