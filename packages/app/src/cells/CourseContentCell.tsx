@@ -84,11 +84,11 @@ function transformBodyHTML(html: string, formatURL: (url: string) => string, res
             break;
         // trigger resize watchers on metadata load
         case "VIDEO":
-            (element as HTMLVideoElement).onloadedmetadata = resized;
+            (element as HTMLVideoElement).onloadedmetadata = () => element.isConnected && resized();
             break;
         // trigger resize watchers on image load
         case "IMG":
-            (element as HTMLImageElement).onload = resized;
+            (element as HTMLImageElement).onload = () => element.isConnected && resized();
             break;
         case "IFRAME":
             (element as HTMLIFrameElement).marginHeight = "0";
