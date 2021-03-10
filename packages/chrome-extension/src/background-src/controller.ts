@@ -17,29 +17,29 @@ const persistent: Record<string, string> = new Proxy(JSON.parse(localStorage.get
 const Log = BBLog("BackgroundController");
 
 class AsyncObserver<T> {
-    private pool: Array<[(res: T) => void, (err: any) => void]> | null = null;
+    #pool: Array<[(res: T) => void, (err: any) => void]> | null = null;
 
     observe(): Promise<T> {
-        return new Promise((resolve, reject) => this.pool?.push([resolve, reject]) || reject(new Error("Not open.")));
+        return new Promise((resolve, reject) => (this.#pool || (this.#pool = [])).push([resolve, reject]));
     }
 
     open() {
-        if (this.pool) return;
-        this.pool = [];
+        if (this.#pool) return;
+        this.#pool = [];
     }
 
     resolve(result: T) {
-        this.pool?.forEach(([ resolve ]) => resolve(result));
-        this.pool = null;
+        this.#pool?.forEach(([ resolve ]) => resolve(result));
+        this.#pool = null;
     }
 
     reject(err: any) {
-        this.pool?.forEach(([ , reject ]) => reject(err));
-        this.pool = null;
+        this.#pool?.forEach(([ , reject ]) => reject(err));
+        this.#pool = null;
     }
 
     get isOpen() {
-        return this.pool !== null;
+        return this.#pool !== null;
     }
 }
 

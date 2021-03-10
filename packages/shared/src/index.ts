@@ -1,4 +1,5 @@
 export * from "./activity"
+export * from "./chrome-integration"
 export * from "./content"
 export * from "./course"
 export * from "./delegate-trait"

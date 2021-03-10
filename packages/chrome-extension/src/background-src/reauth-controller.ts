@@ -11,7 +11,9 @@ export default class ReauthController {
 
     public loggingIn = false
 
-    #completions: Function[] = []
+    public needsReauthRequestListeners: Function[] = [];
+
+    #completions: [Function, Function][] = []
 
     #authTabController = new TabController({
         dataForNewTab: () => ({
@@ -20,19 +22,40 @@ export default class ReauthController {
         }),
         tabUpdated: async (tab) => {
             if (tab.url?.endsWith("/ultra/institution-page")) {
-                this.loggingIn = false
-                await this.#authTabController.close();
-                
-                BackgroundController.shared.reloadObservers.reject(new Error("Context invalidated."))
+                await this.teardown();
 
                 await BackgroundController.shared.reloadUserID()
 
                 await BackgroundController.shared.windowController.open();
                 
-                this.#completions.forEach(fn => fn())
+                this.#completions.forEach(([fn]) => fn())
             }
         }
     });
+
+    private async teardown() {
+        this.loggingIn = false
+        await this.#authTabController.close();
+        
+        BackgroundController.shared.reloadObservers.reject(new Error("Context invalidated."))
+    }
+
+    public async userRequestedRelogin() {
+        Log.debug("Reauth was requested.");
+
+        this.loggingIn = true
+
+        await this.#authTabController.open();
+
+        await new Promise((resolve,reject) => this.#completions.push([resolve, reject]));
+    }
+
+    public async userDeniedRelogin() {
+        Log.debug("Reauth was denied.");
+
+        this.#completions.forEach(([, reject ]) => reject(new Error("User denied relogin.")));
+        await this.teardown();
+    }
 
     public async relogin() {
         if (!BackgroundController.shared.windowController.exists) {
@@ -41,16 +64,19 @@ export default class ReauthController {
         }
         if (this.loggingIn) {
             Log.debug("Reauth was requested while we are already reauthing. Resolving once reauth completes.");
-            await new Promise(resolve => this.#completions.push(resolve));
+            await new Promise((resolve, reject) => this.#completions.push([resolve, reject]));
         }
-        else {
-            Log.debug("Reauth was requested.");
-            
-            this.loggingIn = true
-            
-            await this.#authTabController.open();
+        else {        
+            this.needsReauthRequestListeners.forEach(fn => fn());
 
-            await new Promise(resolve => this.#completions.push(resolve))
+            this.loggingIn = true
+
+            await new Promise((resolve, reject) => this.#completions.push([resolve, reject]));
         }
+    }
+
+    public watchLogin(fn: Function) {
+        if (this.loggingIn) fn();
+        this.needsReauthRequestListeners.push(fn);
     }
 }
