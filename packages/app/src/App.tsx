@@ -1,6 +1,8 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useToasts } from "react-toast-notifications";
+import { integrationAPI } from "./api";
 import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
@@ -42,6 +44,26 @@ function App() {
     const [columnItems, setColumnItems, { addColumn, removeColumn, updatePreferences }] = usePersistentColumns();
 
     const [courseColorCoding, setCourseColorCoding] = useState(loadCourseColorLedger());
+
+    const { addToast } = useToasts();
+
+    const isShowingToast = useRef(false);
+
+    const confirmRelogin = () => integrationAPI.auth.confirmRelogin();
+    const rejectRelogin = async () => {
+        await integrationAPI.auth.rejectRelogin();
+        isShowingToast.current = false;
+    };
+
+    useEffect(() => {
+        integrationAPI.auth.onIsLoggedOut(() => !isShowingToast.current && (isShowingToast.current = true) && addToast((
+            <div onClick={confirmRelogin}>You&apos;re logged out. Click here to log back in.</div>
+        ), {
+            appearance: "warning",
+            autoDismiss: false,
+            onDismiss: rejectRelogin
+        }));
+    });
 
     useEffect(() => {
         writeCourseColorLedger(courseColorCoding);

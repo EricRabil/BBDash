@@ -56,3 +56,14 @@ body {
 label {
     font-size: 0.8rem;
 }
+
+.react-toast-notifications__toast__icon-wrapper {
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.react-toast-notifications__toast__content {
+    cursor: pointer;
+}
