@@ -182,7 +182,7 @@ export class CourseLayer extends APILayer {
         const courses = await this.all(cached);
 
         const now = new Date();
-        return courses.filter(course => new Date(course.endDate) > now && new Date(course.startDate) < now);
+        return courses.filter(course => new Date(course.term?.endDate || course.endDate) > now && new Date(course.term?.startDate || course.startDate) < now);
     }
 
     /**
