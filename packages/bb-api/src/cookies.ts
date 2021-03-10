@@ -43,6 +43,8 @@ export class CookieManager {
      * Integrations should only call this if performing a direct mutation to the jar.
      */
     async cookiesChangedHook() {
+        if (typeof localStorage !== "object") return;
+
         const parsed = await this.parseRouterCookie();
 
         const user = parsed.user;
