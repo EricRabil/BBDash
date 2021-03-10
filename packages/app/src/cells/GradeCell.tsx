@@ -1,8 +1,11 @@
-import { Course, GradebookEntry, GradebookStatus } from "@bbdash/shared";
+import { Course, GradebookEntry } from "@bbdash/shared";
 import React from "react";
 import ColumnCell from "../components/ColumnCell";
 
-const pointsEarned = (entry: GradebookEntry) => typeof entry.manualGrade === "number" ? entry.manualGrade : typeof entry.displayGrade?.score === "number" ? entry.displayGrade.score : null;
+function convertDisplayGrade(entry: GradebookEntry): number | null {
+    if (!entry.displayGrade) return null;
+    return (+entry.displayGrade / 100) * entry.pointsPossible;
+}
 
 /**
  * Presents one unit of grade data
@@ -27,12 +30,12 @@ export default class GradeCell extends React.Component<{
      * Computes the grade in the current course
      */
     grade() {
-        const { actual, possible } = this.props.grades.filter(g => g.status === GradebookStatus.GRADED).reduce(({ actual, possible }, grade) => {
-            const earned = pointsEarned(grade);
+        const gradePairs = this.props.grades.filter(m => m.status === "GRADED" || typeof m.manualGrade === "string").map(m => [parseFloat(([m.manualGrade || m.manualScore || convertDisplayGrade(m)] as unknown as string[]).find(g => typeof g !== "undefined" && g !== null) || ""), m.pointsPossible]).filter(([pts,pos]) => !isNaN(pts) && !isNaN(pos));
 
+        const { actual, possible } = gradePairs.reduce(({ actual, possible }, [ earned, pointsPossible ]) => {
             return {
-                actual: actual + (earned || 0),
-                possible: possible + (typeof earned === "number" ? grade.pointsPossible : 0)
+                actual: actual + earned,
+                possible: possible + (typeof earned === "number" ? pointsPossible : 0)
             };
         }, { actual: 0, possible: 0 });
 
