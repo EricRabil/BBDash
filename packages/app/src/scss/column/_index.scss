@@ -34,8 +34,14 @@
     }
   }
 
+  &:not([attr-virtualized=true]) > .column-body {
+    overflow-y: overlay;
+  }
+
   &>.column-body {
-    overflow-y: scroll;
+    .ReactVirtualized__Grid {
+      overflow: overlay !important;
+    }
 
     & .ReactVirtualized__Grid__innerScrollContainer {
       &>.column-cell:not(:last-child) {

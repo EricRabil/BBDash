@@ -11,6 +11,22 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+    overflow: hidden;
+}
+
+::-webkit-scrollbar {
+    background: rgba(0, 0, 0, 0.1);
+    width: 5px;
+    height: 5px;
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+}
+
 .App {
     height: 100vh;
     width: 100vw;
@@ -45,7 +61,7 @@ body {
 }
 
 .grid-track-root {
-    overflow-x: scroll;
+    overflow-x: overlay;
 }
 
 .column-track {

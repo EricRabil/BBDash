@@ -168,7 +168,7 @@ export default function StreamColumn(props: StreamColumnOptions) {
                     </React.Fragment>
                 )} header={<React.Fragment>Sort Order</React.Fragment>} {...props} />
             </React.Fragment>
-        )} {...props}>
+        )} attr-virtualized="true" {...props}>
             <AutoSizer>
                 {({ height, width }) => (
                     <List

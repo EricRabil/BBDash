@@ -134,7 +134,7 @@ export default function CourseContentsColumn(props: ColumnOptions<CourseContents
                 </React.Fragment>
             )} header={<React.Fragment>Sort Order</React.Fragment>} {...props} />
         </React.Fragment>
-    } {...props}>
+    }  attr-virtualized="true" {...props}>
         <AutoSizer>
             {({ height, width }) => (
                 <List
