@@ -38,7 +38,7 @@ export namespace RemoteObjectFactory {
                                     return {
                                         __fn__: nonce
                                     }
-                                }
+                                } else return arg;
                             })
 
                             return new Promise(resolve => {
