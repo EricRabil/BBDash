@@ -45,14 +45,17 @@ export default function SettingsModal(props: Omit<BBModalContentContext, "childr
 
     return (
         <BBModal {...props} header={
-            <span>Settings</span>
-        }>
+            <React.Fragment>
+                <span>Settings</span>
+                <span className="dash-version">BBDash {GIT_HASH}</span>
+            </React.Fragment>
+        } className="dash-settings">
             <ColumnSettingsListField type="list" multi={true} values={Object.keys(allCourses)} labelText={id => (
                 <React.Fragment>
                     {allCourses[id]?.displayName || allCourses[id]?.name || id}
                 </React.Fragment>
             )} header={<React.Fragment>Hidden Courses</React.Fragment>} {...settingsContext} />
-            <span>BBDash {GIT_HASH}</span>
+            
         </BBModal>
     );
 }

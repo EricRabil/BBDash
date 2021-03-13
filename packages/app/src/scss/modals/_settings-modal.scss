@@ -1,0 +1,18 @@
+.dash-settings {
+    .modal-body {
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: 10px;
+    }
+
+    .modal-header {
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: 5px;
+    }
+
+    .dash-version {
+        color: darken(white, 20);
+        font-size: 0.8em;
+    }
+}
