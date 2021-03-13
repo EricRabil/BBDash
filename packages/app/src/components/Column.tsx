@@ -3,6 +3,7 @@ import classnames from "classnames";
 import React, { PropsWithChildren, PropsWithoutRef, ReactNode, useLayoutEffect, useState } from "react";
 import { useMergePreferences } from "../composables/useDefaultPreferences";
 import BBModal from "./BBModal";
+import BBTooltip from "./BBTooltip";
 import { useModal } from "./Modal";
 
 export interface BasePreferences {
@@ -57,9 +58,11 @@ export default function Column<Preferences extends BasePreferences>(props: Props
                     {props.preferences.name}
                 </div>
 
-                <span className="column-prefs-toggle" onClick={toggleIsShowingSettings}>
-                    <FontAwesomeIcon icon="cog" />
-                </span>
+                <BBTooltip content={<span>Configure Column</span>}>
+                    <span className="column-prefs-toggle" onClick={toggleIsShowingSettings}>
+                        <FontAwesomeIcon icon="cog" />
+                    </span>
+                </BBTooltip>
             </div>
 
             <div className="column-body">

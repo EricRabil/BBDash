@@ -1,13 +1,13 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Tippy, { TippyProps } from "@tippyjs/react";
-import React, { PropsWithRef, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useToasts } from "react-toast-notifications";
 import "tippy.js/dist/tippy.css";
 import { integrationAPI } from "./api";
 import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
+import BBTooltip from "./components/BBTooltip";
 import ColumnGrid from "./components/ColumnGrid";
 import { useModal } from "./components/Modal";
 import FeedbackModal from "./components/modals/FeedbackModal";
@@ -42,14 +42,6 @@ const columns: ColumnDefinition[] = [
         name: "Course Contents"
     }
 ];
-
-function BBTooltip({ content, children, duration = 100, placement = "bottom" }: PropsWithRef<{ content: TippyProps["content"], children?: React.ReactElement<any>, duration?: number, placement?: TippyProps["placement"] }>) {
-    return (
-        <Tippy content={content} duration={duration} placement={placement} className="bb-tooltip">
-            {children}
-        </Tippy>
-    );
-}
 
 /**
  * Finds the definition of a column with the given identifier
