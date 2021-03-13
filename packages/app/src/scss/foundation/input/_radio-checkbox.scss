@@ -7,7 +7,6 @@
     row-gap: $group-gap;
 
     .multi-input-body {
-        @include core-border;
         display: grid;
         grid-auto-rows: max-content;
         row-gap: $group-gap;
