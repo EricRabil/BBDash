@@ -13,6 +13,7 @@ import { useModal } from "./components/Modal";
 import FeedbackModal from "./components/modals/FeedbackModal";
 import SettingsModal from "./components/modals/SettingsModal";
 import { ColorCodingContext, loadCourseColorLedger, writeCourseColorLedger } from "./contexts/color-coding-context";
+import { CourseFilterContext, useCourseFilter } from "./contexts/course-filter-context";
 import usePersistentColumns from "./storage/column-items";
 
 interface ColumnDefinition {
@@ -71,6 +72,8 @@ function App() {
         isShowingToast.current = false;
     };
 
+    const courseFilterContext = useCourseFilter();
+
     useEffect(() => {
         integrationAPI.auth.onIsLoggedOut(() => !isShowingToast.current && (isShowingToast.current = true) && addToast((
             <div onClick={confirmRelogin}>You&apos;re logged out. Click here to log back in.</div>
@@ -95,53 +98,55 @@ function App() {
     };
 
     return (
-        <div className="App">
-            <div className="sidebar">
-                {columns.map(({ icon, id, name }) => (
-                    <BBTooltip key={id} placement="right" content={<span>{name}</span>}>
-                        <span className="sidebar-icon-container"><FontAwesomeIcon icon={icon} onClick={() => addColumn(id)} /></span>
+        
+        <CourseFilterContext.Provider value={courseFilterContext}>
+            <div className="App">
+                <div className="sidebar">
+                    {columns.map(({ icon, id, name }) => (
+                        <BBTooltip key={id} placement="right" content={<span>{name}</span>}>
+                            <span className="sidebar-icon-container"><FontAwesomeIcon icon={icon} onClick={() => addColumn(id)} /></span>
+                        </BBTooltip>
+                    ))}
+                    <div className="sidebar-spacer" />
+                    <BBTooltip placement="right" content={<span>Report Bug</span>}>
+                        <span className="sidebar-icon-container" onClick={toggleIsFeedbackShowing}><FontAwesomeIcon icon="exclamation-triangle" /></span>
                     </BBTooltip>
-                ))}
-                <div className="sidebar-spacer" />
-                <BBTooltip placement="right" content={<span>Report Bug</span>}>
-                    <span className="sidebar-icon-container" onClick={toggleIsFeedbackShowing}><FontAwesomeIcon icon="exclamation-triangle" /></span>
-                </BBTooltip>
-                <BBTooltip placement="right" content={<span>Settings</span>}>
-                    <span className="sidebar-icon-container" onClick={toggleIsSettingsShowing}><FontAwesomeIcon icon="cog" /></span>
-                </BBTooltip>
+                    <BBTooltip placement="right" content={<span>Settings</span>}>
+                        <span className="sidebar-icon-container" onClick={toggleIsSettingsShowing}><FontAwesomeIcon icon="cog" /></span>
+                    </BBTooltip>
+                </div>
+                <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
+                <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
+                <ColorCodingContext.Provider value={{ courses: courseColorCoding, updateColorCodingForCourse }}>
+                    <ColumnGrid
+                        columnItems={columnItems}
+                        onLayoutChange={layout => {
+                            const newColumnItems = columnItems.slice();
+
+                            layout.forEach(entry => {
+                                newColumnItems[+entry.i].column = entry.x;
+                            });
+
+                            setColumnItems(newColumnItems);
+                        }}
+                    >
+                        {columnItems.map((item, index) => {
+                            const Element = findColumnByID(item.id)?.component;
+
+                            if (!Element) return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
+
+                            return <Element
+                                key={index}
+                                data-grid={{ x: item.column, y: 0, w: 1, h: 1 }}
+                                id={index}
+                                preferences={item.preferences}
+                                updatePreferences={(preferences: object) => updatePreferences(index, preferences)}
+                                remove={() => removeColumn(index)} />;
+                        })}
+                    </ColumnGrid>
+                </ColorCodingContext.Provider>
             </div>
-            <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
-            <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
-            <ColorCodingContext.Provider value={{ courses: courseColorCoding, updateColorCodingForCourse }}>
-                <ColumnGrid
-                    columnItems={columnItems}
-                    onLayoutChange={layout => {
-                        const newColumnItems = columnItems.slice();
-
-                        layout.forEach(entry => {
-                            newColumnItems[+entry.i].column = entry.x;
-                        });
-
-                        setColumnItems(newColumnItems);
-                    }}
-                >
-                    {columnItems.map((item, index) => {
-                        const Element = findColumnByID(item.id)?.component;
-
-                        if (!Element) return <div key={index} data-grid={{ x: item.column, y: 0, w: 1, h: 1 }} />;
-
-                        return <Element
-                            key={index}
-                            data-grid={{ x: item.column, y: 0, w: 1, h: 1 }}
-                            id={index}
-                            preferences={item.preferences}
-                            updatePreferences={(preferences: object) => updatePreferences(index, preferences)}
-                            remove={() => removeColumn(index)} />;
-                    })}
-                </ColumnGrid>
-            </ColorCodingContext.Provider>
-            {/*  */}
-        </div>
+        </CourseFilterContext.Provider>
     );
 }
 

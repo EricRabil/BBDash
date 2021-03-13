@@ -1,6 +1,8 @@
 import { CourseContentItem } from "@bbdash/shared";
+import { useContext } from "react";
 import { useQuery } from "react-query";
 import apiClient from "../api";
+import { CourseFilterContext } from "../contexts/course-filter-context";
 
 /**
  * Links to the course contents of the authenticated user
@@ -11,6 +13,7 @@ export default function useCourseContents() {
     }), {
         placeholderData: {} as Record<string, CourseContentItem[]>
     });
+    const { courseFilter } = useContext(CourseFilterContext);
 
-    return data as Record<string, CourseContentItem[]>;
+    return Object.fromEntries(Object.entries(data as Record<string, CourseContentItem[]>).filter(([ courseID ]) => !courseFilter[courseID]));
 }
