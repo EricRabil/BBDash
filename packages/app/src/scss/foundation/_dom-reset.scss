@@ -1,0 +1,14 @@
+@import "mixins";
+
+body {
+    @include core-font;
+    margin: 0;
+}
+
+html {
+    overflow: hidden;
+}
+
+:focus {
+    outline: none;
+}

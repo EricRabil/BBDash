@@ -2,7 +2,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import classnames from "classnames";
 import React, { PropsWithChildren, PropsWithoutRef, ReactNode, useLayoutEffect, useState } from "react";
 import { useMergePreferences } from "../composables/useDefaultPreferences";
-import ColumnCell from "./ColumnCell";
+import BBModal from "./BBModal";
+import { useModal } from "./Modal";
 
 export interface BasePreferences {
     name: string;
@@ -35,6 +36,8 @@ export default function Column<Preferences extends BasePreferences>(props: Props
 
     const { children, className, settings, remove, updatePreferences, ...divProps } = props;
 
+    const [ isShowingSettings, toggleIsShowingSettings ] = useModal();
+
     useLayoutEffect(() => {
         setSettingsHeight(showingSettings ? Array.from(settingsCell?.children || []).reduce((a,c) => a + c.clientHeight, 0) : 0);
     }, [showingSettings]);
@@ -54,33 +57,27 @@ export default function Column<Preferences extends BasePreferences>(props: Props
                     {props.preferences.name}
                 </div>
 
-                <span className="column-prefs-toggle" onClick={() => {
-                    setShowingSettings(!showingSettings);
-                }}>
+                <span className="column-prefs-toggle" onClick={toggleIsShowingSettings}>
                     <FontAwesomeIcon icon="cog" />
                 </span>
             </div>
 
             <div className="column-body">
-                <ColumnCell className="settings-cell" style={{
-                    height: `${settingsHeight}px`,
-                    display: (showingSettings || transitioning) ? undefined : "none"
-                }} rootRef={setSettingsCell} onTransitionEnd={() => setTransitioning(false)}>
-                    <div className="settings-cell-body">
-                        {settings}
-
-                        <label className="column-settings-field--single">
-                            <span className="column-settings-field--header">Column Name</span>
+                <BBModal isShowing={isShowingSettings} toggleShowing={toggleIsShowingSettings} className="settings-cell" footer={
+                    <div className="modal-btn btn-danger" onClick={() => remove()}>
+                        Delete
+                    </div>
+                }>
+                    <form>
+                        <label className="input-group">
+                            <span className="input-header">Column Name</span>
                             
                             <input type="text" placeholder="Column Name" value={props.preferences.name} onChange={event => merge({ name: event.currentTarget.value } as any)} />
                         </label>
-                    </div>
-                    <div className="settings-cell-footer">
-                        <div className="settings-cell-footer--action danger" onClick={() => remove()}>
-                            <FontAwesomeIcon icon="trash" />
-                        </div>
-                    </div>
-                </ColumnCell>
+
+                        {settings}
+                    </form>
+                </BBModal>
                 {children}
             </div>
         </div>

@@ -5,13 +5,13 @@ import { addListener, mergeDisconnectHandles } from "./listener-lifecycles";
 const Log = BBLog("CookieWatcher");
 
 function debounce<T>(func: (arg0: T) => unknown, wait: number, immediate = false) {
-	let timeout: NodeJS.Timeout | null;
+	let timeout: number | null;
 	return function(arg: T) {
 		clearTimeout(timeout!);
 		timeout = setTimeout(function() {
 			timeout = null;
 			if (!immediate) func(arg);
-		}, wait);
+		}, wait) as unknown as number;
 		if (immediate && !timeout) func(arg);
 	};
 }

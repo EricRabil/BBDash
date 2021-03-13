@@ -1,0 +1,8 @@
+@import "../../variables";
+
+$base-spacing: 10px;
+
+$group-gap: $base-spacing / 2;
+$group-horizontal-spacing: $base-spacing * 0.75;
+$group-vertical-spacing: $base-spacing;
+$group-padding: $group-vertical-spacing $group-horizontal-spacing;

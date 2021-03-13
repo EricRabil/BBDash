@@ -10,6 +10,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@reduxjs/toolkit": "^1.2.5",
+    "@tippyjs/react": "^4.2.4",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "luxon": "^1.25.0",
@@ -64,6 +65,7 @@
     "cors": "^2.8.5",
     "cra-build-watch": "^3.4.0",
     "eslint": "^7.18.0",
-    "eslint-plugin-react": "^7.22.0"
+    "eslint-plugin-react": "^7.22.0",
+    "react-git-info": "^2.0.0"
   }
 }

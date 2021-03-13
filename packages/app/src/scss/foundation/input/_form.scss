@@ -1,0 +1,8 @@
+@import "variables";
+
+form {
+    flex: 1;
+    display: grid;
+    grid-auto-rows: max-content;
+    row-gap: $group-gap * 2;
+}

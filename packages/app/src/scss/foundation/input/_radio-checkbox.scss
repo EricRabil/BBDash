@@ -1,0 +1,112 @@
+@import "../mixins";
+@import "variables";
+
+.multi-input-group {
+    display: grid;
+    grid-auto-rows: max-content;
+    row-gap: $group-gap;
+
+    .multi-input-body {
+        @include core-border;
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: $group-gap;
+        padding: $group-vertical-spacing / 2 0;
+    }
+}
+
+
+label[for-input-type=checkbox],
+label[for-input-type=radio] {
+    display: grid;
+    grid-template-columns: min-content 1fr;
+    column-gap: $group-gap;
+    align-items: center;
+    cursor: pointer;
+
+    span {
+        grid-column: 2;
+    }
+
+    input[type=checkbox], input[type=radio] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+
+        & + span {
+            display: grid;
+            grid-template-columns: min-content 1fr;
+            column-gap: $group-gap;
+            align-items: center;
+        }
+
+        $control-dims: 16px;
+
+        /* Checkbox un-checked style */
+        & + span::before, &[type=radio] + span::after {
+            content: '';
+            border-radius: 3px;
+            display: inline-block;
+            width: $control-dims;
+            height: $control-dims;
+            vertical-align: -2px;
+        }
+
+        & + span::before {
+            border: 1px solid grey;
+        }
+
+        &[type=checkbox]:checked + span::before {
+            background-image: url('https://cdnjs.cloudflare.com/ajax/libs/ionicons/4.5.6/collection/build/ionicons/svg/ios-checkmark.svg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 25px;
+            background-color: #e7ffba;
+            color: white;
+            border-radius: 2px;
+        }
+
+        &[type=radio]{
+            & + span {
+                /* Checked checkbox style (in this case the background is green #e7ffba, change this to change the color) */
+                &::after {
+                    $height: 8px;
+                    $width: 8px;
+                    /* The size of the checkmark icon, you may/may not need this */
+                    position: absolute;
+                    height: $height;
+                    width: $width;
+                    margin-top: ($control-dims - $height + 2px) / 2;
+                    margin-left: ($control-dims - $width + 2px) / 2;
+                    border-radius: 50%;
+
+                    transition: transform $transition-speed linear;
+                    transform: scale(1.9);
+                    background-color: rgb(65, 65, 75);
+                }
+
+                &::before {
+                    border-radius: 50%;
+                    background: #e7ffba;
+                }
+            }
+
+            &:checked + span {
+                &::after {
+                    transform: scale(1);
+                }
+            }
+        }
+
+        /* Disabled checkbox styles */
+        &:disabled + span {
+            cursor: default;
+            color: black;
+            opacity: 0.5;
+        }
+    }
+
+    input {
+        margin: 2px 0;
+    }
+}

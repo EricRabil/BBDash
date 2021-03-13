@@ -27,7 +27,6 @@ export default function ColumnGrid({ onLayoutChange, children, columnItems }: Pr
                     width={GRID_WIDTH}
                     rowHeight={height}
                     compactType={"horizontal"}
-                    isResizable={false}
                     autoSize={true}
                     draggableHandle=".column-drag-handle"
                     onLayoutChange={onLayoutChange}

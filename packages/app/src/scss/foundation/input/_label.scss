@@ -1,0 +1,12 @@
+@import "variables";
+
+.input-group {
+    display: grid;
+    grid-auto-rows: max-content;
+    row-gap: $group-gap;
+}
+
+.input-header {
+    font-weight: bold;
+    margin-left: $group-horizontal-spacing;
+}

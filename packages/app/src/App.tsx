@@ -1,12 +1,17 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useEffect, useRef, useState } from "react";
+import Tippy, { TippyProps } from "@tippyjs/react";
+import React, { PropsWithRef, useEffect, useRef, useState } from "react";
 import { useToasts } from "react-toast-notifications";
+import "tippy.js/dist/tippy.css";
 import { integrationAPI } from "./api";
 import CourseContentsColumn from "./columns/CourseContentsColumn";
 import GradesColumn from "./columns/GradesColumn";
 import StreamColumn from "./columns/StreamColumn";
 import ColumnGrid from "./components/ColumnGrid";
+import { useModal } from "./components/Modal";
+import FeedbackModal from "./components/modals/FeedbackModal";
+import SettingsModal from "./components/modals/SettingsModal";
 import { ColorCodingContext, loadCourseColorLedger, writeCourseColorLedger } from "./contexts/color-coding-context";
 import usePersistentColumns from "./storage/column-items";
 
@@ -14,25 +19,37 @@ interface ColumnDefinition {
     icon: IconProp;
     component: React.FunctionComponentFactory<any>;
     id: string;
+    name: string;
 }
 
 const columns: ColumnDefinition[] = [
     {
         icon: "align-left",
         component: StreamColumn,
-        id: "stream"
+        id: "stream",
+        name: "Activity Stream"
     },
     {
         icon: "percent",
         component: GradesColumn,
-        id: "grades"
+        id: "grades",
+        name: "Grades"
     },
     {
         icon: "database",
         component: CourseContentsColumn,
-        id: "contents"
+        id: "contents",
+        name: "Course Contents"
     }
 ];
+
+function BBTooltip({ content, children, duration = 100, placement = "bottom" }: PropsWithRef<{ content: TippyProps["content"], children?: React.ReactElement<any>, duration?: number, placement?: TippyProps["placement"] }>) {
+    return (
+        <Tippy content={content} duration={duration} placement={placement} className="bb-tooltip">
+            {children}
+        </Tippy>
+    );
+}
 
 /**
  * Finds the definition of a column with the given identifier
@@ -46,6 +63,9 @@ function App() {
     const [courseColorCoding, setCourseColorCoding] = useState(loadCourseColorLedger());
 
     const { addToast, removeToast } = useToasts();
+
+    const [ isSettingsShowing, toggleIsSettingsShowing ] = useModal();
+    const [ isFeedbackShowing, toggleIsFeedbackShowing ] = useModal();
 
     const isShowingToast = useRef(false);
 
@@ -85,10 +105,21 @@ function App() {
     return (
         <div className="App">
             <div className="sidebar">
-                {columns.map(({ icon, id }) => (
-                    <FontAwesomeIcon icon={icon} key={id} onClick={() => addColumn(id)} title={id} />
+                {columns.map(({ icon, id, name }) => (
+                    <BBTooltip key={id} placement="right" content={<span>{name}</span>}>
+                        <span className="sidebar-icon-container"><FontAwesomeIcon icon={icon} onClick={() => addColumn(id)} /></span>
+                    </BBTooltip>
                 ))}
+                <div className="sidebar-spacer" />
+                <BBTooltip placement="right" content={<span>Report Bug</span>}>
+                    <span className="sidebar-icon-container" onClick={toggleIsFeedbackShowing}><FontAwesomeIcon icon="exclamation-triangle" /></span>
+                </BBTooltip>
+                <BBTooltip placement="right" content={<span>Settings</span>}>
+                    <span className="sidebar-icon-container" onClick={toggleIsSettingsShowing}><FontAwesomeIcon icon="cog" /></span>
+                </BBTooltip>
             </div>
+            <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
+            <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
             <ColorCodingContext.Provider value={{ courses: courseColorCoding, updateColorCodingForCourse }}>
                 <ColumnGrid
                     columnItems={columnItems}
@@ -117,6 +148,7 @@ function App() {
                     })}
                 </ColumnGrid>
             </ColorCodingContext.Provider>
+            {/*  */}
         </div>
     );
 }

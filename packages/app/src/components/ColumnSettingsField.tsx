@@ -79,11 +79,11 @@ export function ColumnSettingsListField<Preferences extends BasePreferences>({ m
     const chunkName = `${Date.now().toString()}-${prefKey}`;
 
     return (
-        <div className="column-settings-list">
-            <div className="column-settings-field--header">
+        <div className="multi-input-group">
+            <div className="input-header">
                 {header}
             </div>
-            <div className="column-settings-list--body">
+            <div className="multi-input-body">
                 {values.map(key => (
                     <ColumnSettingsField key={key} type={multi ? "checkbox" : "radio"} name={chunkName} labelText={labelText(key)} onUpdate={value => write(key, value as boolean)} value={ledger[key]} {...{ updatePreferences, remove, preferences }} />
                 ))}
@@ -114,8 +114,6 @@ export default function ColumnSettingsField<Preferences extends BasePreferences>
 
     return (
         <label for-input-type={props.type}>
-            {(props.type === "checkbox" || props.type === "radio") ? null : props.labelText}
-
             <input type={props.type} checked={isCheckable ? preferenceValue as unknown as boolean : false} name={props.name} value={isCheckable ? undefined : preferenceValue as unknown as string} onChange={event => {
                 switch (props.type) {
                 case "checkbox":
@@ -127,7 +125,7 @@ export default function ColumnSettingsField<Preferences extends BasePreferences>
                 }
             }} />
 
-            {(props.type === "checkbox" || props.type === "radio") ? props.labelText : null}
+            <span>{props.labelText}</span>
         </label>
     );
 }

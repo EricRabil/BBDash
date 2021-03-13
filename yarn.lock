@@ -1579,6 +1579,7 @@ __metadata:
     "@fortawesome/free-solid-svg-icons": ^5.15.2
     "@fortawesome/react-fontawesome": ^0.1.14
     "@reduxjs/toolkit": ^1.2.5
+    "@tippyjs/react": ^4.2.4
     "@types/chrome": 0.0.100
     "@types/classnames": ^2.2.11
     "@types/luxon": ^1.25.1
@@ -1603,6 +1604,7 @@ __metadata:
     react-color: ^2.19.3
     react-contexify: ^5.0.0
     react-dom: ^17.0.1
+    react-git-info: ^2.0.0
     react-grid-layout: ^1.2.0
     react-query: ^3.6.0
     react-redux: ^7.2.0
@@ -3429,6 +3431,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@popperjs/core@npm:^2.8.3":
+  version: 2.9.1
+  resolution: "@popperjs/core@npm:2.9.1"
+  checksum: 6739f6344b67c393dd06dee4a8b60dbc22abec502497b5cef091aa859efc35fe1c924e3b21762bef2667b4736a5fe713ad075dcd8429a6671bf30470e8090898
+  languageName: node
+  linkType: hard
+
 "@reduxjs/toolkit@npm:^1.2.5":
   version: 1.5.0
   resolution: "@reduxjs/toolkit@npm:1.5.0"
@@ -3637,6 +3646,18 @@ __metadata:
     "@svgr/plugin-svgo": ^5.5.0
     loader-utils: ^2.0.0
   checksum: 077a569a0e2d8381370cef2802578ce598e2ed9718d5ab68c7cfa84672a4186802204f6bbe164620064af39ee2a5c3d69fcdea999e4a2264715ab3683f459be1
+  languageName: node
+  linkType: hard
+
+"@tippyjs/react@npm:^4.2.4":
+  version: 4.2.4
+  resolution: "@tippyjs/react@npm:4.2.4"
+  dependencies:
+    tippy.js: ^6.3.1
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 6858089b56cd57efc9b22f4f68f275424adbdc9369b880def2f00fc05909c5abca543d9ba31ad147ca5a90cc75a6d6363213f4e65a1cb70f42b7e8df53cc034d
   languageName: node
   linkType: hard
 
@@ -5355,7 +5376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-macros@npm:2.8.0, babel-plugin-macros@npm:^2.0.0":
+"babel-plugin-macros@npm:2.8.0, babel-plugin-macros@npm:^2.0.0, babel-plugin-macros@npm:^2.8.0":
   version: 2.8.0
   resolution: "babel-plugin-macros@npm:2.8.0"
   dependencies:
@@ -15795,6 +15816,15 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
+"react-git-info@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "react-git-info@npm:2.0.0"
+  dependencies:
+    babel-plugin-macros: ^2.8.0
+  checksum: 1ade7b4212751e59881b68fd0019b31cda4e9657800698685b2b70a392be354c593baa358edf782e4ebff60f4e25cc4249eabb8e70f4daca34a8f6663ead991f
+  languageName: node
+  linkType: hard
+
 "react-grid-layout@npm:^1.2.0":
   version: 1.2.0
   resolution: "react-grid-layout@npm:1.2.0"
@@ -18298,6 +18328,15 @@ resolve@1.18.1:
   version: 1.4.2
   resolution: "tinycolor2@npm:1.4.2"
   checksum: cf33d084cb378d2988fad1b214e62f38be75ba1a9a6df98d4dadf77c31f82796d40822100e6d3e1973c9233ddf0ddbbbfdcac40e2288c958bca3c6d310e2ccb4
+  languageName: node
+  linkType: hard
+
+"tippy.js@npm:^6.3.1":
+  version: 6.3.1
+  resolution: "tippy.js@npm:6.3.1"
+  dependencies:
+    "@popperjs/core": ^2.8.3
+  checksum: e4194c42424bafe98919776bbacb5bd67ead5ca0d45126823c9e494d22d67ce1b09000aa18c84f36fc051071149656cecabb8dedb7adf598ea9372542fe11920
   languageName: node
   linkType: hard
 

@@ -1,0 +1,73 @@
+@import "../variables";
+
+.column-container {
+    display: grid;
+    grid-template-rows: 5px 50px minmax(0, 1fr);
+    row-gap: 1px;
+
+    max-height: 100vh;
+
+    .column-drag-handle {
+        background: darken($main-background, 5);
+        cursor: move;
+    }
+
+    &>.column-header {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        background: white;
+        user-select: none;
+
+        padding: 0 10px;
+
+        .column-header--main {
+            flex: 1;
+            font-weight: 500;
+            font-size: 1.25em;
+        }
+
+        .column-prefs-toggle {
+            cursor: pointer;
+        }
+    }
+
+    &:not([attr-virtualized=true])>.column-body {
+        overflow-y: overlay;
+    }
+
+    &>.column-body {
+        .ReactVirtualized__Grid {
+            overflow: overlay !important;
+        }
+
+        & .ReactVirtualized__Grid__innerScrollContainer {
+            &>.column-cell:not(:last-child) {
+                margin-bottom: 1px;
+            }
+        }
+
+        & .column-cell {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+
+            background: white;
+            padding: 15px 10px;
+
+            &>.data-cell--inner {
+                background-color: var(--cellBackground);
+            }
+
+            a {
+                font-weight: 500;
+
+                &:not(:hover) {
+                    text-decoration: none;
+                }
+
+                color: black;
+            }
+        }
+    }
+}

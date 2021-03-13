@@ -1,0 +1,9 @@
+.bb-tooltip {
+    $color: rgb(21, 21, 41);
+    background: $color;
+    box-shadow: 0 2px 20px -2px black;
+
+    .tippy-arrow {
+        color: $color;
+    }
+}

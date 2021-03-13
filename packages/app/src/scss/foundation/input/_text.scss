@@ -1,0 +1,26 @@
+@import "variables";
+@import "../mixins";
+
+$types: (
+    email, password, search, tel, text, url
+);
+
+$text-field-selector: ();
+
+@each $type in $types {
+    $text-field-selector: append($text-field-selector, 'input[type=#{$type}]', comma);
+}
+
+#{$text-field-selector}, textarea {
+    padding: $group-padding;
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    resize: vertical;
+    @include focus-border;
+}
+
+textarea {
+    @include core-font;
+    max-height: 300px;
+    min-height: 30px;
+}

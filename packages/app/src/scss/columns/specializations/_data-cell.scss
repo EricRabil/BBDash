@@ -1,10 +1,17 @@
-@import "variables";
+@import "../../variables";
+
+// Lays out a column cell that is used to present data in a card-like format
+//   vv data-cell--header-title
+// |---------------------------|
+// | Assignment 1 ------ 12/23 | << data-cell--header
+// |                           |
+// | Do some stuff, idk lol <3 | << data-cell--description
+// |                           |
+// | Due: 12/25/21 ----------- | << data-cell--strong
+// |---------------------------|
 
 .data-cell {
     padding: 0.5px 0 !important;
-
-    &:not(:last-child) .data-cell--inner {
-    }
 
     .data-cell--inner {
         display: grid !important;

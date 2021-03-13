@@ -1,0 +1,97 @@
+@import "mixins";
+
+.modal-container {
+    $vertical-padding: 25px;
+    $horizontal-padding: 20px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    background: rgba(0, 0, 0, 0.6);
+
+    $modal-background: rgb(65, 65, 75);
+    $modal-header-background: lighten($modal-background, 5);
+
+    &[attr-is-transitioning=true] {
+        @include animation(modal-fade, opacity, 0, 1);
+        
+        .modal {
+            @include animation(modal-scale, transform, scale(0.5), scale(1)) {
+                80% {
+                    transform: scale(1.05);
+                }
+            }
+        }
+
+        &[attr-is-disappearing=true] {
+            .modal {
+                animation-direction: reverse;
+            }
+
+            animation-direction: reverse;
+        }
+    }
+
+    .modal {
+        display: flex;
+        flex-flow: column;
+        color: white;
+        min-width: 450px;
+        background: $modal-background;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0px 0px 15px -2px black;
+
+        .modal-header {
+            padding: $vertical-padding $horizontal-padding;
+            background: $modal-header-background;
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .modal-body {
+            padding: $vertical-padding $horizontal-padding;
+        }
+
+        .modal-footer {
+            display: flex;
+            flex-flow: row;
+            align-self: flex-end;
+            padding: $vertical-padding $horizontal-padding;
+
+            .modal-btn {
+                border: 1px solid rgba(0, 0, 0, 0.4);
+                background: rgb(83, 87, 92);
+                padding: ($vertical-padding / 4) ($horizontal-padding / 2);
+                border-radius: 5px;
+
+                &:not(:last-child) {
+                    margin-right: 5px;
+                }
+
+                cursor: pointer;
+
+                transition: box-shadow 50ms linear;
+                box-shadow: 0px 0px 100px 100px rgba(0, 0, 0, 0) inset;
+
+                &:hover {
+                    box-shadow: 0px 0px 100px 100px rgba(0, 0, 0, 0.2) inset;
+                }
+
+                &:active {
+                    box-shadow: 0px 0px 100px 100px rgba(0, 0, 0, 0.3) inset;
+                }
+
+                &.btn-danger {
+                    background: rgb(192, 43, 43);
+                }
+            }
+        }
+    }
+}

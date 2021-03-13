@@ -1,31 +1,6 @@
-@use "column";
-@use "stream";
+@use "foundation";
+@use "columns";
 @import "variables";
-
-body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-html {
-    overflow: hidden;
-}
-
-::-webkit-scrollbar {
-    background: rgba(0, 0, 0, 0.1);
-    width: 5px;
-    height: 5px;
-    border-radius: 20px;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 20px;
-}
 
 .App {
     height: 100vh;
@@ -36,50 +11,4 @@ html {
     column-gap: 5px;
 
     background: $main-background;
-
-    &>.sidebar {
-        background: $sidebar-background;
-
-        display: grid;
-        grid-auto-rows: max-content;
-        row-gap: 20px;
-        padding: 20px 10px;
-        justify-items: center;
-        --icon-size: 45%;
-
-        & > svg {
-            width: var(--icon-size);
-            height: auto;
-            color: white;
-            cursor: pointer;
-        }
-    }
-}
-
-:focus {
-    outline: none;
-}
-
-.grid-track-root {
-    overflow-x: overlay;
-}
-
-.column-track {
-    height: 100%;
-    width: 100%;
-}
-
-label {
-    font-size: 0.8rem;
-}
-
-.react-toast-notifications__toast__icon-wrapper {
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.react-toast-notifications__toast__content {
-    cursor: pointer;
 }

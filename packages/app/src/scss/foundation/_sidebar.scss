@@ -1,0 +1,29 @@
+@import "../variables";
+
+.App > .sidebar {
+    background: $sidebar-background;
+
+    display: flex;
+    flex-flow: column;
+    row-gap: 20px;
+    padding: 20px 10px;
+    justify-items: center;
+    --icon-size: 45%;
+
+    .sidebar-spacer {
+        flex-grow: 1;
+    }
+
+    & .sidebar-icon-container {
+        display: flex;
+        flex-flow: row;
+        justify-content: center;
+    }
+
+    & svg {
+        width: var(--icon-size);
+        height: auto;
+        color: white;
+        cursor: pointer;
+    }
+}
