@@ -1,4 +1,3 @@
-
 import { Course, CourseContentItem, CourseEnrollment, GradeMapping, PaginatedQuery } from "@bbdash/shared";
 import APILayer from "../structs/layer";
 import { isAxiosError } from "../util";

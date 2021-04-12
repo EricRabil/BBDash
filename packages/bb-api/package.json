@@ -7,7 +7,7 @@
   "author": "BBL Opposition",
   "license": "MIT",
   "dependencies": {
-    "@bbdash/shared": "workspace:*",
+    "@bbdash/shared": "^1.0.0",
     "axios": "^0.21.1",
     "axios-cookiejar-support": "^1.0.1",
     "tough-cookie": "^4.0.0"

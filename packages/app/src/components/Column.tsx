@@ -71,7 +71,11 @@ export default function Column<Preferences extends BasePreferences>(props: Props
                         Delete
                     </div>
                 }>
-                    <form>
+                    <form onSubmit={e => {
+                        e.preventDefault();
+                        toggleIsShowingSettings();
+                        return false;
+                    }}>
                         <label className="input-group">
                             <span className="input-header">Column Name</span>
                             

@@ -8,12 +8,19 @@ import { ToastProvider } from "react-toast-notifications";
 import App from "./App";
 import "./boot/fontawesome";
 import { queryClient } from "./composables/_query";
+import { ColorCodingProvider } from "./contexts/color-coding-context";
+import { CourseFilterProvider } from "./contexts/course-filter-context";
 import "./scss/_index.scss";
+
 
 ReactDOM.render(
     <QueryClientProvider client={queryClient}>
         <ToastProvider>
-            <App />
+            <CourseFilterProvider>
+                <ColorCodingProvider>
+                    <App />
+                </ColorCodingProvider>
+            </CourseFilterProvider>
         </ToastProvider>
     </QueryClientProvider>,
     document.getElementById("root")

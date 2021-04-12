@@ -22,7 +22,7 @@ export default function ColumnCell({ children, className, rootRef, course, style
 }) {
     const [referenceElement, setReferenceElement] = useState(null as unknown as HTMLDivElement | null);
     const ctxID = useMemo(() => Date.now() + (courseCounter++), [course?.id]);
-    const { courses } = useContext(ColorCodingContext);
+    const { courseColors } = useContext(ColorCodingContext);
     const { show } = useContextMenu({
         id: ctxID,
     });
@@ -41,7 +41,7 @@ export default function ColumnCell({ children, className, rootRef, course, style
     return (
         <>
             <div onContextMenu={course ? show : undefined} ref={setReferenceElement} style={{
-                "--cellBackground": course && courses[course.id] || undefined,
+                "--cellBackground": course && courseColors[course.id] || undefined,
                 ...(style || {})
             } as CSSProperties & { "--cellBackground": string | undefined }} className={`column-cell${className ? ` ${className}` : ""}`} {...props}>
                 {children}
