@@ -5,6 +5,25 @@ interface APIRequest<API extends object, Layer extends keyof API = keyof API, Me
     args?: Method extends (...args: any[]) => any ? Parameters<Method> : never;
 }
 
+class DisconnectionObserver {
+    #callback: () => void;
+    #port: chrome.runtime.Port;
+    #disconnected = false;
+
+    public constructor(port: chrome.runtime.Port) {
+        this.#port = port;
+        port.onDisconnect.addListener(this.#callback = () => this.#disconnected = true);
+    }
+
+    public teardown() {
+        this.#port.onDisconnect.removeListener(this.#callback);
+    }
+
+    public get disconnected() {
+        return this.#disconnected;
+    }
+}
+
 /**
  * Serves an API object over the chrome port system
  */
@@ -59,7 +78,12 @@ export class RemoteObjectServer<API extends object> {
         // drop the request if it is invalid
         if (!this.isAPIRequest(request)) return;
 
+        const disconnectionObserver = new DisconnectionObserver(port);
+
         const response = await this.handleRequest(request, port);
+
+        if (disconnectionObserver.disconnected) return;
+        disconnectionObserver.teardown();
 
         port.postMessage({
             response,

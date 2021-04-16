@@ -15,4 +15,23 @@
         color: darken(white, 20);
         font-size: 0.8em;
     }
+
+    .palette-tray {
+        display: flex;
+
+        .palette-colors {
+            margin-left: 5px;
+
+            .palette-color {
+                display: inline-block;
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+
+                &:not(:first-child) {
+                    margin-left: 1px;
+                }
+            }
+        }
+    }
 }

@@ -1,27 +1,43 @@
 // @ts-ignore
 __webpack_public_path__ = "http://127.0.0.1:3000/";
 
+if (process.env.REACT_APP_WDYR === "I_WANTED_TO") {
+    // eslint-disable-next-line
+    const whyDidYouRender = require("@welldone-software/why-did-you-render");
+    whyDidYouRender(React, {
+        trackAllPureComponents: true,
+    });
+}
+
 import React from "react";
 import ReactDOM from "react-dom";
-import { QueryClientProvider } from "react-query";
+import { Provider } from "react-redux";
 import { ToastProvider } from "react-toast-notifications";
 import App from "./App";
 import "./boot/fontawesome";
-import { queryClient } from "./composables/_query";
 import { ColorCodingProvider } from "./contexts/color-coding-context";
-import { CourseFilterProvider } from "./contexts/course-filter-context";
+import { CourseBlacklistProvider } from "./contexts/course-blacklist-context";
+import { ItemOrganizerProvider } from "./contexts/item-organizer-context";
+import { RightClickContextProvider } from "./contexts/right-click-context";
 import "./scss/_index.scss";
+import { store } from "./store";
+import { reloadAll } from "./store/connection";
 
+reloadAll();
 
 ReactDOM.render(
-    <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
         <ToastProvider>
-            <CourseFilterProvider>
+            <ItemOrganizerProvider>
                 <ColorCodingProvider>
-                    <App />
+                    <RightClickContextProvider>
+                        <CourseBlacklistProvider>
+                            <App />
+                        </CourseBlacklistProvider>
+                    </RightClickContextProvider>
                 </ColorCodingProvider>
-            </CourseFilterProvider>
+            </ItemOrganizerProvider>
         </ToastProvider>
-    </QueryClientProvider>,
+    </Provider>,
     document.getElementById("root")
 );

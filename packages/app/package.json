@@ -5,14 +5,15 @@
   "dependencies": {
     "@bbdash/chrome-remote-objects": "workspace:*",
     "@bbdash/shared": "workspace:*",
-    "@erics-forks/react-scripts": "^4.0.6",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@reduxjs/toolkit": "^1.2.5",
+    "@reduxjs/toolkit": "^1.5.1",
     "@tippyjs/react": "^4.2.4",
+    "@welldone-software/why-did-you-render": "^6.1.1",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
+    "lodash.once": "^4.1.1",
     "luxon": "^1.25.0",
     "react": "^17.0.1",
     "react-color": "^2.19.3",
@@ -20,18 +21,20 @@
     "react-dom": "^17.0.1",
     "react-grid-layout": "^1.2.0",
     "react-query": "^3.6.0",
-    "react-redux": "^7.2.0",
+    "react-redux": "^7.2.3",
+    "react-scripts": "^4.0.3",
     "react-toast-notifications": "^2.4.3",
     "react-use-persistent": "^1.0.2",
     "react-virtualized": "^9.22.3",
+    "react-virtualized-auto-sizer": "^1.0.5",
+    "react-window-dynamic-size-list": "^1.0.0",
     "sass": "^1.32.5",
     "typescript": "~3.8.2"
   },
   "scripts": {
-    "start": "WRITE_TO_DISK=true WDS_SOCKET_HOST=localhost WDS_SOCKET_PORT=3000 react-scripts start",
-    "build": "PUBLIC_URL=/ react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "WDS_SOCKET_HOST=localhost WDS_SOCKET_PORT=3000 craco start",
+    "build": "PUBLIC_URL=/ craco build",
+    "test": "craco test"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -52,21 +55,25 @@
     "@bbdash/bb-api": "workspace:*",
     "@types/chrome": "0.0.100",
     "@types/classnames": "^2.2.11",
+    "@types/lodash.once": "^4.1.6",
     "@types/luxon": "^1.25.1",
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-color": "^3.0.4",
     "@types/react-dom": "^16.9.0",
     "@types/react-grid-layout": "^1.1.1",
-    "@types/react-redux": "^7.1.7",
+    "@types/react-redux": "^7.1.16",
     "@types/react-toast-notifications": "^2.4.0",
     "@types/react-virtualized": "^9.21.11",
+    "@types/react-virtualized-auto-sizer": "^1.0.0",
+    "@types/react-window": "^1.8.2",
     "@typescript-eslint/eslint-plugin": "^4.14.0",
     "@typescript-eslint/parser": "^4.14.0",
     "cors": "^2.8.5",
     "cra-build-watch": "^3.4.0",
     "eslint": "^7.18.0",
     "eslint-plugin-react": "^7.22.0",
-    "react-git-info": "^2.0.0"
+    "react-git-info": "^2.0.0",
+    "react-window": "^1.8.6"
   }
 }

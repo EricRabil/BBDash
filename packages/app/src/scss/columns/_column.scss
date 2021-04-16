@@ -55,6 +55,8 @@
             background: white;
             padding: 15px 10px;
 
+            color: var(--cellTextColor);
+
             &>.data-cell--inner {
                 background-color: var(--cellBackground);
             }
@@ -66,7 +68,7 @@
                     text-decoration: none;
                 }
 
-                color: black;
+                color: var(--cellTextColor, black);
             }
         }
     }

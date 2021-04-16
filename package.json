@@ -16,5 +16,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@craco/craco": "^6.1.1"
+  }
 }

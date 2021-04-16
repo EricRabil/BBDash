@@ -6,6 +6,4 @@ const ChromeBlackboardAPI = RemoteObjectFactory.createFactory<BlackboardAPI>();
 
 export const integrationAPI = RemoteObjectFactory.createFactory<IntegrationAPI>("integration");
 
-integrationAPI.auth.onIsLoggedOut(() => console.log("pong"));
-
 export default ChromeBlackboardAPI;

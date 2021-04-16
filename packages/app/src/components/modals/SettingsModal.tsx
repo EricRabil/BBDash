@@ -1,46 +1,55 @@
 import React, { useContext } from "react";
-import { useAllActiveCourses } from "../../composables/useCourses";
-import { ColorCodingContext } from "../../contexts/color-coding-context";
-import { CourseFilterContext } from "../../contexts/course-filter-context";
+import { ColorCodingContext, ColorPalettes } from "../../contexts/color-coding-context";
+import { CourseBlacklistContext } from "../../contexts/course-blacklist-context";
+import { useAllActiveCourses } from "../../hooks/useAllActiveCourses";
 import { GIT_HASH } from "../../utils/git";
-import BBModal, { BBModalContentContext } from "../BBModal";
-import { ColumnSettingsListField as ColumnSettingsListField2 } from "../ColumnSettingsField2";
+import { SettingsListField } from "../SettingsField";
+import BBModal, { BBModalContentContext } from "./BBModal";
 
 export default function SettingsModal(props: Omit<BBModalContentContext, "children">) {
     const allCourses = useAllActiveCourses();
 
-    const { overwriteFilter, courseFilter } = useContext(CourseFilterContext);
-    
     const { colorPaletteID, colorPaletteIDs, setColorPaletteID } = useContext(ColorCodingContext);
 
     return (
         <BBModal {...props} header={
-            <React.Fragment>
+            <>
                 <span>Settings</span>
                 <span className="dash-version">BBDash {GIT_HASH}</span>
-            </React.Fragment>
+            </>
         } className="dash-settings">
-            <ColumnSettingsListField2 multi={true} options={Object.keys(allCourses)} value={courseFilter} setValue={newValue => {
-                overwriteFilter(newValue);
-            }} header={
-                <>
-                    <span>Hidden Courses</span>
-                </>
-            }>
-                {id => (
-                    <>
-                        {allCourses[id]?.displayName || allCourses[id]?.name || id}
-                    </>
+            <CourseBlacklistContext.Consumer>
+                {({ blacklistedCourses, overwriteBlacklistedCourses }) => (
+                    <SettingsListField multi={true} options={Object.keys(allCourses)} value={blacklistedCourses} setValue={newValue => {
+                        overwriteBlacklistedCourses(newValue);
+                    }} header={
+                        <span>Hidden Courses</span>
+                    }>
+                        {id => (
+                            <>
+                                {allCourses[id]?.displayName || allCourses[id]?.name || id}
+                            </>
+                        )}
+                    </SettingsListField>
                 )}
-            </ColumnSettingsListField2>
+            </CourseBlacklistContext.Consumer>
             
-            <ColumnSettingsListField2 multi={false} options={colorPaletteIDs} value={colorPaletteID} setValue={newValue => {
+            <SettingsListField multi={false} options={colorPaletteIDs} value={colorPaletteID} setValue={newValue => {
                 setColorPaletteID(newValue);
             }} header={<>Color Palette</>}>
-                {option => (
-                    <>{option}</>
+                {paletteID => (
+                    <div className="palette-tray">
+                        <span className="palette-name">{paletteID}</span>
+                        <div className="palette-colors">
+                            {ColorPalettes[paletteID].colors.map(color => (
+                                <span className="palette-color" style={{
+                                    backgroundColor: color
+                                }} key={color} />
+                            ))}
+                        </div>
+                    </div>
                 )}
-            </ColumnSettingsListField2>
+            </SettingsListField>
         </BBModal>
     );
 }

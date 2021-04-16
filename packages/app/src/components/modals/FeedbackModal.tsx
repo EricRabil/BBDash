@@ -1,5 +1,5 @@
 import React from "react";
-import BBModal, { BBModalContentContext } from "../BBModal";
+import BBModal, { BBModalContentContext } from "./BBModal";
 
 export default function BugReportModal(props: Omit<BBModalContentContext, "children">) {
     return (

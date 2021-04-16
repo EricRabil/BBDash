@@ -8,3 +8,5 @@ export function activeKeys<T extends Record<string, boolean>>(obj?: T, excludeFr
     if (active.length === 0) return Object.keys(obj || {}).filter(key => !excludeFromDefaults.includes(key));
     else return active;
 }
+
+export const COLUMN_V2 = true;

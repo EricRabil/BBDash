@@ -19,6 +19,12 @@
       "isolatedModules": true,
       "sourceMap": false,
       "jsx": "react"
-    }
+    },
+    "exclude": [
+      "dist",
+      "node_modules",
+      "webpack",
+      "public"
+    ]
 }
   
