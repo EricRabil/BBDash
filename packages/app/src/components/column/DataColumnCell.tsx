@@ -26,7 +26,7 @@ export default function DataColumnCell({ data, rootRef }: { data: DataCellData, 
                 </div>
                 <DataCellRenderContent content={data.subtitle} className="data-cell--muted" />
                 <DataCellRenderContent content={data.description} className="data-cell--description" />
-                <DataCellRenderContent content={data.footer} className="data-cell--strong" />
+                <DataCellRenderContent content={data.footer} className="data-cell--muted data-cell--strong" />
             </div>
         </div>
     );
