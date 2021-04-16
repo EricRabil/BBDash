@@ -1,4 +1,4 @@
-import React, { cloneElement, createContext, PropsWithChildren, ReactNode, useCallback } from "react";
+import React, { createContext, PropsWithChildren, useCallback } from "react";
 import { DataCellData, FilterableKey, SortableKey } from "../transformers/spec";
 import { SortOrder } from "../utils/data-presentation";
 
@@ -23,6 +23,9 @@ export interface ColumnSettingsState {
     setKey: <Key extends keyof ColumnSettings>(key: Key, value: ColumnSettings[Key]) => void;
 }
 
+/**
+ * Publicizes the column settings for the current column
+ */
 export const ColumnSettingsContext = createContext<ColumnSettingsState>({
     settings: { name: "Column" },
     deleteColumn: () => undefined,
@@ -30,22 +33,14 @@ export const ColumnSettingsContext = createContext<ColumnSettingsState>({
     setKey: () => undefined
 });
 
-function insertProps(children: ReactNode, props: object): ReactNode {
-    const elements = React.Children.toArray(children);
+export interface ColumnSettingsProviderProps { settings: ColumnSettings, deleteColumn: () => void, setSettings: (settings: ColumnSettings) => void }
 
-    if (elements.length === 1) return cloneElement(elements[0] as any, props);
-    else if (elements.length > 0) {
-        return [cloneElement(elements[0] as any, props), ...elements.slice(1)];
-    }
-    else return [];
-}
-
-export function ColumnSettingsProvider({ children, deleteColumn, settings, setSettings, ...props }: PropsWithChildren<{ settings: ColumnSettings, deleteColumn: () => void, setSettings: (settings: ColumnSettings) => void }>) {
+export function ColumnSettingsProvider({ children, deleteColumn, settings, setSettings }: PropsWithChildren<ColumnSettingsProviderProps>) {
     const setKey: ColumnSettingsState["setKey"] = useCallback((key, value) => setSettings(Object.assign({}, settings, { [key]: value })), [settings, setSettings]);
 
     return (
         <ColumnSettingsContext.Provider value={{ settings, deleteColumn, setSettings, setKey }}>
-            {insertProps(children, props)}
+            {children}
         </ColumnSettingsContext.Provider>
     );
 }

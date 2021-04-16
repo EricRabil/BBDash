@@ -21,8 +21,6 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
     const [ isShowing, toggleShowing ] = useModal();
     const { settings: { filters, sortBy, sortOrder, name }, deleteColumn, setKey } = useContext(ColumnSettingsContext);
     const { sortables, filterables } = DataSourceSpecs[dataSource];
-    
-    if (!sortables?.length && !filterables?.length) return null;
 
     return (
         <>

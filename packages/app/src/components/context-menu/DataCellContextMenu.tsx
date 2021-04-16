@@ -4,6 +4,9 @@ import { ItemOrganizerContext } from "../../contexts/item-organizer-context";
 import { RightClickContext } from "../../contexts/right-click-context";
 import CourseColorCoding from "./items/CourseColorCoding";
 
+/**
+ * Returns an onContextMenu handler that will control the presentation of data cell context menus
+ */
 export function useDataCellContextMenuHandler() {
     const { setItem } = useContext(RightClickContext);
 
@@ -20,13 +23,16 @@ export function useDataCellContextMenuHandler() {
             parent = parent.parentElement;
         }
 
+        // right-click outside of a data cell
         if (!parent) return setItem(null);
 
+        // update the context data
         setItem({
             itemURI: parent.getAttribute("attr-uri")!,
             courseID: parent.getAttribute("attr-course-id")!
         });
         
+        // ready to go
         showContextMenu(ev);
     }, [setItem, showContextMenu]);
 }

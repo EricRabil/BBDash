@@ -5,6 +5,9 @@ import { selectCourses } from "../../store/reducers/courses";
 import { DataCellData } from "../../transformers/spec";
 import DataCellRenderContent from "./DataCellRenderContent";
 
+/**
+ * Renders one cell of data
+ */
 export default function DataColumnCell({ data, rootRef }: { data: DataCellData, rootRef?: MutableRefObject<Element | null> }) {
     const courses = useSelector(selectCourses);
     const { courseColors, courseTextColors } = useContext(ColorCodingContext);

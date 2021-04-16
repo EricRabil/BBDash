@@ -17,7 +17,15 @@ import DataColumnPreferences from "./DataColumnPreferences";
 export interface DataColumnProps<DataSourceType extends DataSource> extends PropsWithoutRef<{
     className?: string;
 }> {
+    /**
+     * Where the data originated. Used for determining things like filters, sort by in preferences
+     */
     dataSource: DataSourceType;
+    /**
+     * Default size of the cell. Defaults to 0.
+     * 
+     * Increase this if your content will have intense renders so that less is rendered during initial measurements.
+     */
     defaultSize?: number;
 }
 
@@ -31,6 +39,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     const { settings: { filters, sortBy, sortOrder, name } } = useContext(ColumnSettingsContext);
 
+    // Transformed data without any filters or sorting applied
     const rawTransformedData = useMemo(() => transformData(dataSource, rawData, {
         courses
     }), [dataSource, rawData, courses]);
@@ -39,11 +48,13 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
         let transformed = rawTransformedData;
 
         if (filters) {
+            // apply user-configured filters
             transformed = filterData(transformed, {
                 filters
             });
         }
 
+        // apply global hiddenItems and blacklistedCourses filters
         return transformed.filter(data => {    
             return !hiddenItems.includes(data.attributes.uri) && !blacklistedCourses.includes(data.attributes.courseID);
         });
@@ -58,6 +69,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
         });
     }, [sortBy, sortOrder]);
 
+    // ready-to-render data
     const transformedData = useMemo(() => {
         const [ pinnedData, normalData ] = splitArray(filteredData, item => pinnedItems.includes(item.attributes.uri) ? 0 : 1);
 

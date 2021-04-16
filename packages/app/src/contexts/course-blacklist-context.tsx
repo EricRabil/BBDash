@@ -8,6 +8,9 @@ export interface CourseBlacklistState {
     clear: () => void;
 }
 
+/**
+ * Manages which courses should be dropped from column data
+ */
 export const CourseBlacklistContext = createContext<CourseBlacklistState>({
     blacklistedCourses: [],
     setBlacklisted: () => undefined,

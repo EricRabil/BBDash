@@ -3,6 +3,9 @@ import { useSelector } from "react-redux";
 import { selectCourses } from "../store/reducers/courses";
 import { filterObject } from "../utils/object";
 
+/**
+ * Returns only the courses that are during the current term
+ */
 export function useAllActiveCourses() {
     const courses = useSelector(selectCourses);
 

@@ -11,6 +11,9 @@ export interface SettingsListFieldProps<T extends string, Multi extends boolean>
     children?: (option: T) => JSX.Element;
 }
 
+/**
+ * Represents either a radio or checklist.
+ */
 export function SettingsListField<T extends string, Multi extends boolean>(props: SettingsListFieldProps<T, Multi>) {
     const children = useMemo(() => typeof props.children === "function" ? props.children : null, [props.children]);
 
@@ -50,6 +53,9 @@ export interface SettingsFieldProps<T extends string | number | boolean, Type ex
     type: Type;
 }
 
+/**
+ * Represents one unit of data, supports everything that input[type] supports
+ */
 export default function SettingsField<T extends string | number | boolean, Type extends string>(props: PropsWithChildren<SettingsFieldProps<T, Type>>) {
     const isCheckable = props.type === "checkbox" || props.type === "radio";
 

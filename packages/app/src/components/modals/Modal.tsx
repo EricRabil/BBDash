@@ -46,6 +46,9 @@ function useEffectAfterFirstRun(effect: React.EffectCallback, deps?: React.Depen
     }, deps);
 }
 
+/**
+ * Helper for managing the transition of a Modal as it enters and exits
+ */
 export default function Modal({ children, ...ctx }: ModalProps) {
     const [ didComplete, setDidComplete ] = useState(true);
     const [ isTransitioning, setIsTransitioning ] = useState(false);

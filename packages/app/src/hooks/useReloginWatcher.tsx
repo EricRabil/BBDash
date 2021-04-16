@@ -2,6 +2,9 @@ import React, { useEffect, useRef } from "react";
 import { useToasts } from "react-toast-notifications";
 import { integrationAPI } from "../api";
 
+/**
+ * Mounts listeners that prompt the user when they have been logged out
+ */
 export default function useReloginWatcher() {
     const { addToast, removeToast } = useToasts();
     const isShowingToast = useRef(false);

@@ -26,6 +26,9 @@ function commitTextForModalType(type: AnyModalType): string {
     }
 }
 
+/**
+ * Styled modal for other modals to implement. Comes with controls and a header.
+ */
 export default function BBModal({ header, footer, children, className, type = "alert", ...ctx }: BBModalContentContext) {
     const innerContainer = useRef(null as HTMLElement | null);
 

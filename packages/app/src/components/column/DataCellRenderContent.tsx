@@ -2,11 +2,15 @@ import classNames from "classnames";
 import React, { DetailedHTMLProps, HTMLAttributes, useMemo } from "react";
 import { AnyRenderContent, RenderContentFormat } from "../../transformers/spec";
 
+/**
+ * Renders a node of render content within a DataCellData tree.
+ */
 export default function DataCellRenderContent({ content, className, tag: Tag = "div", ...props }: { content: AnyRenderContent, tag?: keyof JSX.IntrinsicElements } & DetailedHTMLProps<HTMLAttributes<unknown>, unknown>) {
     if (!content) return null;
 
     if (typeof content === "string") content = { format: RenderContentFormat.text, data: content };
 
+    // Tag is overridden to a if a link is present.
     if (content.link) Tag = "a";
 
     const baseProps = {

@@ -5,6 +5,9 @@ import DynamicSizeList, { DynamicSizeListProps } from "react-window-dynamic-size
 
 export type AutoSizingDynamicSizeListProps<T, MemoState> = Omit<DynamicSizeListProps<T, MemoState>, "width" | "height">;
 
+/**
+ * Wraps a DynamicSizeList in an AutoSizer so that you don't need to
+ */
 export default function AutoSizingDynamicSizeList<T, MemoState>(props: AutoSizingDynamicSizeListProps<T, MemoState>) {
     return (
         <AutoSizer>

@@ -4,8 +4,8 @@ import GridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { AutoSizer } from "react-virtualized";
-import { ColumnSettingsProvider } from "../contexts/column-settings-context";
-import usePersistentColumns from "../hooks/usePersistentColumns";
+import { ColumnSettingsProvider, ColumnSettingsProviderProps } from "../contexts/column-settings-context";
+import usePersistentColumns, { ColumnItem } from "../hooks/usePersistentColumns";
 import { DataSource } from "../transformers/data-source-spec";
 import DataColumn, { DataColumnProps } from "./column/DataColumn";
 
@@ -61,15 +61,28 @@ export function findColumnDefinitionByID(id: string): ColumnDefinition | null {
 }
 
 /**
- * Presents a track where columns can be placed and moved around
- * @param opts options to pass to the grid layout
+ * Facilitates passthrough of layout props to the inner item, while still setting up the provider
+ */
+function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem } & ColumnSettingsProviderProps>) {
+    const Element = findColumnDefinitionByID(item.id)?.component;
+
+    if (!Element) return <div {...props} />;
+
+    return (
+        <ColumnSettingsProvider settings={settings} setSettings={setSettings} deleteColumn={deleteColumn}>
+            <Element {...props} />
+        </ColumnSettingsProvider>
+    );
+}
+
+/**
+ * Mounts the columns from usePersistentColumns in a rearrangable grid.
+ * @param elProps the properties to pass to the root element
  */
 export default function ColumnGrid(elProps: PropsWithRef<React.HTMLAttributes<HTMLElement>>) {
     const [ columnItems, setColumnItems, { removeColumn, updatePreferences } ] = usePersistentColumns();
 
     const layout: Layout[] = useMemo(() => columnItems.map((item, index) => ({ i: index.toString(), x: item.column, y: 0, w: 1, h: 1 })), [columnItems]);
-
-    console.log(layout);
 
     return (
         <div className="grid-track-root" {...elProps}>
@@ -91,17 +104,9 @@ export default function ColumnGrid(elProps: PropsWithRef<React.HTMLAttributes<HT
                         }}
                         layout={layout}
                     >
-                        {columnItems.map((item, index) => {
-                            const Element = findColumnDefinitionByID(item.id)?.component;
-
-                            if (!Element) return <div key={index} />;
-
-                            return (
-                                <ColumnSettingsProvider key={index} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)}>
-                                    <Element key={index} />
-                                </ColumnSettingsProvider>
-                            );
-                        })}
+                        {columnItems.map((item, index) => (
+                            <GridItemMounter key={index} item={item} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)} />
+                        ))}
                     </GridLayout>
                 )}
             </AutoSizer>

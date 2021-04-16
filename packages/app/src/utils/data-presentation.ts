@@ -10,12 +10,19 @@ export enum SortOrder {
 
 export const PossibleSortOrders = Object.values(SortOrder);
 
+/**
+ * Filters an array of cell data according to user preferences
+ * @param data data to filter
+ * @param param1 user preferences
+ * @returns filtered array of cell data
+ */
 export function filterData(data: DataCellData[], { filters }: {
     filters: NonNullable<ColumnSettings["filters"]>
 }): DataCellData[] {
     for (const [key, value] of Object.entries(filters)) {
         switch (key) {
         case ENTRY_CONTENT_CATEGORY:
+            // no valid filters, skip filtering to prevent an empty list
             if ((value as unknown[]).filter(item => item).length === 0) break;
 
             data = data.filter(data => {
@@ -27,6 +34,7 @@ export function filterData(data: DataCellData[], { filters }: {
             break;
         case ENTRY_EMPTY:
             data = data.filter(data => {
+                // not a boolean, don't try to check
                 if (typeof data.filterables?.[ENTRY_EMPTY] !== "boolean") return true;
                 if (data.filterables[ENTRY_EMPTY] !== value) return false;
                 return true;
@@ -41,10 +49,17 @@ export function filterData(data: DataCellData[], { filters }: {
     return data;
 }
 
+/**
+ * Sorts an array of cell data according to user preference
+ * @param data data to sort
+ * @param param1 user preference
+ * @returns sorted array of cell data
+ */
 export function sortData(data: DataCellData[], { sortOrder, sortBy }: {
     sortOrder?: SortOrder,
     sortBy: SortableKey
 }) {
+    // Inverts the sorting values when the user wants descending order
     const LESS_THAN = sortOrder === SortOrder.descending ? 1 : -1;
     const GREATER_THAN = sortOrder === SortOrder.descending ? -1 : 1;
 

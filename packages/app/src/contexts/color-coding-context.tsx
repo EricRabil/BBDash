@@ -59,6 +59,9 @@ export interface ColorCodingState {
     setCourseColorPreference(courseID: string, colorIndex: number): void;
 }
 
+/**
+ * Provides APIs and data for displaying and configuring colors in the app
+ */
 export const ColorCodingContext = React.createContext({} as ColorCodingState);
 
 type CourseColorPreferences = Record<string, number>;

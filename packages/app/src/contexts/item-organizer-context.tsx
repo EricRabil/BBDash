@@ -16,6 +16,9 @@ export interface ItemOrganizerContextState {
 
 const noop = () => undefined;
 
+/**
+ * Manages the hiding and pinning of specific items
+ */
 export const ItemOrganizerContext = createContext<ItemOrganizerContextState>({
     hiddenItems: [],
     pinnedItems: [],
