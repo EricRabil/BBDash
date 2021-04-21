@@ -94,7 +94,7 @@ export function ItemOrganizerProvider({ children, hiddenItems: locallyHiddenItem
             globallyHiddenItems: isRoot ? locallyHiddenItems : globallyHiddenItems,
             unhideAllItems,
             pinnedItems,
-            locallyPinnedItems: pinnedItems,
+            locallyPinnedItems,
             globallyPinnedItems: isRoot ? locallyPinnedItems : globallyPinnedItems,
             setPinned,
             unpinAllItems,
