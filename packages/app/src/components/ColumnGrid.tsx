@@ -63,13 +63,13 @@ export function findColumnDefinitionByID(id: string): ColumnDefinition | null {
 /**
  * Facilitates passthrough of layout props to the inner item, while still setting up the provider
  */
-function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem } & ColumnSettingsProviderProps>) {
+function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem } & Omit<ColumnSettingsProviderProps, "columnUID">>) {
     const Element = findColumnDefinitionByID(item.id)?.component;
 
     if (!Element) return <div {...props} />;
 
     return (
-        <ColumnSettingsProvider settings={settings} setSettings={setSettings} deleteColumn={deleteColumn}>
+        <ColumnSettingsProvider columnUID={item.uid} settings={settings} setSettings={setSettings} deleteColumn={deleteColumn}>
             <Element {...props} />
         </ColumnSettingsProvider>
     );

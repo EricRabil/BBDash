@@ -6,8 +6,8 @@ import DataCellContextMenu from "./DataCellContextMenu";
  * Mounts DataCellContextMenu shuttled to <element id="ctx" />
  * @returns 
  */
-export default function CTXPortal() {
+export default function CTXPortal({ ctxID }: { ctxID: string }) {
     return createPortal((
-        <DataCellContextMenu />
+        <DataCellContextMenu ctxID={ctxID} />
     ), document.getElementById("ctx")!);
 }

@@ -11,6 +11,8 @@ import { DataSource, DataSourceMapping } from "../../transformers/data-source-sp
 import { DataCellData } from "../../transformers/spec";
 import { splitArray } from "../../utils/array";
 import { filterData, sortData } from "../../utils/data-presentation";
+import CTXPortal from "../context-menu/CTXPortal";
+import { useDataCellContextMenuHandler } from "../context-menu/DataCellContextMenu";
 import DataColumnList from "./DataColumnList";
 import DataColumnPreferences from "./DataColumnPreferences";
 
@@ -37,7 +39,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
     const { pinnedItems, hiddenItems } = useContext(ItemOrganizerContext);
     const { blacklistedCourses } = useContext(CourseBlacklistContext);
 
-    const { settings: { filters, sortBy, sortOrder, name } } = useContext(ColumnSettingsContext);
+    const { settings: { filters, sortBy, sortOrder, name }, id } = useContext(ColumnSettingsContext);
 
     // Transformed data without any filters or sorting applied
     const rawTransformedData = useMemo(() => transformData(dataSource, rawData, {
@@ -79,9 +81,11 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
         return [ pinnedData, normalData ].flat();
     }, [pinnedItems, filteredData, doSort]);
 
+    const show = useDataCellContextMenuHandler(id.toString());
+
     return (
         <>
-            <div className={classnames("column-container", className)} attr-virtualized="true" {...props}>
+            <div onContextMenu={show} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
                 <div className="column-drag-handle" />
                 <div className="column-header">
                     <div className="column-header--main">
@@ -94,6 +98,8 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
                     <DataColumnList transformedData={transformedData} defaultSize={defaultSize || 0} />
                 </div>
             </div>
+
+            <CTXPortal ctxID={id.toString()} />
         </>
     );
 }

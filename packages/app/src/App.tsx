@@ -4,8 +4,6 @@ import "react-contexify/dist/ReactContexify.css";
 import "tippy.js/dist/tippy.css";
 import BBTooltip from "./components/BBTooltip";
 import ColumnGrid, { COLUMN_DEFINITIONS } from "./components/ColumnGrid";
-import CTXPortal from "./components/context-menu/CTXPortal";
-import { useDataCellContextMenuHandler } from "./components/context-menu/DataCellContextMenu";
 import FeedbackModal from "./components/modals/FeedbackModal";
 import { useModal } from "./components/modals/Modal";
 import SettingsModal from "./components/modals/SettingsModal";
@@ -18,8 +16,6 @@ export default function App() {
 
     const [ isSettingsShowing, toggleIsSettingsShowing ] = useModal();
     const [ isFeedbackShowing, toggleIsFeedbackShowing ] = useModal();
-
-    const handleCtx = useDataCellContextMenuHandler();
 
     useReloginWatcher();
 
@@ -46,10 +42,8 @@ export default function App() {
                         </div>
                         <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
                         <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
-                        <ColumnGrid onContextMenu={handleCtx} />
+                        <ColumnGrid />
                     </div>
-                
-                    <CTXPortal />
                 </>
             )}
         </ColorCodingContext.Consumer>

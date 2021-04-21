@@ -7,11 +7,11 @@ import CourseColorCoding from "./items/CourseColorCoding";
 /**
  * Returns an onContextMenu handler that will control the presentation of data cell context menus
  */
-export function useDataCellContextMenuHandler() {
+export function useDataCellContextMenuHandler(ctxID: string) {
     const { setItem } = useContext(RightClickContext);
 
     const { show: showContextMenu } = useContextMenu({
-        id: "column-ctx"
+        id: ctxID
     });
 
     return useCallback((ev: React.MouseEvent) => {
@@ -37,9 +37,9 @@ export function useDataCellContextMenuHandler() {
     }, [setItem, showContextMenu]);
 }
 
-export default function DataCellContextMenu() {
+export default function DataCellContextMenu({ ctxID }: { ctxID: string }) {
     return (
-        <Menu id={"column-ctx"} animation={false}>
+        <Menu id={ctxID} animation={false}>
             <ItemOrganizerContext.Consumer>
                 {({ pinItem, unpinItem, hideItem, unhideItem, hiddenItems, pinnedItems }) => (
                     <RightClickContext.Consumer>
