@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import "react-contexify/dist/ReactContexify.css";
 import "tippy.js/dist/tippy.css";
 import BBTooltip from "./components/BBTooltip";
@@ -11,6 +11,17 @@ import { ColorCodingContext } from "./contexts/color-coding-context";
 import usePersistentColumns from "./hooks/usePersistentColumns";
 import useReloginWatcher from "./hooks/useReloginWatcher";
 
+function useDynamicCourseStyles(): Record<string, string> {
+    const { courseColors, courseTextColors } = useContext(ColorCodingContext);
+
+    return useMemo(() => {
+        const courseColorVariables: [string, string][] = Object.entries(courseColors).map(([ courseID, courseColor ]) => [`--course-background-${courseID}`, courseColor]);
+        const courseTextVariables: [string, string][] = Object.entries(courseTextColors).map(([ courseID, courseTextColor ]) => [`--course-text-color-${courseID}`, courseTextColor]);
+
+        return Object.fromEntries(courseColorVariables.concat(courseTextVariables));
+    }, [courseColors, courseTextColors]);
+}
+
 export default function App() {
     const [,, { addColumn }] = usePersistentColumns();
 
@@ -19,12 +30,15 @@ export default function App() {
 
     useReloginWatcher();
 
+    const dynamicCourseStyles = useDynamicCourseStyles();
+
     return (
         <ColorCodingContext.Consumer>
             {({ background }) => (
                 <>
                     <div className="App" style={{
-                        backgroundColor: background
+                        backgroundColor: background,
+                        ...dynamicCourseStyles
                     }}>
                         <div className="sidebar">
                             {COLUMN_DEFINITIONS.map(({ icon, id, name }) => (

@@ -1,6 +1,5 @@
-import React, { CSSProperties, MutableRefObject, useContext } from "react";
+import React, { CSSProperties, MutableRefObject } from "react";
 import { useSelector } from "react-redux";
-import { ColorCodingContext } from "../../contexts/color-coding-context";
 import { selectCourses } from "../../store/reducers/courses";
 import { DataCellData } from "../../transformers/spec";
 import DataCellRenderContent from "./DataCellRenderContent";
@@ -10,14 +9,13 @@ import DataCellRenderContent from "./DataCellRenderContent";
  */
 export default function DataColumnCell({ data, rootRef }: { data: DataCellData, rootRef?: MutableRefObject<Element | null> }) {
     const courses = useSelector(selectCourses);
-    const { courseColors, courseTextColors } = useContext(ColorCodingContext);
 
     const course = courses[data.attributes.courseID];
 
     return (
         <div ref={el => rootRef && (rootRef.current = el)} style={{
-            "--cellBackground": course && courseColors[course.id] || undefined,
-            "--cellTextColor": course && courseTextColors[course.id] || "#000000"
+            "--cellBackground": course ? `var(--course-background-${course.id})` : "",
+            "--cellTextColor": course ? `var(--course-text-color-${course.id})` : ""
         } as unknown as CSSProperties} className="column-cell data-cell" attr-uri={data.attributes.uri} attr-course-id={data.attributes.courseID}>
             <div className="data-cell--inner">
                 <div className="data-cell--header">
