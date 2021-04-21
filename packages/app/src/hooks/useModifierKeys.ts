@@ -14,26 +14,19 @@ export function useModifierKeys() {
     const [ ctrl, setCtrl ] = useState(false);
 
     useEffect(() => {
-        function keyDownListener({ shiftKey, metaKey, altKey, ctrlKey }: KeyboardEvent) {
+        function keyListener({ shiftKey, metaKey, altKey, ctrlKey }: KeyboardEvent) {
             setShift(shiftKey);
             setMeta(metaKey);
             setAlt(altKey);
             setCtrl(ctrlKey);
         }
 
-        function keyUpListener() {
-            setShift(false);
-            setMeta(false);
-            setAlt(false);
-            setCtrl(false);
-        }
-
-        document.addEventListener("keydown", keyDownListener, { passive: true });
-        document.addEventListener("keyup", keyUpListener, { passive: true });
+        document.addEventListener("keydown", keyListener, { passive: true });
+        document.addEventListener("keyup", keyListener, { passive: true });
 
         return () => {
-            document.removeEventListener("keydown", keyDownListener);
-            document.removeEventListener("keyup", keyUpListener);
+            document.removeEventListener("keydown", keyListener);
+            document.removeEventListener("keyup", keyListener);
         };
     });
 
