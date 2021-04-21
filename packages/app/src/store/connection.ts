@@ -83,8 +83,6 @@ export async function reloadAll(cache = true) {
 
     const contents: Record<string, CourseContentItem[]> | null = contentsDidResolve ? await pendingContents : null;
 
-    console.log({ courses, grades, entries, contents: pendingContents });
-
     batch(() => {
         dispatchCourses(courses);
         dispatchGrades(grades);

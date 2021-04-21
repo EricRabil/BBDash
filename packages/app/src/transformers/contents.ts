@@ -28,8 +28,6 @@ const transformationCache: Record<string, Node[]> = {};
 function transformBodyHTML(html: string, formatURL: (url: string) => string): Node[] {
     if (transformationCache[html]) return transformationCache[html];
 
-    console.log("genera");
-
     const root = document.createElement("div");
     root.innerHTML = html;
 

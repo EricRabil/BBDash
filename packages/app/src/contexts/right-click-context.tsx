@@ -26,8 +26,6 @@ export function RightClickContextProvider({ children }: PropsWithChildren<{}>) {
 
     const course = (item ? courses[item.courseID] : null) || null;
 
-    console.log(course);
-
     return (
         <RightClickContext.Provider value={{ item, currentCourse: course, setItem }}>
             {children}

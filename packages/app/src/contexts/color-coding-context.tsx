@@ -101,8 +101,6 @@ export function ColorCodingProvider({ children }: PropsWithChildren<{}>) {
         [ courseID, textColorForHex(background || "#ffffff") ]
     )), [ courseColors ]);
 
-    console.log(courseTextColors);
-
     return (
         <ColorCodingContext.Provider value={{
             colorPaletteID,
