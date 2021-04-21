@@ -1,11 +1,12 @@
 import { useCallback } from "react";
 import { getPersistentValue, usePersistent } from "react-use-persistent";
+import { ColumnSettings, DEFAULT_COLUMN_SETTINGS } from "../contexts/column-settings-context";
 
 export interface ColumnItem {
     column: number;
     id: string;
     uid: number;
-    preferences: object;
+    preferences: ColumnSettings;
 }
 
 const columnIDCounter = getPersistentValue<number>("column-id-counter", 0);
@@ -36,7 +37,7 @@ export function usePersistentColumns(): [ColumnItem[], (items: ColumnItem[]) => 
             id,
             uid: nextColumnID(),
             column: 0,
-            preferences: {}
+            preferences: DEFAULT_COLUMN_SETTINGS()
         }));
     }, [setColumnItems, columnItems]);
 

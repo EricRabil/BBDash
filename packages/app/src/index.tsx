@@ -16,8 +16,10 @@ import { ToastProvider } from "react-toast-notifications";
 import App from "./App";
 import "./boot/fontawesome";
 import { ColorCodingProvider } from "./contexts/color-coding-context";
-import { CourseBlacklistProvider } from "./contexts/course-blacklist-context";
-import { ItemOrganizerProvider } from "./contexts/item-organizer-context";
+import { PersistentCourseBlacklistProvider } from "./contexts/course-blacklist-context";
+import { FilterBehaviorProvider } from "./contexts/filter-behavior-context";
+import { PersistentItemOrganizerProvider } from "./contexts/item-organizer-context";
+import { ModifierKeyProvider } from "./contexts/modifier-key-context";
 import { RightClickContextProvider } from "./contexts/right-click-context";
 import "./scss/_index.scss";
 import { store } from "./store";
@@ -28,15 +30,19 @@ reloadAll();
 ReactDOM.render(
     <Provider store={store}>
         <ToastProvider>
-            <ItemOrganizerProvider>
-                <ColorCodingProvider>
-                    <RightClickContextProvider>
-                        <CourseBlacklistProvider>
-                            <App />
-                        </CourseBlacklistProvider>
-                    </RightClickContextProvider>
-                </ColorCodingProvider>
-            </ItemOrganizerProvider>
+            <FilterBehaviorProvider>
+                <PersistentItemOrganizerProvider hiddenKey="hidden-items" pinnedKey="pinned-items">
+                    <ColorCodingProvider>
+                        <RightClickContextProvider>
+                            <PersistentCourseBlacklistProvider>
+                                <ModifierKeyProvider>
+                                    <App />
+                                </ModifierKeyProvider>
+                            </PersistentCourseBlacklistProvider>
+                        </RightClickContextProvider>
+                    </ColorCodingProvider>
+                </PersistentItemOrganizerProvider>
+            </FilterBehaviorProvider>
         </ToastProvider>
     </Provider>,
     document.getElementById("root")

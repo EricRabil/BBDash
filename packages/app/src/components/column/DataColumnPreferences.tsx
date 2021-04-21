@@ -1,9 +1,9 @@
 import { ContentCategories } from "@bbdash/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { PropsWithoutRef, useContext } from "react";
-import { ColumnSettingsContext } from "../../contexts/column-settings-context";
+import { ColumnSettingsContext, usePreference } from "../../contexts/column-settings-context";
 import { DataSource, DataSourceSpecs } from "../../transformers/data-source-spec";
-import { ENTRY_CONTENT_CATEGORY, ENTRY_EMPTY } from "../../transformers/spec";
+import { ENTRY_CONTENT_CATEGORY } from "../../transformers/spec";
 import { PossibleSortOrders, SortOrder } from "../../utils/data-presentation";
 import { categoryNames } from "../../utils/identifier-names";
 import BBTooltip from "../BBTooltip";
@@ -19,8 +19,13 @@ const ALL_CATEGORIES: Array<keyof typeof ContentCategories> = Object.keys(Conten
  */
 export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ dataSource: DataSource }>) {
     const [ isShowing, toggleShowing ] = useModal();
-    const { settings: { filters, sortBy, sortOrder, name }, deleteColumn, setKey } = useContext(ColumnSettingsContext);
+    const { deleteColumn } = useContext(ColumnSettingsContext);
     const { sortables, filterables } = DataSourceSpecs[dataSource];
+
+    const [ name, setName ] = usePreference("name");
+    const [ filters, setFilters ] = usePreference("filters");
+    const [ sortBy, setSortBy ] = usePreference("sortBy");
+    const [ sortOrder, setSortOrder ] = usePreference("sortOrder");
 
     return (
         <>
@@ -41,12 +46,12 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
                     <label className="input-group">
                         <span className="input-header">Column Name</span>
 
-                        <input type="text" placeholder="Column Name" value={name} onChange={event => setKey("name", event.currentTarget.value)} />
+                        <input type="text" placeholder="Column Name" value={name} onChange={event => setName(event.currentTarget.value)} />
                     </label>
                     {sortables?.length ? (
                         <>
-                            <SettingsListField multi={false} options={sortables} value={sortBy || null} setValue={newValue => setKey("sortBy", newValue)} header={<>Sort By</>} />
-                            <SettingsListField multi={false} options={PossibleSortOrders} value={sortOrder || SortOrder.descending} setValue={newValue => setKey("sortOrder", newValue)} header={<>Sort Mode</>} />
+                            <SettingsListField multi={false} options={sortables} value={sortBy || null} setValue={setSortBy} header={<>Sort By</>} />
+                            <SettingsListField multi={false} options={PossibleSortOrders} value={sortOrder || SortOrder.descending} setValue={setSortOrder} header={<>Sort Mode</>} />
                         </>
                     ) : null}
                     {filterables?.length ? (
@@ -54,10 +59,9 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
                             switch (filterType) {
                             case "ENTRY_CONTENT_CATEGORY":
                                 return (
-                                    <SettingsListField<keyof typeof ContentCategories, true> multi={true} key={filterType} options={ALL_CATEGORIES} value={(filters?.ENTRY_CONTENT_CATEGORY || []) as unknown as Array<keyof typeof ContentCategories>} setValue={newValue => setKey("filters", {
-                                        [ENTRY_CONTENT_CATEGORY]: newValue,
-                                        [ENTRY_EMPTY]: filters?.ENTRY_EMPTY
-                                    })} header={<>Content Categories</>}>
+                                    <SettingsListField<keyof typeof ContentCategories, true> multi={true} key={filterType} options={ALL_CATEGORIES} value={filters.ENTRY_CONTENT_CATEGORY! as unknown as Array<keyof typeof ContentCategories>} setValue={newValue => setFilters(Object.assign({}, filters, {
+                                        [ENTRY_CONTENT_CATEGORY]: newValue
+                                    }))} header={<>Content Categories</>}>
                                         {type => <>{categoryNames[type] as string}</>}
                                     </SettingsListField>
                                 );

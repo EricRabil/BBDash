@@ -1,7 +1,9 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from "react";
-import { DataCellData, FilterableKey, SortableKey } from "../transformers/spec";
+import React, { createContext, PropsWithChildren, useCallback, useContext } from "react";
+import { DataCellData, ENTRY_CONTENT_CATEGORY, FilterableKey, SortableKey } from "../transformers/spec";
 import { SortOrder } from "../utils/data-presentation";
-import { ItemOrganizerContext } from "./item-organizer-context";
+import { CourseBlacklistProvider } from "./course-blacklist-context";
+import { FilterBehaviorProvider } from "./filter-behavior-context";
+import { ItemOrganizerProvider } from "./item-organizer-context";
 
 type FilterSetting<T extends string | boolean | undefined> =
     T extends string | undefined ? string[]
@@ -10,13 +12,14 @@ type FilterSetting<T extends string | boolean | undefined> =
 
 export interface ColumnSettings {
     sortBy?: SortableKey;
-    sortOrder?: SortOrder;
-    filters?: {
+    sortOrder: SortOrder;
+    filters: {
         [Key in FilterableKey]?: FilterSetting<NonNullable<DataCellData["filterables"]>[Key]>;
     };
     name?: string;
-    pinned?: string[];
-    hidden?: string[];
+    pinned: string[];
+    hidden: string[];
+    blacklistedCourses: string[];
 }
 
 export interface ColumnSettingsState {
@@ -27,11 +30,22 @@ export interface ColumnSettingsState {
     setKey: <Key extends keyof ColumnSettings>(key: Key, value: ColumnSettings[Key]) => void;
 }
 
+export const DEFAULT_COLUMN_SETTINGS: () => ColumnSettings = () => ({
+    name: "Column",
+    pinned: [],
+    hidden: [],
+    blacklistedCourses: [],
+    filters: {
+        [ENTRY_CONTENT_CATEGORY]: []
+    },
+    sortOrder: SortOrder.descending
+});
+
 /**
  * Publicizes the column settings for the current column
  */
 export const ColumnSettingsContext = createContext<ColumnSettingsState>({
-    settings: { name: "Column" },
+    settings: DEFAULT_COLUMN_SETTINGS(),
     id: 0,
     deleteColumn: () => undefined,
     setSettings: () => undefined,
@@ -45,48 +59,32 @@ export interface ColumnSettingsProviderProps {
     columnUID: number;
 }
 
-function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) {
-    const { settings, setKey } = useContext(ColumnSettingsContext);
-
-    const { hiddenItems: globallyHiddenItems } = useContext(ItemOrganizerContext);
-    const hiddenItems = useMemo(() => globallyHiddenItems.concat(settings.hidden || []), [globallyHiddenItems, settings.hidden]);
-    const pinnedItems = useMemo(() => settings.pinned || [], [settings.pinned]);
-    const [ temporarilyShowHiddenItems, setTemporarilyShowHiddenItems ] = useState(false);
-
-    console.log("hey girl");
+function ColumnBackedCourseBlacklistProvider({ children }: PropsWithChildren<{}>) {
+    const [ blacklistedCourses, setBlacklistedCourses ] = usePreference("blacklistedCourses");
 
     return (
-        <ItemOrganizerContext.Provider value={{
-            hiddenItems,
-            hideItem: useCallback(itemID => {
-                if (hiddenItems.includes(itemID)) return;
-                setKey("hidden", hiddenItems.concat(itemID));
-            }, [hiddenItems, setKey]),
-            unhideItem: useCallback(itemID => {
-                if (!hiddenItems.includes(itemID)) return;
-                setKey("hidden", hiddenItems.filter(itemID1 => itemID !== itemID1));
-            }, [hiddenItems, setKey]),
-            unhideAllItems: useCallback(() => {
-                setKey("hidden", []);
-            }, [setKey]),
-            pinnedItems,
-            pinItem: useCallback(itemID => {
-                if (pinnedItems.includes(itemID)) return;
-                console.log("hey girl hey!");
-                setKey("pinned", pinnedItems.concat(itemID));
-            }, [pinnedItems, setKey]),
-            unpinItem: useCallback(itemID => {
-                if (!pinnedItems.includes(itemID)) return;
-                setKey("pinned", pinnedItems.filter(itemID1 => itemID !== itemID1));
-            }, [pinnedItems, setKey]),
-            unpinAllItems: useCallback(() => {
-                setKey("pinned", []);
-            }, [setKey]),
-            temporarilyShowHiddenItems,
-            setTemporarilyShowHiddenItems
-        }}>
+        <CourseBlacklistProvider blacklistedCourses={blacklistedCourses} setBlacklistedCourses={setBlacklistedCourses}>
             {children}
-        </ItemOrganizerContext.Provider>
+        </CourseBlacklistProvider>
+    );
+}
+
+export function usePreference<Key extends keyof ColumnSettings>(key: Key): [ColumnSettings[Key], (newValue: ColumnSettings[Key]) => void] {
+    const { settings, setKey } = useContext(ColumnSettingsContext);
+
+    const setValue = useCallback((newValue: ColumnSettings[Key]) => setKey(key, newValue), [setKey]);
+
+    return [settings[key], setValue];
+}
+
+function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) {
+    const [ hiddenItems, setHiddenItems ] = usePreference("hidden");
+    const [ pinnedItems, setPinnedItems ] = usePreference("pinned");
+    
+    return (
+        <ItemOrganizerProvider hiddenItems={hiddenItems} setHiddenItems={setHiddenItems} pinnedItems={pinnedItems} setPinnedItems={setPinnedItems}>
+            {children}
+        </ItemOrganizerProvider>
     );
 }
 
@@ -95,9 +93,13 @@ export function ColumnSettingsProvider({ children, columnUID: id, deleteColumn, 
 
     return (
         <ColumnSettingsContext.Provider value={{ settings, id, deleteColumn, setSettings, setKey }}>
-            <ColumnBackedItemOrganizerProvider>
-                {children}
-            </ColumnBackedItemOrganizerProvider>
+            <FilterBehaviorProvider>
+                <ColumnBackedItemOrganizerProvider>
+                    <ColumnBackedCourseBlacklistProvider>
+                        {children}
+                    </ColumnBackedCourseBlacklistProvider>
+                </ColumnBackedItemOrganizerProvider>
+            </FilterBehaviorProvider>
         </ColumnSettingsContext.Provider>
     );
 }
