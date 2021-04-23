@@ -31,7 +31,7 @@ export function FilterBehaviorProvider({ children }: PropsWithChildren<{}>) {
     const [ userFiltersAreDisabledLocally, setUserFiltersAreDisabledLocally ] = useState<boolean>(false);
 
     const uriFiltersAreDisabled = uriFiltersAreDisabledGlobally || uriFiltersAreDisabledLocally;
-    const userFiltersAreDisabled = uriFiltersAreDisabledGlobally || uriFiltersAreDisabledLocally;
+    const userFiltersAreDisabled = userFiltersAreDisabledGlobally || userFiltersAreDisabledLocally;
 
     return (
         <FilterBehaviorContext.Provider value={{
