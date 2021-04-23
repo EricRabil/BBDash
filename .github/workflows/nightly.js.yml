@@ -45,5 +45,5 @@ jobs:
     - name: Archive Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: bbdash-nightly-${{ env.GITHUB_RUN_NUMBER }}
+        name: bbdash-nightly-${{ github.run_number }}
         path: bbdash-nightly.zip
