@@ -4,8 +4,9 @@
 name: Nightly Build
 
 on:
-  schedule:
-    - cron: "0 1 * * *"
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -26,14 +27,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn
     - run: yarn build
-    - run: cd packages/chrome-extension/dist && touch bbdash-nightly.tar.gz && tar --exclude=bbdash-nightly.tar.gz -cvzf bbdash-nightly.tar.gz . && mv bbdash-nightly.tar.gz ../../..
+    - run: cd packages/chrome-extension/dist && zip -r bbdash-nightly.zip . && mv bbdash-nightly.zip ../../..
     - run: cd ../../..
-    - name: Deploy Nightly
-      uses: marvinpinto/action-automatic-releases@latest
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        automatic_release_tag: latest
-        prerelease: true
-        title: "Nightly Build ${{ github.sha }}"
-        files: |
-          bbdash-nightly.tar.gz
+        name: BBDashNightly.zip
+        path: bbdash-nightly.zip
