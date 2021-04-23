@@ -1,7 +1,6 @@
 import classnames from "classnames";
 import React, { PropsWithoutRef, useCallback, useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { ColorCodingContext } from "../../contexts/color-coding-context";
 import { ColumnSettingsContext } from "../../contexts/column-settings-context";
 import { CourseBlacklistContext } from "../../contexts/course-blacklist-context";
 import { ItemOrganizerContext } from "../../contexts/item-organizer-context";
@@ -44,7 +43,6 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     const { pinnedItems, hiddenItems } = useContext(ItemOrganizerContext);
     const { blacklistedCourses } = useContext(CourseBlacklistContext);
-    const { colors } = useContext(ColorCodingContext);
 
     const { settings: { filters, sortBy, sortOrder, name, headerColor }, id } = useContext(ColumnSettingsContext);
     
