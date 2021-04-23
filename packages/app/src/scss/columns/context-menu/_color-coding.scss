@@ -14,6 +14,15 @@
         max-width: 225px;
         white-space: pre-wrap;
         cursor: default !important;
+
+        input[type=text] {
+            border: none;
+            font-weight: 500;
+            color: black !important;
+            font-size: 1.1em;
+            max-width: 225px;
+            white-space: pre-wrap;
+        }
     }
 }
 

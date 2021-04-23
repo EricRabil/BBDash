@@ -8,7 +8,7 @@ $types: (
 $text-field-selector: ();
 
 @each $type in $types {
-    $text-field-selector: append($text-field-selector, 'input[type=#{$type}]', comma);
+    $text-field-selector: append($text-field-selector, 'input[type=#{$type}]:not(.no-coreui)', comma);
 }
 
 #{$text-field-selector}, textarea {
