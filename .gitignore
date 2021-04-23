@@ -19,3 +19,5 @@ yarn-error.log
 cookies.json
 
 .env
+.DS_Store
+bbdash-nightly*
