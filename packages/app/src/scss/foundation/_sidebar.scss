@@ -1,7 +1,9 @@
 @import "../variables";
+@import "../foundation/mixins";
 
 .App > .sidebar {
-    background: var(--palette-app-sidebar-background-color);
+    background-color: var(--palette-app-sidebar-background-color);
+    @include palette-property-transition(background-color);
 
     display: flex;
     flex-flow: column;

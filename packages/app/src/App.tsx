@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import React, { useCallback, useContext } from "react";
 import "react-contexify/dist/ReactContexify.css";
 import "tippy.js/dist/tippy.css";
 import BBTooltip from "./components/BBTooltip";
@@ -18,6 +18,14 @@ export default function App() {
 
     const [ isSettingsShowing, toggleIsSettingsShowing ] = useModal();
     const [ isFeedbackShowing, toggleIsFeedbackShowing ] = useModal();
+
+    const { colorPaletteID, setColorPaletteID } = useContext(ColorCodingContext);
+
+    const isDark = colorPaletteID === "dark";
+
+    const toggleTheme = useCallback(() => {
+        setColorPaletteID(isDark ? "light" : "dark");
+    }, [colorPaletteID, isDark, setColorPaletteID]);
 
     useReloginWatcher();
 
@@ -38,6 +46,9 @@ export default function App() {
                                 </BBTooltip>
                             ))}
                             <div className="sidebar-spacer" />
+                            <BBTooltip placement="right" content={<span>{isDark ? "Light Mode" : "Dark Mode"}</span>}>
+                                <span className="sidebar-icon-container" onClick={toggleTheme}><FontAwesomeIcon icon={isDark ? "sun" : "moon"} /></span>
+                            </BBTooltip>
                             <BBTooltip placement="right" content={<span>Report Bug</span>}>
                                 <span className="sidebar-icon-container" onClick={toggleIsFeedbackShowing}><FontAwesomeIcon icon="exclamation-triangle" /></span>
                             </BBTooltip>

@@ -1,3 +1,4 @@
+@use "sass:list";
 @import "../variables";
 
 @mixin animation($name, $property, $from, $to, $duration: $transition-speed, $timing: $timing-function) {
@@ -28,6 +29,19 @@
     &:focus,
     &:active {
         border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+}
+
+@mixin palette-property-transition($property) {
+    @if type-of($property) == list {
+        $transition-components: ();
+        @each $prop in $property {
+            $transition-components: append($transition-components, $property $transition-speed $timing-function, comma);
+        }
+
+        transition: $transition-components;
+    } @else {
+        transition: $property $transition-speed $timing-function;
     }
 }
 

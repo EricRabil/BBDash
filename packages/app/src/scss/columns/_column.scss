@@ -1,3 +1,4 @@
+@import "../foundation/mixins";
 @import "../variables";
 
 .column-container {
@@ -22,6 +23,8 @@
         
         position: relative;
 
+        @include palette-property-transition(color);
+
         &::before {
             position: absolute;
             content: '';
@@ -30,7 +33,8 @@
             width: 100%;
             height: 100%;
 
-            background: var(--column-header-background-color, white);
+            @include palette-property-transition(background-color);
+            background-color: var(--column-header-background-color, white);
             opacity: 0.6;
             z-index: -1;
         }
@@ -66,16 +70,22 @@
             flex-flow: column;
             justify-content: center;
 
-            background: var(--palette-app-background-color);
+            @include palette-property-transition((background-color, color));
+
+            background-color: var(--palette-app-background-color);
             padding: 15px 10px;
 
             color: var(--cellTextColor);
 
             &>.data-cell--inner {
+                @include palette-property-transition(background-color);
+
                 background-color: var(--cellBackground, var(--palette-default-background-color));
             }
 
             a {
+                @include palette-property-transition(color);
+
                 font-weight: 500;
 
                 &:not(:hover) {

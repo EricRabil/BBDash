@@ -1,6 +1,6 @@
-@use "foundation";
-@use "columns";
-@use "modals";
+@import "foundation";
+@import "columns";
+@import "modals";
 @import "variables";
 
 .App {
@@ -11,5 +11,7 @@
     grid-template-columns: 60px minmax(0, 1fr);
     column-gap: 5px;
 
-    background: var(--palette-app-background-color);
+    background-color: var(--palette-app-background-color);
+
+    @include palette-property-transition(background-color);
 }
