@@ -40,7 +40,7 @@ export function useDataCellContextMenuHandler(ctxID: string) {
 
 export default function DataCellContextMenu({ ctxID }: { ctxID: string }) {
     const { locallyBlacklistedCourses, globallyBlacklistedCourses, setBlacklisted } = useContext(CourseBlacklistContext);
-    const { alt, shift } = useContext(ModifierKeyContext);
+    const { alt, ctrl } = useContext(ModifierKeyContext);
 
     const { currentCourse: course, uri: item } = useContext(RightClickContext);
 
@@ -73,7 +73,7 @@ export default function DataCellContextMenu({ ctxID }: { ctxID: string }) {
                 </>
             ) : null}
             <FilterBehaviorContextItems />
-            {shift ? (
+            {ctrl ? (
                 <>
                     <Separator />
                     <Item disabled={true}>
