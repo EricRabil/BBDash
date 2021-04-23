@@ -21,16 +21,29 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn
-    - run: yarn build
-    - run: cd packages/chrome-extension/dist && zip -r bbdash-nightly.zip . && mv bbdash-nightly.zip ../../..
-    - run: cd ../../..
+    
+    - name: Cache Node Modules
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+    - name: Install Node Modules
+      run: yarn
+
+    - name: Build Extension
+      run: yarn build
+
+    - name: Zip Extension
+      run: cd packages/chrome-extension/dist && zip -r bbdash-nightly.zip . && mv bbdash-nightly.zip ../../.. && cd ../../..
+
     - name: Archive Artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: BBDashNightly.zip
+        name: bbdash-nightly-${ GITHUB_RUN_NUMBER }.zip
         path: bbdash-nightly.zip
