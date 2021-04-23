@@ -37,7 +37,7 @@ export function PersistentCourseBlacklistProvider({ children }: PropsWithChildre
 
 export function CourseBlacklistProvider({ children, blacklistedCourses: locallyBlacklistedCourses, setBlacklistedCourses: setLocallyBlacklistedCourses }: PropsWithChildren<{ blacklistedCourses: string[], setBlacklistedCourses: (blacklistedCourses: string[]) => void }>) {
     const {
-        blacklistedCourses: globallyBlacklistedCourses,
+        globallyBlacklistedCourses,
         setBlacklisted: setBlacklistedGlobally,
         clear: clearGlobally,
         isDefault: isRoot
