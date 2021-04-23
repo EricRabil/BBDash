@@ -11,5 +11,5 @@
     grid-template-columns: 60px minmax(0, 1fr);
     column-gap: 5px;
 
-    background: $main-background;
+    background: var(--palette-app-background-color);
 }

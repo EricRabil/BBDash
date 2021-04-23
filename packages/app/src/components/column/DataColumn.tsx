@@ -1,6 +1,7 @@
 import classnames from "classnames";
 import React, { PropsWithoutRef, useCallback, useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
+import { ColorCodingContext } from "../../contexts/color-coding-context";
 import { ColumnSettingsContext } from "../../contexts/column-settings-context";
 import { CourseBlacklistContext } from "../../contexts/course-blacklist-context";
 import { ItemOrganizerContext } from "../../contexts/item-organizer-context";
@@ -11,6 +12,7 @@ import { DataSource, DataSourceMapping } from "../../transformers/data-source-sp
 import { DataCellData } from "../../transformers/spec";
 import { splitArray } from "../../utils/array";
 import { filterData, sortData } from "../../utils/data-presentation";
+import { BBURI } from "../../utils/uri";
 import CTXPortal from "../context-menu/CTXPortal";
 import { useDataCellContextMenuHandler } from "../context-menu/DataCellContextMenu";
 import DataColumnList from "./DataColumnList";
@@ -31,6 +33,10 @@ export interface DataColumnProps<DataSourceType extends DataSource> extends Prop
     defaultSize?: number;
 }
 
+const renderCaches: Record<number, Record<string, Node[]>> = {};
+
+const getRenderCache = (id: number) => renderCaches[id] || (renderCaches[id] = {});
+
 export default function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, ...props }: DataColumnProps<DataSourceType>) {
     const rawData: DataSourceMapping[DataSourceType][] = useSelector(useMemo(() => selectDataForSource(dataSource), [ dataSource ]));
 
@@ -38,12 +44,14 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     const { pinnedItems, hiddenItems } = useContext(ItemOrganizerContext);
     const { blacklistedCourses } = useContext(CourseBlacklistContext);
+    const { colors } = useContext(ColorCodingContext);
 
-    const { settings: { filters, sortBy, sortOrder, name }, id } = useContext(ColumnSettingsContext);
-
+    const { settings: { filters, sortBy, sortOrder, name, headerColor }, id } = useContext(ColumnSettingsContext);
+    
     // Transformed data without any filters or sorting applied
     const rawTransformedData = useMemo(() => transformData(dataSource, rawData, {
-        courses
+        courses,
+        renderCache: getRenderCache(id)
     }), [dataSource, rawData, courses]);
 
     const filteredData = useMemo(() => {
@@ -83,11 +91,16 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     const show = useDataCellContextMenuHandler(id.toString());
 
+    const columnURI = useMemo(() => BBURI.forColumn(id).toString(), [id]);
+
     return (
         <>
             <div onContextMenu={show} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
                 <div className="column-drag-handle" />
-                <div className="column-header">
+                <div className="column-header" attr-uri={columnURI} style={typeof headerColor === "number" ? {
+                    "--column-header-background-color": `var(--palette-background-secondary-color-${headerColor})`,
+                    color: `var(--palette-text-secondary-color-${headerColor})`
+                } as any : undefined}>
                     <div className="column-header--main">
                         {name || "Column"}
                     </div>

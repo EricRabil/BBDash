@@ -1,5 +1,6 @@
 import { Course } from "@bbdash/shared";
 import { TransformationOptions } from ".";
+import { BBURI } from "../utils/uri";
 import { TaggedCourseContentItem } from "./data-source-spec";
 import { DataCellData, ENTRY_CONTENT_CATEGORY, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
 import { formatDate } from "./util";
@@ -18,15 +19,14 @@ function makeLinkForContent(content: TaggedCourseContentItem, course: Course): s
     else return formatURL(link.href, course);
 }
 
-const transformationCache: Record<string, Node[]> = {};
-
 /**
  * Takes raw content HTML and adapts its nodes to integrate well with our layout/virtual scrolling. Returns a ready-to-mount HTML node
  * @param html raw HTML
  * @param formatURL url formatter
  */
-function transformBodyHTML(html: string, formatURL: (url: string) => string): Node[] {
+function transformBodyHTML(html: string, formatURL: (url: string) => string, transformationCache: Record<string, Node[]>): Node[] {
     if (transformationCache[html]) return transformationCache[html];
+    console.log("miss");
 
     const root = document.createElement("div");
     root.innerHTML = html;
@@ -92,10 +92,13 @@ function transformBodyHTML(html: string, formatURL: (url: string) => string): No
         }
     });
 
-    return transformationCache[html] = Array.from(root.childNodes);
+    const children = Array.from(root.childNodes);
+    children.forEach(c => root.removeChild(c));
+
+    return transformationCache[html] = children;
 }
 
-export default function transformCourseContents(contents: TaggedCourseContentItem[], { courses }: TransformationOptions) {
+export default function transformCourseContents(contents: TaggedCourseContentItem[], { courses, renderCache }: TransformationOptions) {
     const data: DataCellData[] = [];
 
     for (const content of contents) {
@@ -114,21 +117,17 @@ export default function transformCourseContents(contents: TaggedCourseContentIte
             },
             subtitle: course.displayName,
             description: content.body ? {
-                format: RenderContentFormat.text,
+                format: RenderContentFormat.html,
                 ref: element => {
                     if (!element?.isConnected) return;
-                    const toMount = transformBodyHTML(content.body, url => formatURL(url, course));
-
-                    for (let node of toMount) {
-                        if (node.isConnected) node = node.cloneNode(true);
-                        element.append(node);
-                    }
+                    const toMount = transformBodyHTML(content.body, url => formatURL(url, course), renderCache);
+                    element.append(...toMount);
                 },
                 className: "course-contents--compatibility-mode"
             } : null,
             attributes: {
                 courseID: content.courseID,
-                uri: `content:${content.id}`
+                uri: BBURI.fromCourseContentItem(content).toString()
             },
             sortables: {
                 [ENTRY_TIME]: content.modified || content.created,

@@ -1,7 +1,7 @@
 @import "../variables";
 
 .App > .sidebar {
-    background: $sidebar-background;
+    background: var(--palette-app-sidebar-background-color);
 
     display: flex;
     flex-flow: column;

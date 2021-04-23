@@ -7,6 +7,7 @@ import transformStreamEntries from "./stream";
 
 export interface TransformationOptions {
     courses: Record<string, Course>;
+    renderCache: Record<string, Node[]>;
 }
 
 export function transformData<DataSourceType extends DataSource>(dataSource: DataSourceType, data: DataSourceMapping[DataSourceType][], options: TransformationOptions): DataCellData[] {

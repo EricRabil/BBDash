@@ -2,12 +2,12 @@
     background-color: rgba(0, 0, 0, 0) !important;
 }
 
-.course-color-picker {
+.bb-color-picker {
     display: grid;
     grid-auto-rows: max-content;
     row-gap: 10px;
 
-    .course-color-picker--course-name {
+    .bb-color-picker--label {
         font-weight: 500;
         color: black !important;
         font-size: 1.1em;
@@ -15,4 +15,8 @@
         white-space: pre-wrap;
         cursor: default !important;
     }
+}
+
+.ctx-danger > .react-contexify__item__content {
+    color: rgb(192, 43, 43);
 }

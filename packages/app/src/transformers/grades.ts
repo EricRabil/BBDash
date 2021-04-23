@@ -1,6 +1,7 @@
 import { GradebookEntry } from "@bbdash/shared";
 import { TransformationOptions } from ".";
 import { courseLink } from "../utils/courses";
+import { BBURI } from "../utils/uri";
 import { TaggedGradebookEntries } from "./data-source-spec";
 import { DataCellData, ENTRY_EMPTY, RenderContentFormat } from "./spec";
 
@@ -47,7 +48,7 @@ export default function transformGradeEntries(courseGrades: TaggedGradebookEntri
             description: localizedAverage,
             attributes: {
                 courseID,
-                uri: `grade:${courseID}`
+                uri: BBURI.fromGradebook({ courseID, grades }).toString()
             },
             filterables: {
                 [ENTRY_EMPTY]: localizedAverage === NO_GRADE

@@ -20,6 +20,7 @@ export interface ColumnSettings {
     pinned: string[];
     hidden: string[];
     blacklistedCourses: string[];
+    headerColor: number;
 }
 
 export interface ColumnSettingsState {
@@ -30,15 +31,16 @@ export interface ColumnSettingsState {
     setKey: <Key extends keyof ColumnSettings>(key: Key, value: ColumnSettings[Key]) => void;
 }
 
-export const DEFAULT_COLUMN_SETTINGS: () => ColumnSettings = () => ({
-    name: "Column",
+export const DEFAULT_COLUMN_SETTINGS: (name?: string) => ColumnSettings = (name = "Column") => ({
+    name,
     pinned: [],
     hidden: [],
     blacklistedCourses: [],
     filters: {
         [ENTRY_CONTENT_CATEGORY]: []
     },
-    sortOrder: SortOrder.descending
+    sortOrder: SortOrder.descending,
+    headerColor: -1
 });
 
 /**

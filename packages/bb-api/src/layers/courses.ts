@@ -1,6 +1,6 @@
 import { Course, CourseContentItem, CourseEnrollment, GradeMapping, PaginatedQuery } from "@bbdash/shared";
 import APILayer from "../structs/layer";
-import { isAxiosError } from "../util";
+import { isAxiosError, Throttle } from "../util";
 
 interface CourseListingResult {
     coursesWithActivity: string[];
@@ -144,14 +144,19 @@ export class CourseLayer extends APILayer {
                     });
     
                     const parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
-    
-                    const subcontents = await Promise.all(parents.map(parent => {
+                    
+                    const contentsLookupQueue = new Throttle<ParentItem, CourseContentItem[]>(async parent => {
                         if (parent.availability.available === "No") return [];
                         else return this.fetchSubcontents({
                             contentID: parent.id,
                             ...query
                         }).catch(() => [] as CourseContentItem[]);
-                    }));
+                    });
+
+                    contentsLookupQueue.take(parents);
+                    contentsLookupQueue.close();
+                    
+                    const subcontents = await contentsLookupQueue.asPromise;
                     
                     return subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
                 } else throw e;

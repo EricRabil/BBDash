@@ -1,10 +1,13 @@
 import { useCallback } from "react";
-import { getPersistentValue, usePersistent } from "react-use-persistent";
+import { getPersistentValue } from "react-use-persistent";
 import { ColumnSettings, DEFAULT_COLUMN_SETTINGS } from "../contexts/column-settings-context";
+import { DataSource } from "../transformers/data-source-spec";
+import { findColumnDefinitionByDataSource } from "../utils/column-definitions";
+import { persistentColumnsRef } from "../utils/persist";
 
 export interface ColumnItem {
     column: number;
-    id: string;
+    dataSource: DataSource;
     uid: number;
     preferences: ColumnSettings;
 }
@@ -21,23 +24,23 @@ function nextColumnID(): number {
  * Creates a set of persistent APIs for managing columns and their order in the layout track
  */
 export function usePersistentColumns(): [ColumnItem[], (items: ColumnItem[]) => void, {
-    addColumn(id: string): void;
+    addColumn(dataSource: DataSource): void;
     removeColumn(index: number): void;
     updatePreferences(index: number, preferences: object): void;
 }] {
     // All column items
-    const [columnItems, setColumnItems] = usePersistent<ColumnItem[]>("columns", []);
+    const [columnItems, setColumnItems] = persistentColumnsRef.useAsState();
 
     /**
      * Inserts a column with the given ID at the start of the track
      * @param id id of the column being inserted
      */
-    const addColumn = useCallback((id: string) => {
+    const addColumn = useCallback((dataSource: DataSource) => {
         setColumnItems(columnItems.concat({
-            id,
+            dataSource,
             uid: nextColumnID(),
             column: 0,
-            preferences: DEFAULT_COLUMN_SETTINGS()
+            preferences: DEFAULT_COLUMN_SETTINGS(findColumnDefinitionByDataSource(dataSource)?.name)
         }));
     }, [setColumnItems, columnItems]);
 

@@ -1,13 +1,11 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import React, { PropsWithoutRef, PropsWithRef, useMemo } from "react";
+import React, { PropsWithRef, useMemo } from "react";
 import GridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { AutoSizer } from "react-virtualized";
 import { ColumnSettingsProvider, ColumnSettingsProviderProps } from "../contexts/column-settings-context";
 import usePersistentColumns, { ColumnItem } from "../hooks/usePersistentColumns";
-import { DataSource } from "../transformers/data-source-spec";
-import DataColumn, { DataColumnProps } from "./column/DataColumn";
+import { findColumnDefinitionByDataSource } from "../utils/column-definitions";
 
 const HORIZONTAL_MARGIN = 5;
 const VERTICAL_MARGIN = 0;
@@ -16,55 +14,11 @@ const COLUMN_WIDTH = 345;
 
 const GRID_WIDTH = (COLUMNS * COLUMN_WIDTH) + (COLUMNS * HORIZONTAL_MARGIN);
 
-interface ColumnDefinition {
-    icon: IconProp;
-    component: React.FunctionComponentFactory<any>;
-    id: string;
-    name: string;
-}
-
-function makeDataSourceComponent<DataSourceType extends DataSource>(dataSource: DataSourceType, dataColumnProps: Partial<DataColumnProps<DataSourceType>> = {}) {
-    return function DataSourceComponent(props: PropsWithoutRef<{}>) {
-        return (
-            <DataColumn {...dataColumnProps} dataSource={dataSource} {...props} />
-        );
-    };
-}
-
-export const COLUMN_DEFINITIONS: ColumnDefinition[] = [
-    {
-        icon: "align-left",
-        component: makeDataSourceComponent(DataSource.stream),
-        id: "stream",
-        name: "Activity Stream"
-    },
-    {
-        icon: "percent",
-        component: makeDataSourceComponent(DataSource.grades),
-        id: "grades",
-        name: "Grades"
-    },
-    {
-        icon: "database",
-        component: makeDataSourceComponent(DataSource.contents, { defaultSize: 63 }),
-        id: "contents",
-        name: "Course Contents"
-    }
-];
-
-/**
- * Finds the definition of a column with the given identifier
- * @param id identifier of the column to lookup
- */
-export function findColumnDefinitionByID(id: string): ColumnDefinition | null {
-    return COLUMN_DEFINITIONS.find(def => def.id === id) || null;
-}
-
 /**
  * Facilitates passthrough of layout props to the inner item, while still setting up the provider
  */
 function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem } & Omit<ColumnSettingsProviderProps, "columnUID">>) {
-    const Element = findColumnDefinitionByID(item.id)?.component;
+    const Element = findColumnDefinitionByDataSource(item.dataSource)?.component;
 
     if (!Element) return <div {...props} />;
 

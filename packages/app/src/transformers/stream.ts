@@ -2,6 +2,7 @@ import { StreamEntry } from "@bbdash/shared";
 import { DateTime } from "luxon";
 import { TransformationOptions } from ".";
 import { courseLink } from "../utils/courses";
+import { BBURI } from "../utils/uri";
 import { DataCellData, ENTRY_DUE_DATE, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
 import { formatDate } from "./util";
 
@@ -43,7 +44,7 @@ export default function transformStreamEntries(entries: StreamEntry[], { courses
             footer: dueDate ? `Due Date: ${dueDate}` : null,
             attributes: {
                 courseID: entry.se_courseId,
-                uri: `stream:${entry.se_id}`
+                uri: BBURI.fromStreamEntry(entry).toString()
             },
             sortables: {
                 [ENTRY_TIME]: entry.se_timestamp,
