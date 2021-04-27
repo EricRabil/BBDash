@@ -13,7 +13,8 @@ export type DataSourceSpecLedger = {
 
 export const DataSourceSpecs: DataSourceSpecLedger = {
     [DataSource.stream]: {
-        sortables: [ENTRY_TIME, ENTRY_TITLE, ENTRY_DUE_DATE]
+        sortables: [ENTRY_TIME, ENTRY_TITLE, ENTRY_DUE_DATE],
+        filterables: [ENTRY_DUE_DATE]
     },
     [DataSource.contents]: {
         sortables: [ENTRY_TIME, ENTRY_TITLE],

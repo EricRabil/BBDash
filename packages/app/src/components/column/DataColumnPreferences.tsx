@@ -8,7 +8,7 @@ import { PossibleSortOrders, SortOrder } from "../../utils/data-presentation";
 import { categoryNames } from "../../utils/identifier-names";
 import BBTooltip from "../BBTooltip";
 import BBModal, { useModal } from "../modals/BBModal";
-import { SettingsListField } from "../SettingsField";
+import SettingsField, { SettingsListField } from "../SettingsField";
 
 const ALL_CATEGORIES: Array<keyof typeof ContentCategories> = Object.keys(ContentCategories) as unknown as Array<keyof typeof ContentCategories>;
 
@@ -64,6 +64,15 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
                                     }))} header={<>Content Categories</>}>
                                         {type => <>{categoryNames[type] as string}</>}
                                     </SettingsListField>
+                                );
+                            case "ENTRY_DUE_DATE":
+                                return (
+                                    <SettingsField type="checkbox" value={filters[filterType] as boolean} setValue={newValue => setFilters({
+                                        ...filters,
+                                        "ENTRY_DUE_DATE": newValue
+                                    })}>
+                                        Needs Due Date
+                                    </SettingsField>
                                 );
                             }
                         })

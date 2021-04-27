@@ -36,8 +36,16 @@ export function filterData(data: DataCellData[], { filters }: {
             data = data.filter(data => {
                 // not a boolean, don't try to check
                 if (typeof data.filterables?.[ENTRY_EMPTY] !== "boolean") return true;
-                if (data.filterables[ENTRY_EMPTY] !== value) return false;
-                return true;
+                return data.filterables[ENTRY_EMPTY] === value;
+            });
+            
+            break;
+        case ENTRY_DUE_DATE:
+            if (!value) break;
+
+            data = data.filter(data => {
+                if (typeof data.filterables?.[ENTRY_DUE_DATE] !== "boolean") return true;
+                return data.filterables[ENTRY_DUE_DATE] === value;
             });
             
             break;

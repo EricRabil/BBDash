@@ -50,6 +50,9 @@ export default function transformStreamEntries(entries: StreamEntry[], { courses
                 [ENTRY_TIME]: entry.se_timestamp,
                 [ENTRY_TITLE]: title,
                 [ENTRY_DUE_DATE]: entry.itemSpecificData.notificationDetails?.dueDate
+            },
+            filterables: {
+                [ENTRY_DUE_DATE]: typeof entry.itemSpecificData.notificationDetails?.dueDate === "string"
             }
         });
     }

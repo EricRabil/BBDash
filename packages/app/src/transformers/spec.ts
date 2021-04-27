@@ -48,6 +48,7 @@ export interface DataCellData {
     filterables?: {
         [ENTRY_CONTENT_CATEGORY]?: string;
         [ENTRY_EMPTY]?: boolean;
+        [ENTRY_DUE_DATE]?: boolean;
     };
     attributes: DataCellAttributes;
 }
