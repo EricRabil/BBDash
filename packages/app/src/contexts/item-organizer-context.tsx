@@ -1,14 +1,16 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext } from "react";
+import React, { createContext, PropsWithChildren, useCallback, useContext, useMemo } from "react";
 import { usePersistent } from "react-use-persistent";
 import { FilterBehaviorContext } from "./filter-behavior-context";
 
 export interface ItemOrganizerContextState {
     hiddenItems: readonly string[];
+    absoluteHiddenItems: readonly string[];
     locallyHiddenItems: readonly string[];
     globallyHiddenItems: readonly string[];
     setHidden: (itemID: string, hidden: boolean, globally?: boolean) => void;
     unhideAllItems: (globally?: boolean) => void;
     pinnedItems: readonly string[];
+    absolutePinnedItems: readonly string[];
     locallyPinnedItems: readonly string[];
     globallyPinnedItems: readonly string[];
     setPinned: (itemID: string, pinned: boolean, globally?: boolean) => void;
@@ -21,11 +23,13 @@ export interface ItemOrganizerContextState {
  */
 export const ItemOrganizerContext = createContext<ItemOrganizerContextState>({
     hiddenItems: [],
+    absoluteHiddenItems: [],
     locallyHiddenItems: [],
     globallyHiddenItems: [],
     setHidden: () => undefined,
     unhideAllItems: () => undefined,
     pinnedItems: [],
+    absolutePinnedItems: [],
     locallyPinnedItems: [],
     globallyPinnedItems: [],
     setPinned: () => undefined,
@@ -83,17 +87,22 @@ export function ItemOrganizerProvider({ children, hiddenItems: locallyHiddenItem
         else setLocallyPinnedItems([]);
     }, [isRoot, unpinAllItemsGlobally, setLocallyPinnedItems]);
 
-    const hiddenItems = uriFiltersAreDisabled ? [] : globallyHiddenItems.concat(locallyHiddenItems);
-    const pinnedItems = uriFiltersAreDisabled ? [] : globallyPinnedItems.concat(locallyPinnedItems);
+    const absoluteHiddenItems = useMemo(() => globallyHiddenItems.concat(locallyHiddenItems), [globallyHiddenItems, locallyHiddenItems]);
+    const absolutePinnedItems = useMemo(() => globallyPinnedItems.concat(locallyPinnedItems), [globallyPinnedItems, locallyPinnedItems]);
+
+    const hiddenItems = useMemo(() => uriFiltersAreDisabled ? [] : absoluteHiddenItems, [uriFiltersAreDisabled, absoluteHiddenItems]);
+    const pinnedItems = useMemo(() => uriFiltersAreDisabled ? [] : absolutePinnedItems, [uriFiltersAreDisabled, absolutePinnedItems]);
 
     return (
         <ItemOrganizerContext.Provider value={{
             hiddenItems,
+            absoluteHiddenItems,
             setHidden,
             locallyHiddenItems,
             globallyHiddenItems: isRoot ? locallyHiddenItems : globallyHiddenItems,
             unhideAllItems,
             pinnedItems,
+            absolutePinnedItems,
             locallyPinnedItems,
             globallyPinnedItems: isRoot ? locallyPinnedItems : globallyPinnedItems,
             setPinned,

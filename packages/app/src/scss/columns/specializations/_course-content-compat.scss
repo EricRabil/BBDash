@@ -1,12 +1,4 @@
-@mixin dashed($color1, $color2) {
-    background: repeating-linear-gradient(
-        135deg,
-        $color1,
-        $color1 10px,
-        $color2 10px,
-        $color2 20px
-    );
-}
+@import "../../foundation/mixins";
 
 // Maximizes the space utilized by externally defined HTML from blackboard
 

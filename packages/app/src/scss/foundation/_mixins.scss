@@ -52,3 +52,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+@mixin dashed($color1, $color2) {
+    background-image: repeating-linear-gradient(
+        135deg,
+        $color1,
+        $color1 10px,
+        $color2 10px,
+        $color2 20px
+    );
+}

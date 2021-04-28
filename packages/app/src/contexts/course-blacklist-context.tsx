@@ -1,9 +1,10 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext } from "react";
+import React, { createContext, PropsWithChildren, useCallback, useContext, useMemo } from "react";
 import { usePersistent } from "react-use-persistent";
 import { FilterBehaviorContext } from "./filter-behavior-context";
 
 export interface CourseBlacklistState {
     blacklistedCourses: string[];
+    absoluteBlacklistedCourses: string[];
     locallyBlacklistedCourses: string[];
     globallyBlacklistedCourses: string[];
     setBlacklisted: (courseID: string, blacklisted: boolean, globally?: boolean) => void;
@@ -17,6 +18,7 @@ export interface CourseBlacklistState {
  */
 export const CourseBlacklistContext = createContext<CourseBlacklistState>({
     blacklistedCourses: [],
+    absoluteBlacklistedCourses: [],
     locallyBlacklistedCourses: [],
     globallyBlacklistedCourses: [],
     setBlacklisted: () => undefined,
@@ -59,11 +61,13 @@ export function CourseBlacklistProvider({ children, blacklistedCourses: locallyB
         setLocallyBlacklistedCourses(courseIDs);
     }, [setLocallyBlacklistedCourses]);
 
-    const blacklistedCourses = uriFiltersAreDisabled ? [] : globallyBlacklistedCourses.concat(locallyBlacklistedCourses);
+    const absoluteBlacklistedCourses = useMemo(() => globallyBlacklistedCourses.concat(locallyBlacklistedCourses), [globallyBlacklistedCourses, locallyBlacklistedCourses]);
+    const blacklistedCourses = useMemo(() => uriFiltersAreDisabled ? [] : absoluteBlacklistedCourses, [uriFiltersAreDisabled, absoluteBlacklistedCourses]);
 
     return (
         <CourseBlacklistContext.Provider value={{
             blacklistedCourses,
+            absoluteBlacklistedCourses,
             locallyBlacklistedCourses,
             globallyBlacklistedCourses: isRoot ? locallyBlacklistedCourses : globallyBlacklistedCourses,
             overwriteBlacklistedCourses,

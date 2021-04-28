@@ -4,10 +4,17 @@ import { selectCourses } from "../../store/reducers/courses";
 import { DataCellData } from "../../transformers/spec";
 import DataCellRenderContent from "./DataCellRenderContent";
 
+export interface DataColumnCellProps {
+    data: DataCellData;
+    isPinned?: boolean;
+    isHidden?: boolean;
+    rootRef?: MutableRefObject<Element | null>;
+}
+
 /**
  * Renders one cell of data
  */
-export default function DataColumnCell({ data, rootRef }: { data: DataCellData, rootRef?: MutableRefObject<Element | null> }) {
+export default function DataColumnCell({ data, rootRef, isPinned = false, isHidden = false }: DataColumnCellProps) {
     const courses = useSelector(selectCourses);
 
     const course = courses[data.attributes.courseID];
@@ -16,7 +23,7 @@ export default function DataColumnCell({ data, rootRef }: { data: DataCellData, 
         <div ref={el => rootRef && (rootRef.current = el)} style={{
             "--cellBackground": course ? `var(--course-background-${course.id})` : "",
             "--cellTextColor": course ? `var(--course-text-color-${course.id})` : ""
-        } as unknown as CSSProperties} className="column-cell data-cell" attr-uri={data.attributes.uri} attr-course-id={data.attributes.courseID}>
+        } as unknown as CSSProperties} className="column-cell data-cell" attr-pinned={isPinned.toString()} attr-hidden={isHidden.toString()} attr-uri={data.attributes.uri} attr-course-id={data.attributes.courseID}>
             <div className="data-cell--inner">
                 <div className="data-cell--header">
                     <DataCellRenderContent content={data.header?.title} className="data-cell--header-title" />

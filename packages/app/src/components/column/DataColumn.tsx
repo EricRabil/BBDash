@@ -63,9 +63,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
         }
 
         // apply global hiddenItems and blacklistedCourses filters
-        return transformed.filter(data => {    
-            return !hiddenItems.includes(data.attributes.uri) && !blacklistedCourses.includes(data.attributes.courseID);
-        });
+        return transformed.filter(data => !hiddenItems.includes(data.attributes.uri) && !blacklistedCourses.includes(data.attributes.courseID));
     }, [hiddenItems, blacklistedCourses, filters, rawTransformedData]);
 
     const doSort = useCallback((data: DataCellData[]) => {
@@ -78,7 +76,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
     }, [sortBy, sortOrder]);
 
     // ready-to-render data
-    const transformedData = useMemo(() => {
+    const renderData = useMemo(() => {
         const [ pinnedData, normalData ] = splitArray(filteredData, item => pinnedItems.includes(item.attributes.uri) ? 0 : 1);
 
         doSort(pinnedData);
@@ -106,7 +104,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
                     <DataColumnPreferences dataSource={dataSource} />
                 </div>
                 <div className="column-body">
-                    <DataColumnList transformedData={transformedData} defaultSize={defaultSize || 0} />
+                    <DataColumnList data={renderData} defaultSize={defaultSize || 0} />
                 </div>
             </div>
 

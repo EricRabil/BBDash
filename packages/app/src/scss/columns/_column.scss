@@ -77,10 +77,36 @@
 
             color: var(--cellTextColor);
 
+            &[attr-pinned=true] > .data-cell--inner::before {
+                @include dashed(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+            }
+
+            &[attr-hidden=true] > .data-cell--inner::before {
+                @include dashed(rgba(255, 0, 0, 0.05), rgba(255, 0, 0, 0.1));
+            }
+
             &>.data-cell--inner {
                 @include palette-property-transition(background-color);
 
                 background-color: var(--cellBackground, var(--palette-default-background-color));
+                position: relative;
+
+                & > * {
+                    z-index: 1;
+                }
+
+                &::before {
+                    position: absolute;
+                    content: '';
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-attachment: fixed;
+                    background-size: 100vh 100vw;
+
+                    z-index: 0;
+                }
             }
 
             a {
