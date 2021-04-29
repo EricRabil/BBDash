@@ -1,6 +1,6 @@
 FROM node:14
 
-WORKDIR /var/jenkins_home/workspace/BBDash_master
+WORKDIR /tmp/bbdash
 
 # Copy `yarn.lock` and all `package.json` files from the first build stage in
 # preparation for `yarn install`.
@@ -21,3 +21,5 @@ COPY packages/shared/package.json packages/shared/package.json
 # files inside each workspace, which can happen if npm is used as the package
 # manager on the host side.
 RUN yarn install --immutable --inline-builds
+
+COPY . .

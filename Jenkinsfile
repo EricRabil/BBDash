@@ -1,23 +1,17 @@
-pipeline {
-	agent {
-		dockerfile {
-			filename 'Dockerfile'
-			customWorkspace '/var/jenkins_home/workspace/BBDash_master'
-			args '-u root'
+node {
+	git 'https://github.com/EricRabil/BBDash'
+	
+	def build_env = docker.build('bbdash:build', '.')
+
+	stage('Build') {
+		build_env.inside {
+			sh 'cd /tmp/bbdash/build && yarn build'
 		}
 	}
-	stages {
-		stage('Build') {
-			steps {
-				sh 'yarn build'
-			}
-		}
-		stage('Archive') {
-			steps {
-				dir('build') {
-					archiveArtifacts artifacts: '**'
-				}
-			}
+
+	stage('Archive') {
+		build_env.inside {
+			archiveArtifacts artifacts: '/tmp/bbdash/build/**'
 		}
 	}
 }
