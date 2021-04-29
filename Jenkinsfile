@@ -2,7 +2,6 @@ pipeline {
 	agent {
 		dockerfile {
 			filename 'Dockerfile'
-			customWorkspace '/var/bbdash'
 		}
 	}
 	stages {
