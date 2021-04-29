@@ -22,5 +22,3 @@ COPY scripts/stash_node_modules.js scripts/stash_node_modules.js
 # files inside each workspace, which can happen if npm is used as the package
 # manager on the host side.
 RUN yarn install --immutable --inline-builds
-
-RUN node scripts/stash_node_modules.js
