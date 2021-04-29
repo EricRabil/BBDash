@@ -2,6 +2,11 @@ FROM node:14
 
 WORKDIR /tmp/bbdash
 
+RUN apt-get -y update \
+     && apt-get -y autoremove \
+     && apt-get clean \
+     && apt-get install -y zip
+
 # Copy `yarn.lock` and all `package.json` files from the first build stage in
 # preparation for `yarn install`.
 COPY package.json package.json
@@ -21,5 +26,7 @@ COPY packages/shared/package.json packages/shared/package.json
 # files inside each workspace, which can happen if npm is used as the package
 # manager on the host side.
 RUN yarn install --immutable --inline-builds
+
+RUN ls
 
 COPY . .
