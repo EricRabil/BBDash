@@ -1,11 +1,14 @@
 pipeline {
-	agent { dockerfile true }
+	agent {
+		dockerfile {
+			filename 'Dockerfile'
+			args '-u root'
+		}
+	}
 	stages {
 		stage('Build') {
 			steps {
-				dir(path: '/var/bbdash') {
-					sh 'yarn build'
-				}
+				sh 'yarn build'
 			}
 		}
 	}
