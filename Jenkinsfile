@@ -12,5 +12,12 @@ pipeline {
 				sh 'yarn build'
 			}
 		}
+		stage('Archive') {
+			steps {
+				dir('build') {
+					archiveArtifacts artifacts: '**'
+				}
+			}
+		}
 	}
 }
