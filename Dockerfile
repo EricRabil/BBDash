@@ -1,5 +1,7 @@
 FROM node:14
 
+WORKDIR /var/jenkins_home/workspace/BBDash_master
+
 # Copy `yarn.lock` and all `package.json` files from the first build stage in
 # preparation for `yarn install`.
 COPY package.json package.json
