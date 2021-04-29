@@ -13,7 +13,6 @@ COPY packages/bb-api/package.json packages/bb-api/package.json
 COPY packages/chrome-extension/package.json packages/chrome-extension/package.json
 COPY packages/chrome-remote-objects/package.json packages/chrome-remote-objects/package.json
 COPY packages/shared/package.json packages/shared/package.json
-COPY scripts/stash_node_modules.js scripts/stash_node_modules.js
 
 # Install all dependencies and verify that `yarn.lock` will not be modified
 # during the process. If `yarn.lock` needs to be modified, this step is
