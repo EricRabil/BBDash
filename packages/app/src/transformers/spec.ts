@@ -9,7 +9,13 @@ export interface RenderContent<Format extends RenderContentFormat> {
     data?: string | null;
     className?: string | null;
     link?: string | null;
-    ref?: (element: HTMLElement | null) => unknown
+    ref?: (element: HTMLElement | null) => unknown;
+    aria?: {
+        label?: string | null;
+        hidden?: boolean | null;
+    };
+    elProps?: object;
+    tag?: (keyof JSX.IntrinsicElements) | null;
 }
 
 export type HTMLRenderContent = RenderContent<RenderContentFormat.html>;

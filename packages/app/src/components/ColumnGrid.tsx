@@ -17,7 +17,7 @@ const GRID_WIDTH = (COLUMNS * COLUMN_WIDTH) + (COLUMNS * HORIZONTAL_MARGIN);
 /**
  * Facilitates passthrough of layout props to the inner item, while still setting up the provider
  */
-function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem } & Omit<ColumnSettingsProviderProps, "columnUID">>) {
+function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem, tabIndex?: number } & Omit<ColumnSettingsProviderProps, "columnUID">>) {
     const Element = findColumnDefinitionByDataSource(item.dataSource)?.component;
 
     if (!Element) return <div {...props} />;
@@ -39,7 +39,7 @@ export default function ColumnGrid(elProps: PropsWithRef<React.HTMLAttributes<HT
     const layout: Layout[] = useMemo(() => columnItems.map((item, index) => ({ i: index.toString(), x: item.column, y: 0, w: 1, h: 1 })), [columnItems]);
 
     return (
-        <div className="grid-track-root" {...elProps}>
+        <div className="grid-track-root" role="main" {...elProps}>
             <AutoSizer>
                 {({ height }) => (
                     <GridLayout className="column-track"
@@ -57,9 +57,14 @@ export default function ColumnGrid(elProps: PropsWithRef<React.HTMLAttributes<HT
                             })));
                         }}
                         layout={layout}
+                        {...{
+                            innerRef: (el: HTMLDivElement) => {
+                                el?.setAttribute("role", "grid");
+                            }
+                        }}
                     >
                         {columnItems.map((item, index) => (
-                            <GridItemMounter key={index} item={item} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)} />
+                            <GridItemMounter tabIndex={layout[index].x + 1} key={index} item={item} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)} />
                         ))}
                     </GridLayout>
                 )}

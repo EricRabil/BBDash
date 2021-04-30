@@ -30,7 +30,7 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
     return (
         <>
             <BBTooltip content={<span>Configure Column</span>}>
-                <span className="column-prefs-toggle" onClick={toggleShowing}>
+                <span className="column-prefs-toggle" tabIndex={0} onClick={toggleShowing}>
                     <FontAwesomeIcon icon="cog" />
                 </span>
             </BBTooltip>

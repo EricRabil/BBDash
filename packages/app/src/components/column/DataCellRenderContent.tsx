@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { DetailedHTMLProps, HTMLAttributes, useMemo } from "react";
-import { AnyRenderContent, RenderContentFormat } from "../../transformers/spec";
+import { AnyRenderContent, HTMLRenderContent, RenderContentFormat, TextRenderContent } from "../../transformers/spec";
 
 /**
  * Renders a node of render content within a DataCellData tree.
@@ -11,18 +11,23 @@ export default function DataCellRenderContent({ content, className, tag: Tag = "
     if (typeof content === "string") content = { format: RenderContentFormat.text, data: content };
 
     // Tag is overridden to a if a link is present.
+    if (content.tag) Tag = content.tag;
     if (content.link) Tag = "a";
 
     const baseProps = {
         className: classNames(className, content.className),
-        ref: content.ref
+        ref: content.ref,
+        ...(content.elProps || {})
     };
 
-    const extraProps = useMemo(() => content?.link ? {
+    const extraProps = useMemo(() => Object.assign({}, content?.link ? {
         href: content.link,
         target: "_blank",
         rel: "noreferrer"
-    } : {}, [content.link]);
+    } : {}, (content as HTMLRenderContent | TextRenderContent)?.aria ? {
+        "aria-label": (content as HTMLRenderContent | TextRenderContent).aria!.label,
+        "aria-hidden": (content as HTMLRenderContent | TextRenderContent).aria!.hidden || false
+    } : {}), [content.link, content?.aria]);
 
     switch (content.format) {
     case RenderContentFormat.html:

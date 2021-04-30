@@ -53,7 +53,7 @@ export class Throttle<Source, Result> {
     #pendingPromise: Promise<Result[]>;
     #resolve: (results: Result[]) => void;
 
-    constructor(public transformer: (src: Source) => Promise<Result>, public max: number = 15) {
+    constructor(public transformer: (src: Source) => Promise<Result>, public max: number = 5) {
         this.#pendingPromise = new Promise(resolve => this.#resolve = resolve);
     }
     
@@ -116,5 +116,71 @@ export class Throttle<Source, Result> {
 
     public get full(): boolean {
         return this.inProgress.size >= this.max;
+    }
+}
+
+export class SharedThrottle {
+    constructor(public maxConcurrent: number) {}
+    
+    #pending: Set<Promise<any>> = new Set();;
+    #fifoQueue: (() => Promise<any>)[] = [];
+    #resolutions: Map<() => Promise<any>, [(value: any) => void, (err: any) => void]> = new Map();
+
+    public static sharedInstance: SharedThrottle = new SharedThrottle(3);
+
+    public async runNow<T>(generator: () => Promise<T>) {
+        const promise = generator();
+        this.#pending.add(promise);
+
+        let result: T, finished = false;
+
+        try {
+            result = await promise;
+            finished = true;
+        } catch (e) {
+            this.reject(generator, e);
+        }
+
+        if (finished) this.resolve(generator, result!);
+
+        this.#pending.delete(promise);
+
+        const nextItem = this.#fifoQueue.shift();
+        if (!nextItem) return;
+        this.runNow(nextItem);
+    }
+
+    public resolve<T>(generator: () => Promise<T>, value: T) {
+        if (!this.#resolutions.has(generator)) throw new Error("Mismatched resolution");
+        this.#resolutions.get(generator)![0](value);
+        this.#resolutions.delete(generator);
+    }
+
+    public reject<T>(generator: () => Promise<T>, err: any) {
+        if (!this.#resolutions.has(generator)) throw new Error("Mismatched resolution");
+        this.#resolutions.get(generator)![1](err);
+        this.#resolutions.delete(generator);
+    }
+
+    public async process<T>(items: Array<() => Promise<T>>): Promise<T[]> {
+        const promises = items.map(item => new Promise<T>((resolve, reject) => this.#resolutions.set(item, [resolve, reject])));
+
+        while (!this.full) {
+            const item = items.shift();
+            if (!item) break;
+            this.runNow(item);
+        }
+
+        this.#fifoQueue.push(...items);
+
+        return Promise.all(promises);
+    }
+
+    public async processOne<T>(item: () => Promise<T>): Promise<T> {
+        return this.process([ item ]).then(([ result ]) => result);
+    }
+
+    public get full(): boolean {
+        return this.#pending.size >= this.maxConcurrent;
     }
 }

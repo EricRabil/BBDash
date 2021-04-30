@@ -1,6 +1,6 @@
 import { Course, CourseContentItem, CourseEnrollment, GradeMapping, PaginatedQuery } from "@bbdash/shared";
 import APILayer from "../structs/layer";
-import { isAxiosError, Throttle } from "../util";
+import { isAxiosError, SharedThrottle } from "../util";
 
 interface CourseListingResult {
     coursesWithActivity: string[];
@@ -77,19 +77,27 @@ export class CourseLayer extends APILayer {
     } = {
         contents: {}
     }
+    
+    private throttle = new SharedThrottle(2);
 
+    private pendingEnrollments: Promise<CourseEnrollment[]> | null = null;
     /**
      * Returns all enrollments for the current user
      * @param cached whether to use cached results when possible. default true
      */
     async enrollments(cached = true): Promise<CourseEnrollment[]> {
         if (cached && this.cache.enrollments) return this.cache.enrollments;
+        if (this.pendingEnrollments) return this.pendingEnrollments;
 
-        const { data: { results } } = await this.axios.get(`/users/${this.api.userID}/memberships?expand=course.effectiveAvailability,course.permissions,courseRole&includeCount=true&limit=10000`) as {
-            data: MembershipEnrollmentListing;
-        };
-
-        this.cache.enrollments = results;
+        const results = await (this.pendingEnrollments = new Promise(async resolve => {
+            const { data: { results } } = await this.axios.get(`/users/${this.api.userID}/memberships?expand=course.effectiveAvailability,course.permissions,courseRole&includeCount=true&limit=10000`) as {
+                data: MembershipEnrollmentListing;
+            };
+    
+            this.cache.enrollments = results;
+            resolve(results);
+            this.pendingEnrollments = null;
+        }));
 
         return results;
     }
@@ -99,9 +107,9 @@ export class CourseLayer extends APILayer {
      * @param {CourseContentsQuery} query query to apply when fetching the contents
      */
     private async fetchContents({ courseID, ...params }: CourseContentsQuery): Promise<CourseContentItem[]> {
-        const { data: { results } } = await this.api.axios.get(this.api.formatURL(`/learn/api/public/v1/courses/${courseID}/contents`), {
+        const { data: { results } } = await this.throttle.processOne(() => this.api.axios.get(this.api.formatURL(`/learn/api/public/v1/courses/${courseID}/contents`), {
             params: mapContentsQuery(params)
-        });
+        }));
 
         return results;
     }
@@ -111,9 +119,9 @@ export class CourseLayer extends APILayer {
      * @param {CourseContentsQuery} query query to apply when fetching the subcontents
      */
     private async fetchSubcontents({ courseID, contentID, ...params }: SubcontentsQuery): Promise<CourseContentItem[]> {
-        const { data: { results } } = await this.api.axios.get(this.api.formatURL(`/learn/api/public/v1/courses/${courseID}/contents/${contentID}/children`), {
+        const { data: { results } } = await this.throttle.processOne(() => this.api.axios.get(this.api.formatURL(`/learn/api/public/v1/courses/${courseID}/contents/${contentID}/children`), {
             params: mapContentsQuery(params)
-        });
+        }));
 
         return results;
     }
@@ -145,18 +153,13 @@ export class CourseLayer extends APILayer {
     
                     const parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
                     
-                    const contentsLookupQueue = new Throttle<ParentItem, CourseContentItem[]>(async parent => {
+                    const subcontents = await Promise.all(parents.map(parent => {
                         if (parent.availability.available === "No") return [];
                         else return this.fetchSubcontents({
                             contentID: parent.id,
                             ...query
                         }).catch(() => [] as CourseContentItem[]);
-                    });
-
-                    contentsLookupQueue.take(parents);
-                    contentsLookupQueue.close();
-                    
-                    const subcontents = await contentsLookupQueue.asPromise;
+                    }));
                     
                     return subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
                 } else throw e;

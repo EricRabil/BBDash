@@ -113,7 +113,14 @@ export default function transformCourseContents(contents: TaggedCourseContentIte
                     data: content.title,
                     link
                 },
-                sideTitle: date
+                sideTitle: {
+                    format: RenderContentFormat.html,
+                    data: date,
+                    tag: "time",
+                    elProps: {
+                        dateTime: content.modified || content.created
+                    }
+                }
             },
             subtitle: course.displayName,
             description: content.body ? {

@@ -1,5 +1,6 @@
 import { GradebookEntry, GradeMapping, PaginatedQuery } from "@bbdash/shared";
 import APILayer from "../structs/layer";
+import { SharedThrottle } from "../util";
 
 type GradeListing = PaginatedQuery<GradebookEntry>;
 
@@ -21,7 +22,7 @@ export class GradesLayer extends APILayer {
     async forCourse(courseID: string, cached = false): Promise<GradebookEntry[]> {
         if (cached && this.cache.grades && this.cache.grades[courseID]) return this.cache.grades[courseID];
 
-        const { data: { results } } = await this.axios.get(`/courses/${courseID}/gradebook/grades?isExcludedFromCourseUserActivity=true&limit=100&userId=${this.api.userID}`) as {
+        const { data: { results } } = await SharedThrottle.sharedInstance.processOne(() => this.axios.get(`/courses/${courseID}/gradebook/grades?isExcludedFromCourseUserActivity=true&limit=100&userId=${this.api.userID}`)) as {
             data: GradeListing
         };
 
@@ -43,10 +44,10 @@ export class GradesLayer extends APILayer {
         await Promise.all(courses.map(async course => {
             try {
                 gradeMapping[course.id] = await this.forCourse(course.id, cached);
-            } catch (e) {
+            } catch {
                 gradeMapping[course.id] = [];
             }
-        }))
+        }));
 
         return gradeMapping;
     }

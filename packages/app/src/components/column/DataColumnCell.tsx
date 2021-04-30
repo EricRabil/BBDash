@@ -23,10 +23,10 @@ export default function DataColumnCell({ data, rootRef, isPinned = false, isHidd
         <div ref={el => rootRef && (rootRef.current = el)} style={{
             "--cellBackground": course ? `var(--course-background-${course.id})` : "",
             "--cellTextColor": course ? `var(--course-text-color-${course.id})` : ""
-        } as unknown as CSSProperties} className="column-cell data-cell" attr-pinned={isPinned.toString()} attr-hidden={isHidden.toString()} attr-uri={data.attributes.uri} attr-course-id={data.attributes.courseID}>
-            <div className="data-cell--inner">
-                <div className="data-cell--header">
-                    <DataCellRenderContent content={data.header?.title} className="data-cell--header-title" />
+        } as unknown as CSSProperties} role="cell" className="column-cell data-cell" attr-pinned={isPinned.toString()} attr-hidden={isHidden.toString()} attr-uri={data.attributes.uri} attr-course-id={data.attributes.courseID}>
+            <div className="data-cell--inner" role="presentation">
+                <div className="data-cell--header" role="presentation">
+                    <DataCellRenderContent content={data.header?.title} className="data-cell--header-title" role="heading" />
                     <DataCellRenderContent content={data.header?.sideTitle} className="data-cell--muted" />
                 </div>
                 <DataCellRenderContent content={data.subtitle} className="data-cell--muted" />

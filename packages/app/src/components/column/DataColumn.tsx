@@ -89,21 +89,23 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     const columnURI = useMemo(() => BBURI.forColumn(id).toString(), [id]);
 
+    const headerLabelID = `${id}-label`;
+
     return (
         <>
-            <div onContextMenu={show} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
+            <div onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
                 <div className="column-drag-handle" />
                 <div className="column-header" attr-uri={columnURI} style={typeof headerColor === "number" ? {
                     "--column-header-background-color": `var(--palette-background-secondary-color-${headerColor})`,
                     color: `var(--palette-text-secondary-color-${headerColor})`
-                } as any : undefined}>
-                    <div className="column-header--main">
+                } as any : undefined} role="heading">
+                    <div id={headerLabelID} className="column-header--main">
                         {name || "Column"}
                     </div>
 
                     <DataColumnPreferences dataSource={dataSource} />
                 </div>
-                <div className="column-body">
+                <div className="column-body" role="presentation">
                     <DataColumnList data={renderData} defaultSize={defaultSize || 0} />
                 </div>
             </div>

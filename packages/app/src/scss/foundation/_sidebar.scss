@@ -7,10 +7,18 @@
 
     display: flex;
     flex-flow: column;
-    row-gap: 20px;
     padding: 20px 10px;
     justify-items: center;
     --icon-size: 45%;
+    margin: 0;
+
+    .sidebar-section {
+        display: flex;
+        flex-flow: column;
+        row-gap: 20px;
+        padding: 0;
+        margin: 0;
+    }
 
     .sidebar-spacer {
         flex-grow: 1;

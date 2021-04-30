@@ -1,3 +1,4 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useCallback, useContext } from "react";
 import "react-contexify/dist/ReactContexify.css";
@@ -12,6 +13,14 @@ import { useColorPaletteCSSVariables } from "./hooks/useColorPaletteCSSVariables
 import usePersistentColumns from "./hooks/usePersistentColumns";
 import useReloginWatcher from "./hooks/useReloginWatcher";
 import { COLUMN_DEFINITIONS } from "./utils/column-definitions";
+
+function SidebarItem({ ariaHidden = false, tooltip, popsUp = false, icon, click }: { ariaHidden?: boolean, tooltip: string, popsUp?: boolean, icon: IconProp, click?: () => void }) {
+    return (
+        <BBTooltip placement="right" content={<span>{tooltip}</span>}>
+            <li role="menuitem" aria-haspopup={popsUp} aria-hidden={ariaHidden} aria-label={tooltip} className="sidebar-icon-container" onClick={click}><FontAwesomeIcon icon={icon} /></li>
+        </BBTooltip>
+    );
+}
 
 export default function App() {
     const [,, { addColumn }] = usePersistentColumns();
@@ -39,23 +48,19 @@ export default function App() {
                         backgroundColor: background,
                         ...colorPaletteCSSVariables
                     }}>
-                        <div className="sidebar">
-                            {COLUMN_DEFINITIONS.map(({ icon, dataSource, name }) => (
-                                <BBTooltip key={dataSource} placement="right" content={<span>{name}</span>}>
-                                    <span className="sidebar-icon-container"><FontAwesomeIcon icon={icon} onClick={() => addColumn(dataSource)} /></span>
-                                </BBTooltip>
-                            ))}
-                            <div className="sidebar-spacer" />
-                            <BBTooltip placement="right" content={<span>{isDark ? "Light Mode" : "Dark Mode"}</span>}>
-                                <span className="sidebar-icon-container" onClick={toggleTheme}><FontAwesomeIcon icon={isDark ? "sun" : "moon"} /></span>
-                            </BBTooltip>
-                            <BBTooltip placement="right" content={<span>Report Bug</span>}>
-                                <span className="sidebar-icon-container" onClick={toggleIsFeedbackShowing}><FontAwesomeIcon icon="exclamation-triangle" /></span>
-                            </BBTooltip>
-                            <BBTooltip placement="right" content={<span>Settings</span>}>
-                                <span className="sidebar-icon-container" onClick={toggleIsSettingsShowing}><FontAwesomeIcon icon="cog" /></span>
-                            </BBTooltip>
-                        </div>
+                        <nav className="sidebar" role="navigation">
+                            <ul role="menubar" className="sidebar-section" aria-label="Column Creators">
+                                {COLUMN_DEFINITIONS.map(({ icon, dataSource, name }) => (
+                                    <SidebarItem key={dataSource} tooltip={`Add ${name} Column`} icon={icon} click={() => addColumn(dataSource)} />
+                                ))}
+                            </ul>
+                            <div className="sidebar-spacer" aria-hidden />
+                            <ul role="menubar" className="sidebar-section" aria-label="App Controls">
+                                <SidebarItem ariaHidden tooltip={isDark ? "Light Mode" : "Dark Mode"} icon={isDark ? "sun" : "moon"} click={toggleTheme} />
+                                <SidebarItem popsUp tooltip="Report Bug" icon="exclamation-triangle" click={toggleIsFeedbackShowing} />
+                                <SidebarItem popsUp tooltip="Settings" icon="cog" click={toggleIsSettingsShowing} />
+                            </ul>
+                        </nav>
                         <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
                         <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
                         <ColumnGrid />

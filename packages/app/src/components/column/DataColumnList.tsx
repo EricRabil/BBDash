@@ -24,6 +24,10 @@ export interface DataColumnListProps {
     defaultSize: number;
 }
 
+const rowRootProps = {
+    role: "row"
+};
+
 /**
  * Handles the presentation of DataCellData, in a virtualized scrolling list
  */
@@ -44,6 +48,12 @@ export default React.memo(function DataColumnList({ data, defaultSize }: DataCol
             getID={getID}
             isSame={isRendererPropsForDataCellSame}
             overscanCount={15}
+            outerRef={(el: HTMLElement | null) => {
+                if (!el) return;
+                el.setAttribute("role", "presentation");
+                el.firstElementChild!.setAttribute("role", "rowgroup");
+            }}
+            getProps={useCallback(() => rowRootProps, [])}
         >
             {({ ref, index, data }: RowRenderingContext<DataCellData, unknown>) => (
                 <DataColumnCell data={data[index]} isPinned={absolutePinnedItems.includes(data[index].attributes.uri)} isHidden={isHidden(data[index])} rootRef={ref} />
