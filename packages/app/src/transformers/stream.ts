@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { TransformationOptions } from ".";
 import { courseLink } from "../utils/courses";
 import { BBURI } from "../utils/uri";
-import { DataCellData, ENTRY_DUE_DATE, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
+import { DataCellData, ENTRY_COURSE_ID, ENTRY_DUE_DATE, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
 import { formatDate } from "./util";
 
 const renderBlacklist = [
@@ -52,7 +52,8 @@ export default function transformStreamEntries(entries: StreamEntry[], { courses
                 [ENTRY_DUE_DATE]: entry.itemSpecificData.notificationDetails?.dueDate
             },
             filterables: {
-                [ENTRY_DUE_DATE]: typeof entry.itemSpecificData.notificationDetails?.dueDate === "string"
+                [ENTRY_DUE_DATE]: typeof entry.itemSpecificData.notificationDetails?.dueDate === "string",
+                [ENTRY_COURSE_ID]: entry.se_courseId
             }
         });
     }
