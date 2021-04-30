@@ -21,7 +21,6 @@ node {
 		}
 		
 		stage("Archive Artifacts") {
-			sh "mv /tmp/bbdash/packages/chrome-extension/dist ${WORKSPACE}/bbdash-intermediate"
 			sh '''
 			cd /tmp/bbdash/packages/chrome-extension/dist
 			zip -r ../bbdash-${BUILD_NUMBER}-development.zip *
@@ -29,7 +28,7 @@ node {
 			rm -rf ${WORKSPACE}/*.zip
 			mv *.zip ${WORKSPACE}/
 			'''
-			archiveArtifacts artifacts '*.zip'
+			archiveArtifacts artifacts: '*.zip'
 		}
 	}
 }
