@@ -2,7 +2,7 @@ import { Course } from "@bbdash/shared";
 import { TransformationOptions } from ".";
 import { BBURI } from "../utils/uri";
 import { TaggedCourseContentItem } from "./data-source-spec";
-import { DataCellData, ENTRY_CONTENT_CATEGORY, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
+import { DataCellData, ENTRY_CONTENT_CATEGORY, ENTRY_COURSE_ID, ENTRY_TIME, ENTRY_TITLE, RenderContentFormat } from "./spec";
 import { formatDate } from "./util";
 
 const origins = new Map<string, string>();
@@ -141,7 +141,8 @@ export default function transformCourseContents(contents: TaggedCourseContentIte
                 [ENTRY_TITLE]: content.title
             },
             filterables: {
-                [ENTRY_CONTENT_CATEGORY]: content.contentHandler?.id
+                [ENTRY_CONTENT_CATEGORY]: content.contentHandler?.id,
+                [ENTRY_COURSE_ID]: content.courseID
             }
         });
     }

@@ -64,17 +64,19 @@ export function CourseBlacklistProvider({ children, blacklistedCourses: locallyB
     const absoluteBlacklistedCourses = useMemo(() => globallyBlacklistedCourses.concat(locallyBlacklistedCourses), [globallyBlacklistedCourses, locallyBlacklistedCourses]);
     const blacklistedCourses = useMemo(() => uriFiltersAreDisabled ? [] : absoluteBlacklistedCourses, [uriFiltersAreDisabled, absoluteBlacklistedCourses]);
 
+    const api = useMemo(() => ({
+        blacklistedCourses,
+        absoluteBlacklistedCourses,
+        locallyBlacklistedCourses,
+        globallyBlacklistedCourses: isRoot ? locallyBlacklistedCourses : globallyBlacklistedCourses,
+        overwriteBlacklistedCourses,
+        setBlacklisted,
+        clear,
+        isDefault: false
+    }), [blacklistedCourses, absoluteBlacklistedCourses, locallyBlacklistedCourses, isRoot, overwriteBlacklistedCourses, globallyBlacklistedCourses, setBlacklisted, clear]);
+
     return (
-        <CourseBlacklistContext.Provider value={{
-            blacklistedCourses,
-            absoluteBlacklistedCourses,
-            locallyBlacklistedCourses,
-            globallyBlacklistedCourses: isRoot ? locallyBlacklistedCourses : globallyBlacklistedCourses,
-            overwriteBlacklistedCourses,
-            setBlacklisted,
-            clear,
-            isDefault: false
-        }}>
+        <CourseBlacklistContext.Provider value={api}>
             {children}
         </CourseBlacklistContext.Provider>
     );

@@ -36,7 +36,7 @@ const renderCaches: Record<number, Record<string, Node[]>> = {};
 
 const getRenderCache = (id: number) => renderCaches[id] || (renderCaches[id] = {});
 
-export default function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, ...props }: DataColumnProps<DataSourceType>) {
+export default React.forwardRef(function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, ...props }: DataColumnProps<DataSourceType>, ref: any) {
     const rawData: DataSourceMapping[DataSourceType][] = useSelector(useMemo(() => selectDataForSource(dataSource), [ dataSource ]));
 
     const courses = useSelector(selectCourses);
@@ -93,7 +93,7 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
 
     return (
         <>
-            <div onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
+            <div ref={ref} onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
                 <div className="column-drag-handle" />
                 <div className="column-header" attr-uri={columnURI} style={typeof headerColor === "number" ? {
                     "--column-header-background-color": `var(--palette-background-secondary-color-${headerColor})`,
@@ -113,4 +113,4 @@ export default function DataColumn<DataSourceType extends DataSource>({ dataSour
             <CTXPortal ctxID={id.toString()} />
         </>
     );
-}
+});

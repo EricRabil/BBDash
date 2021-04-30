@@ -1,7 +1,9 @@
 import { ContentCategories } from "@bbdash/shared";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { PropsWithoutRef, useContext } from "react";
+import React, { PropsWithoutRef, useContext, useMemo } from "react";
+import { useSelector } from "react-redux";
 import { ColumnSettingsContext, usePreference } from "../../contexts/column-settings-context";
+import { selectCourses } from "../../store/reducers/courses";
 import { DataSource, DataSourceSpecs } from "../../transformers/data-source-spec";
 import { ENTRY_CONTENT_CATEGORY } from "../../transformers/spec";
 import { PossibleSortOrders, SortOrder } from "../../utils/data-presentation";
@@ -26,6 +28,10 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
     const [ filters, setFilters ] = usePreference("filters");
     const [ sortBy, setSortBy ] = usePreference("sortBy");
     const [ sortOrder, setSortOrder ] = usePreference("sortOrder");
+
+    const courses = useSelector(selectCourses);
+
+    const courseIDs = useMemo(() => Object.keys(courses), [courses]);
 
     return (
         <>
@@ -67,12 +73,20 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
                                 );
                             case "ENTRY_DUE_DATE":
                                 return (
-                                    <SettingsField type="checkbox" value={filters[filterType] as boolean} setValue={newValue => setFilters({
+                                    <SettingsField type="checkbox" key={filterType} value={filters[filterType] as boolean} setValue={newValue => setFilters({
                                         ...filters,
                                         "ENTRY_DUE_DATE": newValue
                                     })}>
                                         Needs Due Date
                                     </SettingsField>
+                                );
+                            case "ENTRY_COURSE_ID":
+                                return (
+                                    <SettingsListField multi={true} key={filterType} options={courseIDs} value={filters.ENTRY_COURSE_ID || []} setValue={newValue => setFilters(Object.assign({}, filters, {
+                                        "ENTRY_COURSE_ID": newValue
+                                    }))} header={<>Course Filter</>}>
+                                        {courseID => <>{courses[courseID].displayName}</>}
+                                    </SettingsListField>
                                 );
                             }
                         })

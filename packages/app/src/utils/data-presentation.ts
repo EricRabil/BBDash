@@ -1,6 +1,6 @@
 import { ContentCategories, ContentType } from "@bbdash/shared";
 import { ColumnSettings } from "../contexts/column-settings-context";
-import { DataCellData, ENTRY_CONTENT_CATEGORY, ENTRY_DUE_DATE, ENTRY_EMPTY, ENTRY_TIME, ENTRY_TITLE, SortableKey } from "../transformers/spec";
+import { DataCellData, ENTRY_CONTENT_CATEGORY, ENTRY_COURSE_ID, ENTRY_DUE_DATE, ENTRY_EMPTY, ENTRY_TIME, ENTRY_TITLE, SortableKey } from "../transformers/spec";
 import { parseDate } from "./date";
 
 export enum SortOrder {
@@ -48,6 +48,15 @@ export function filterData(data: DataCellData[], { filters }: {
                 return data.filterables[ENTRY_DUE_DATE] === value;
             });
             
+            break;
+        case ENTRY_COURSE_ID:
+            if ((value as unknown[]).filter(item => item).length === 0) break;
+
+            data = data.filter(data => {
+                if (typeof data.filterables?.[ENTRY_COURSE_ID] !== "string") return false;
+                return (value as string[]).includes(data.filterables[ENTRY_COURSE_ID]!);
+            });
+
             break;
         default:
             break;

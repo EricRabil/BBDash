@@ -118,8 +118,8 @@ export default class BackgroundController {
             Log.info("UserID was reloaded. New ID:", persistent.userID);
         } catch (e) {
             Log.error("UserID failed to reload with error");
-            console.error(e);
-            this.#droppedReload = true
+            this.#droppedReload = true;
+            this.reloadObservers.reject(e);
             return this.reloadObservers.observe();
         }
 

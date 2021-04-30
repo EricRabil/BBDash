@@ -93,8 +93,12 @@ export function ItemOrganizerProvider({ children, hiddenItems: locallyHiddenItem
     const hiddenItems = useMemo(() => uriFiltersAreDisabled ? [] : absoluteHiddenItems, [uriFiltersAreDisabled, absoluteHiddenItems]);
     const pinnedItems = useMemo(() => uriFiltersAreDisabled ? [] : absolutePinnedItems, [uriFiltersAreDisabled, absolutePinnedItems]);
 
-    return (
-        <ItemOrganizerContext.Provider value={{
+    React.useEffect(() => {
+        console.log("?!");
+    }, [setLocallyPinnedItems]);
+
+    const api = useMemo(() => {
+        return {
             hiddenItems,
             absoluteHiddenItems,
             setHidden,
@@ -108,7 +112,11 @@ export function ItemOrganizerProvider({ children, hiddenItems: locallyHiddenItem
             setPinned,
             unpinAllItems,
             isDefault: false
-        }}>
+        };
+    }, [hiddenItems, absolutePinnedItems, setHidden, locallyHiddenItems, globallyPinnedItems, unhideAllItems, pinnedItems, locallyPinnedItems, isRoot, setPinned, unpinAllItems]);
+
+    return (
+        <ItemOrganizerContext.Provider value={api}>
             {children}
         </ItemOrganizerContext.Provider>
     );

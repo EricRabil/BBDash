@@ -17,17 +17,17 @@ const GRID_WIDTH = (COLUMNS * COLUMN_WIDTH) + (COLUMNS * HORIZONTAL_MARGIN);
 /**
  * Facilitates passthrough of layout props to the inner item, while still setting up the provider
  */
-function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem, tabIndex?: number } & Omit<ColumnSettingsProviderProps, "columnUID">>) {
+const GridItemMounter = React.forwardRef(function GridItemMounter({ item, settings, setSettings, deleteColumn, ...props }: PropsWithRef<{ item: ColumnItem, tabIndex?: number } & Omit<ColumnSettingsProviderProps, "columnUID">>, ref) {
     const Element = findColumnDefinitionByDataSource(item.dataSource)?.component;
 
-    if (!Element) return <div {...props} />;
+    if (!Element) return <div ref={ref as any} {...props} />;
 
     return (
         <ColumnSettingsProvider columnUID={item.uid} settings={settings} setSettings={setSettings} deleteColumn={deleteColumn}>
-            <Element {...props} />
+            <Element ref={ref} {...props} />
         </ColumnSettingsProvider>
     );
-}
+});
 
 /**
  * Mounts the columns from usePersistentColumns in a rearrangable grid.
@@ -63,9 +63,11 @@ export default function ColumnGrid(elProps: PropsWithRef<React.HTMLAttributes<HT
                             }
                         }}
                     >
-                        {columnItems.map((item, index) => (
-                            <GridItemMounter tabIndex={layout[index].x + 1} key={index} item={item} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)} />
-                        ))}
+                        {columnItems.map((item, index) => {
+                            return (
+                                <GridItemMounter tabIndex={layout[index].x + 1} key={index} item={item} settings={item.preferences} setSettings={settings => updatePreferences(index, settings)} deleteColumn={() => removeColumn(index)} />
+                            );
+                        })}
                     </GridLayout>
                 )}
             </AutoSizer>

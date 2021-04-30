@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext } from "react";
+import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef } from "react";
 import { DataCellData, ENTRY_CONTENT_CATEGORY, FilterableKey, SortableKey } from "../transformers/spec";
 import { SortOrder } from "../utils/data-presentation";
 import { CourseBlacklistProvider } from "./course-blacklist-context";
@@ -91,7 +91,12 @@ function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) 
 }
 
 export function ColumnSettingsProvider({ children, columnUID: id, deleteColumn, settings, setSettings }: PropsWithChildren<ColumnSettingsProviderProps>) {
-    const setKey: ColumnSettingsState["setKey"] = useCallback((key, value) => setSettings(Object.assign({}, settings, { [key]: value })), [settings, setSettings]);
+    const settingsRef = useRef(settings);
+    const setKey: ColumnSettingsState["setKey"] = useCallback((key, value) => setSettings(Object.assign({}, settings, { [key]: value })), [setSettings]);
+
+    useEffect(() => {
+        settingsRef.current = settings;
+    }, [settings]);
 
     return (
         <ColumnSettingsContext.Provider value={{ settings, id, deleteColumn, setSettings, setKey }}>

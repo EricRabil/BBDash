@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext, useState } from "react";
+import React, { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from "react";
 
 export interface FilterBehaviorState {
     uriFiltersAreDisabled: boolean;
@@ -33,24 +33,30 @@ export function FilterBehaviorProvider({ children }: PropsWithChildren<{}>) {
     const uriFiltersAreDisabled = uriFiltersAreDisabledGlobally || uriFiltersAreDisabledLocally;
     const userFiltersAreDisabled = userFiltersAreDisabledGlobally || userFiltersAreDisabledLocally;
 
+    const setUriFiltersAreDisabled = useCallback((disabled, globally) => {
+        if (globally && !isRoot) setUriFiltersAreDisabledGlobally(disabled, globally);
+        else setUriFiltersAreDisabledLocally(disabled);
+    }, [setUriFiltersAreDisabledGlobally, setUriFiltersAreDisabledLocally]);
+
+    const setUserFiltersAreDisabled = useCallback((disabled, globally) => {
+        if (globally && !isRoot) setUserFiltersAreDisabledGlobally(disabled, globally);
+        else setUserFiltersAreDisabledLocally(disabled);
+    }, [setUserFiltersAreDisabledGlobally, setUserFiltersAreDisabledLocally]);
+
+    const api = useMemo(() => ({
+        uriFiltersAreDisabled,
+        uriFiltersAreDisabledLocally,
+        uriFiltersAreDisabledGlobally,
+        userFiltersAreDisabled,
+        userFiltersAreDisabledLocally,
+        userFiltersAreDisabledGlobally,
+        setUriFiltersAreDisabled,
+        setUserFiltersAreDisabled,
+        isDefault: false
+    }), [uriFiltersAreDisabled, uriFiltersAreDisabledLocally, uriFiltersAreDisabledGlobally, userFiltersAreDisabled, userFiltersAreDisabledLocally, userFiltersAreDisabledGlobally, setUriFiltersAreDisabled, setUserFiltersAreDisabled]);
+
     return (
-        <FilterBehaviorContext.Provider value={{
-            uriFiltersAreDisabled,
-            uriFiltersAreDisabledLocally,
-            uriFiltersAreDisabledGlobally,
-            userFiltersAreDisabled,
-            userFiltersAreDisabledLocally,
-            userFiltersAreDisabledGlobally,
-            setUriFiltersAreDisabled: useCallback((disabled, globally) => {
-                if (globally && !isRoot) setUriFiltersAreDisabledGlobally(disabled, globally);
-                else setUriFiltersAreDisabledLocally(disabled);
-            }, [setUriFiltersAreDisabledGlobally, setUriFiltersAreDisabledLocally]),
-            setUserFiltersAreDisabled: useCallback((disabled, globally) => {
-                if (globally && !isRoot) setUserFiltersAreDisabledGlobally(disabled, globally);
-                else setUserFiltersAreDisabledLocally(disabled);
-            }, [setUserFiltersAreDisabledGlobally, setUserFiltersAreDisabledLocally]),
-            isDefault: false
-        }}>
+        <FilterBehaviorContext.Provider value={api}>
             {children}
         </FilterBehaviorContext.Provider>
     );

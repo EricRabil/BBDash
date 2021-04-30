@@ -5,17 +5,17 @@ import { DataSource } from "../transformers/data-source-spec";
 
 export interface ColumnDefinition {
     icon: IconProp;
-    component: React.FunctionComponentFactory<any>;
+    component: React.ExoticComponent<any>;
     dataSource: DataSource;
     name: string;
 }
 
 export function makeDataSourceComponent<DataSourceType extends DataSource>(dataSource: DataSourceType, dataColumnProps: Partial<DataColumnProps<DataSourceType>> = {}) {
-    return function DataSourceComponent(props: PropsWithoutRef<{}>) {
+    return React.forwardRef(function DataSourceComponent(props: PropsWithoutRef<{}>, ref) {
         return (
-            <DataColumn {...dataColumnProps} dataSource={dataSource} {...props} />
+            <DataColumn ref={ref as any} {...dataColumnProps} dataSource={dataSource} {...props} />
         );
-    };
+    })!;
 }
 
 export const COLUMN_DEFINITIONS: ColumnDefinition[] = [

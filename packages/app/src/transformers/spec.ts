@@ -33,6 +33,7 @@ export const ENTRY_TITLE = "ENTRY_TITLE";
 export const ENTRY_DUE_DATE = "ENTRY_DUE_DATE";
 export const ENTRY_CONTENT_CATEGORY = "ENTRY_CONTENT_CATEGORY";
 export const ENTRY_EMPTY = "ENTRY_EMPTY";
+export const ENTRY_COURSE_ID = "ENTRY_COURSE_ID";
 
 type Maybe<T> = T | undefined | null;
 export type RawDate = Date | string | number;
@@ -55,6 +56,7 @@ export interface DataCellData {
         [ENTRY_CONTENT_CATEGORY]?: string;
         [ENTRY_EMPTY]?: boolean;
         [ENTRY_DUE_DATE]?: boolean;
+        [ENTRY_COURSE_ID]?: string;
     };
     attributes: DataCellAttributes;
 }
