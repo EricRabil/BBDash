@@ -106,10 +106,6 @@ $column-border-radius: 5px;
             @include palette-property-transition(opacity, 0.6);
             cursor: pointer;
 
-            &:focus {
-                outline: 1px solid black;
-            }
-
             &:hover, &:focus {
                 opacity: 0.8;
             }

@@ -9,4 +9,8 @@ html {
     overflow: hidden;
 }
 
-
+:focus {
+    outline: 1px solid #2188ff;
+    box-shadow: rgba(3, 102, 214, 0.3) 0px 0px 0px 2.8px;
+    outline: none;
+}
