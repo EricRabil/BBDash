@@ -10,7 +10,7 @@ import { findColumnDefinitionByDataSource } from "../utils/column-definitions";
 const HORIZONTAL_MARGIN = 5;
 const VERTICAL_MARGIN = 0;
 const COLUMNS = 12;
-const COLUMN_WIDTH = 345;
+const COLUMN_WIDTH = 365;
 
 const GRID_WIDTH = (COLUMNS * COLUMN_WIDTH) + (COLUMNS * HORIZONTAL_MARGIN);
 

@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import React, { PropsWithoutRef, useCallback, useContext, useMemo } from "react";
+import React, { CSSProperties, PropsWithoutRef, useCallback, useContext, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { ColumnSettingsContext } from "../../contexts/column-settings-context";
 import { CourseBlacklistContext } from "../../contexts/course-blacklist-context";
@@ -19,6 +19,7 @@ import DataColumnPreferences from "./DataColumnPreferences";
 
 export interface DataColumnProps<DataSourceType extends DataSource> extends PropsWithoutRef<{
     className?: string;
+    style?: CSSProperties;
 }> {
     /**
      * Where the data originated. Used for determining things like filters, sort by in preferences
@@ -36,7 +37,7 @@ const renderCaches: Record<number, Record<string, Node[]>> = {};
 
 const getRenderCache = (id: number) => renderCaches[id] || (renderCaches[id] = {});
 
-export default React.forwardRef(function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, ...props }: DataColumnProps<DataSourceType>, ref: any) {
+export default React.forwardRef(function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, style = {}, ...props }: DataColumnProps<DataSourceType>, ref: any) {
     const rawData: DataSourceMapping[DataSourceType][] = useSelector(useMemo(() => selectDataForSource(dataSource), [ dataSource ]));
 
     const courses = useSelector(selectCourses);
@@ -93,12 +94,15 @@ export default React.forwardRef(function DataColumn<DataSourceType extends DataS
 
     return (
         <>
-            <div ref={ref} onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" {...props}>
-                <div className="column-drag-handle" />
-                <div className="column-header" attr-uri={columnURI} style={typeof headerColor === "number" ? {
-                    "--column-header-background-color": `var(--palette-background-secondary-color-${headerColor})`,
+            <div ref={ref} onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" style={{
+                ...style,
+                ...(typeof headerColor === "number" ? {
+                    "--column-background-color": `var(--palette-background-secondary-color-${headerColor})`,
                     color: `var(--palette-text-secondary-color-${headerColor})`
-                } as any : undefined} role="heading">
+                } as any : {})
+            }} {...props}>
+                <div className="column-drag-handle" />
+                <div className="column-header" attr-uri={columnURI} role="heading">
                     <div id={headerLabelID} className="column-header--main">
                         {name || "Column"}
                     </div>

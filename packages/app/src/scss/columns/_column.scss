@@ -1,43 +1,100 @@
 @import "../foundation/mixins";
 @import "../variables";
 
-.column-container {
-    display: grid;
-    grid-template-rows: 5px 50px minmax(0, 1fr);
-    row-gap: 1px;
+$column-border-radius: 5px;
 
-    max-height: 100vh;
+@mixin pseudo-init($sizing: 1) {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    @if $sizing == 1 {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+@mixin column-rounded {
+    border-radius: var(--border-radius);
+}
+
+@mixin cell-dashed($condition, $from, $to) {
+    &[#{$condition}] > .data-cell--inner::before {
+        @include dashed($from, $to);
+    }
+}
+
+@mixin cell-background {
+    @include palette-property-transition(background-color, var(--cellBackground, var(--palette-default-background-color)));
+}
+
+@mixin cell-text-color {
+    @include palette-property-transition(color, var(--cellTextColor, var(--palette-default-text-color)));
+}
+
+@mixin configurable-background($value) {
+    &::before {
+        // cell background
+        @include pseudo-init($sizing: 0);
+        @include palette-property-transition(background-color, $value);
+        @include column-rounded;
+
+        width: 100%;
+        height: 100%;
+
+        // background should be an accent
+        opacity: 0.5;
+    }
+}
+
+:root {
+    --border-radius: #{$column-border-radius};
+}
+
+.column-container {
+    @include column-rounded;
+
+    --item-width: calc(100% - 20px);
+
+    display: grid;
+    justify-items: center;
+
+    grid-template-rows: max-content minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 7.5px;
+
+    padding: 7.5px 0;
+    margin: 5px 0;
+
+    max-height: calc(100vh - 25px);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+
+    position: relative;
+
+    @include configurable-background(var(--column-background-color));
 
     .column-drag-handle {
-        background: darken($main-background, 5);
         cursor: move;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        width: 100%;
+        height: 100%;
     }
 
-    &>.column-header {
+    & > .column-header {
+        @include column-rounded;
+
         display: flex;
         flex-flow: row;
         align-items: center;
         user-select: none;
-
-        padding: 0 10px;
         
         position: relative;
 
-        @include palette-property-transition(color);
-
-        &::before {
-            position: absolute;
-            content: '';
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-
-            @include palette-property-transition(background-color);
-            background-color: var(--column-header-background-color, white);
-            opacity: 0.6;
-            z-index: -1;
-        }
+        width: calc(var(--item-width) - 20px);
 
         .column-header--main {
             flex: 1;
@@ -46,76 +103,101 @@
         }
 
         .column-prefs-toggle {
+            @include palette-property-transition(opacity, 0.6);
             cursor: pointer;
+
+            &:focus {
+                outline: 1px solid black;
+            }
+
+            &:hover, &:focus {
+                opacity: 0.8;
+            }
+
+            &:active {
+                opacity: 1;
+            }
         }
     }
 
-    &:not([attr-virtualized=true])>.column-body {
-        overflow-y: overlay;
-    }
+    & > .column-body {
+        --column-background-width-offset: 0px;
 
-    &>.column-body {
-        .ReactVirtualized__Grid {
+        width: var(--item-width);
+
+        ::-webkit-scrollbar-track {
+            margin: 10px;
+        }
+
+        ::-webkit-scrollbar {
+            background: none;
+        }
+
+        & .virtualized-container {
+            // scroll appearance
             overflow: overlay !important;
-        }
+            border-radius: var(--border-radius);
 
-        & .ReactVirtualized__Grid__innerScrollContainer {
-            &>.column-cell:not(:last-child) {
-                margin-bottom: 1px;
+            & > [role=rowgroup] > [role=row]:not(:last-child) .column-cell {
+                // offset background so it doesnt bleed into spacer
+                --column-background-width-offset: 5px;
+
+                &::after {
+                    // separator between cells
+                    content: '';
+                    height: 5px;
+                }
             }
         }
 
         & .column-cell {
+            @include cell-text-color;
+
+            position: relative;
+
             display: flex;
             flex-flow: column;
             justify-content: center;
 
-            @include palette-property-transition((background-color, color));
+            cursor: default;
 
-            background-color: var(--palette-app-background-color);
             padding: 15px 10px;
 
-            color: var(--cellTextColor);
+            // indicate it is pinned
+            @include cell-dashed('attr-pinned=true', rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
 
-            &[attr-pinned=true] > .data-cell--inner::before {
-                @include dashed(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+            // red strikethrough to show its normally hidden
+            @include cell-dashed('attr-hidden=true', rgba(255, 0, 0, 0.05), rgba(255, 0, 0, 0.1));
+
+            &::before {
+                // cell background
+                @include pseudo-init($sizing: 0);
+                @include cell-background;
+                @include column-rounded;
+
+                width: 100%;
+                height: calc(100% - var(--column-background-width-offset));
+
+                // background should be an accent
+                opacity: 0.5;
             }
 
-            &[attr-hidden=true] > .data-cell--inner::before {
-                @include dashed(rgba(255, 0, 0, 0.05), rgba(255, 0, 0, 0.1));
-            }
+            & > .data-cell--inner {
+                @include palette-property-transition(background-color, rgba(255, 255, 255, 0.2));
+                @include column-rounded;
 
-            &>.data-cell--inner {
-                @include palette-property-transition(background-color);
-
-                background-color: var(--cellBackground, var(--palette-default-background-color));
-                position: relative;
-
-                & > * {
-                    z-index: 1;
-                }
-
-                &::before {
-                    position: absolute;
-                    content: '';
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    z-index: 0;
-                }
+                border: 1px solid rgba(0, 0, 0, 0.2);
+                z-index: 1;
             }
 
             a {
-                @include palette-property-transition(color);
+                @include cell-text-color;
 
                 font-weight: 500;
 
                 &:not(:hover) {
                     text-decoration: none;
                 }
-
-                color: var(--cellTextColor, var(--palette-default-text-color));
             }
         }
     }

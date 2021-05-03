@@ -34,9 +34,9 @@ export const ColorPalettes: Record<string, ColorPalette> = {
     }, -40),
     light: makeColorPalette({
         colors: ["#caffbf","#fdffb6","#ffd6a5","#ffadad","#bdb2ff","#a0c4ff","#9bf6ff","#ddd6ff","#ffc6ff"],
-        defaultCellColor: "#c7c7c7",
+        defaultCellColor: "#e3e3e3",
         sidebarColor: "#385e80",
-        background: "#7c96a9",
+        background: "#ffffff",
     }, 40)
 };
 

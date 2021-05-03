@@ -51,6 +51,7 @@ export default React.memo(function DataColumnList({ data, defaultSize }: DataCol
             outerRef={(el: HTMLElement | null) => {
                 if (!el) return;
                 el.setAttribute("role", "presentation");
+                el.className = "virtualized-container";
                 el.firstElementChild!.setAttribute("role", "rowgroup");
             }}
             getProps={useCallback(() => rowRootProps, [])}
