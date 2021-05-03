@@ -1,21 +1,15 @@
 import classnames from "classnames";
-import React, { CSSProperties, PropsWithoutRef, useCallback, useContext, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { ColumnSettingsContext } from "../../contexts/column-settings-context";
-import { CourseBlacklistContext } from "../../contexts/course-blacklist-context";
-import { ItemOrganizerContext } from "../../contexts/item-organizer-context";
-import { selectCourses } from "../../store/reducers/courses";
-import { selectDataForSource } from "../../store/reducers/data";
-import { transformData } from "../../transformers";
-import { DataSource, DataSourceMapping } from "../../transformers/data-source-spec";
-import { DataCellData } from "../../transformers/spec";
-import { splitArray } from "../../utils/array";
-import { filterData, sortData } from "../../utils/data-presentation";
+import React, { CSSProperties, PropsWithoutRef, useContext, useMemo } from "react";
+import { ColumnSettingsContext, PreferenceConsumer } from "../../contexts/column-settings-context";
+import { DataSource } from "../../transformers/data-source-spec";
 import { BBURI } from "../../utils/uri";
 import CTXPortal from "../context-menu/CTXPortal";
 import { useDataCellContextMenuHandler } from "../context-menu/DataCellContextMenu";
+import DataColumnContextmenuController from "./DataColumnContextmenuController";
 import DataColumnList from "./DataColumnList";
 import DataColumnPreferences from "./DataColumnPreferences";
+import DataColumnStyleInjector from "./DataColumnStyleInjector";
+import DataPresentationConsumer from "./DataPresentationConsumer";
 
 export interface DataColumnProps<DataSourceType extends DataSource> extends PropsWithoutRef<{
     className?: string;
@@ -33,58 +27,8 @@ export interface DataColumnProps<DataSourceType extends DataSource> extends Prop
     defaultSize?: number;
 }
 
-const renderCaches: Record<number, Record<string, Node[]>> = {};
-
-const getRenderCache = (id: number) => renderCaches[id] || (renderCaches[id] = {});
-
 export default React.forwardRef(function DataColumn<DataSourceType extends DataSource>({ dataSource, defaultSize, className, style = {}, ...props }: DataColumnProps<DataSourceType>, ref: any) {
-    const rawData: DataSourceMapping[DataSourceType][] = useSelector(useMemo(() => selectDataForSource(dataSource), [ dataSource ]));
-
-    const courses = useSelector(selectCourses);
-
-    const { pinnedItems, hiddenItems } = useContext(ItemOrganizerContext);
-    const { blacklistedCourses } = useContext(CourseBlacklistContext);
-
-    const { settings: { filters, sortBy, sortOrder, name, headerColor }, id } = useContext(ColumnSettingsContext);
-    
-    // Transformed data without any filters or sorting applied
-    const rawTransformedData = useMemo(() => transformData(dataSource, rawData, {
-        courses,
-        renderCache: getRenderCache(id)
-    }), [dataSource, rawData, courses]);
-
-    const filteredData = useMemo(() => {
-        let transformed = rawTransformedData;
-
-        if (filters) {
-            // apply user-configured filters
-            transformed = filterData(transformed, {
-                filters
-            });
-        }
-
-        // apply global hiddenItems and blacklistedCourses filters
-        return transformed.filter(data => !hiddenItems.includes(data.attributes.uri) && !blacklistedCourses.includes(data.attributes.courseID));
-    }, [hiddenItems, blacklistedCourses, filters, rawTransformedData]);
-
-    const doSort = useCallback((data: DataCellData[]) => {
-        if (!sortBy) return data;
-
-        return sortData(data, {
-            sortOrder,
-            sortBy
-        });
-    }, [sortBy, sortOrder]);
-
-    // ready-to-render data
-    const renderData = useMemo(() => {
-        const [ pinnedData, normalData ] = splitArray(filteredData, item => pinnedItems.includes(item.attributes.uri) ? 0 : 1);
-
-        doSort(pinnedData);
-        doSort(normalData);
-
-        return [ pinnedData, normalData ].flat();
-    }, [pinnedItems, filteredData, doSort]);
+    const { id } = useContext(ColumnSettingsContext);
 
     const show = useDataCellContextMenuHandler(id.toString());
 
@@ -94,25 +38,31 @@ export default React.forwardRef(function DataColumn<DataSourceType extends DataS
 
     return (
         <>
-            <div ref={ref} onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" style={{
-                ...style,
-                ...(typeof headerColor === "number" ? {
-                    "--column-background-color": `var(--palette-background-secondary-color-${headerColor})`,
-                    color: `var(--palette-text-secondary-color-${headerColor})`
-                } as any : {})
-            }} {...props}>
-                <div className="column-drag-handle" />
-                <div className="column-header" attr-uri={columnURI} role="heading">
-                    <div id={headerLabelID} className="column-header--main">
-                        {name || "Column"}
-                    </div>
+            <DataColumnContextmenuController>
+                <DataColumnStyleInjector>
+                    <div ref={ref} onContextMenu={show} role="region" aria-labelledby={headerLabelID} className={classnames("column-container", className)} attr-virtualized="true" style={style} attr-uri={columnURI} {...props}>
+                        <div className="column-drag-handle" />
+                        <div className="column-header" role="heading">
+                            <div id={headerLabelID} className="column-header--main">
+                                <PreferenceConsumer preferenceKey="name">
+                                    {([ name ]) => (
+                                        name || "Column"
+                                    )}
+                                </PreferenceConsumer>
+                            </div>
 
-                    <DataColumnPreferences dataSource={dataSource} />
-                </div>
-                <div className="column-body" role="presentation">
-                    <DataColumnList data={renderData} defaultSize={defaultSize || 0} />
-                </div>
-            </div>
+                            <DataColumnPreferences dataSource={dataSource} />
+                        </div>
+                        <div className="column-body" role="presentation">
+                            <DataPresentationConsumer dataSource={dataSource}>
+                                {renderData => (
+                                    <DataColumnList data={renderData} defaultSize={defaultSize || 0} />
+                                )}
+                            </DataPresentationConsumer>
+                        </div>
+                    </div>
+                </DataColumnStyleInjector>
+            </DataColumnContextmenuController>
 
             <CTXPortal ctxID={id.toString()} />
         </>

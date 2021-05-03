@@ -2233,6 +2233,7 @@ __metadata:
     "@types/react-color": ^3.0.4
     "@types/react-dom": ^16.9.0
     "@types/react-grid-layout": ^1.1.1
+    "@types/react-is": ^17.0.0
     "@types/react-redux": ^7.1.16
     "@types/react-toast-notifications": ^2.4.0
     "@types/react-virtualized": ^9.21.11
@@ -2255,6 +2256,7 @@ __metadata:
     react-dom: ^17.0.1
     react-git-info: ^2.0.0
     react-grid-layout: ^1.2.4
+    react-is: ^17.0.2
     react-query: ^3.6.0
     react-redux: ^7.2.3
     react-scripts: ^4.0.3
@@ -4518,6 +4520,15 @@ __metadata:
   dependencies:
     "@types/react": "*"
   checksum: 036ba106b168fb93422010b1b6912262adaa01990ce5ec6c04d2480ec2ba3885c313a8b29be3cc1b4c689a94a76e047d8b2ec37af6daf9426b37271f6785f4a9
+  languageName: node
+  linkType: hard
+
+"@types/react-is@npm:^17.0.0":
+  version: 17.0.0
+  resolution: "@types/react-is@npm:17.0.0"
+  dependencies:
+    "@types/react": "*"
+  checksum: d0734c30ba645c42626ea580addb24f1d23bd35b3f52a3a78ff876ceadfb0ada4b6a4bb55b8730ab17ca240019aa2c5ea67302308f3a8e95ee8b9b20812a76a8
   languageName: node
   linkType: hard
 
@@ -16603,7 +16614,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-is@npm:^17.0.1":
+"react-is@npm:^17.0.1, react-is@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 3eff23f410d40ab9bc5177f147a92c7f42c356a21ecea340e0554566956d67e5e1ba56f26cc7fa22339ac3c7151744177bd6305eaa26d3cbf15f354358c9d9b6

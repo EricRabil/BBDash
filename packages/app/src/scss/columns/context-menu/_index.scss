@@ -1,1 +1,14 @@
 @import "color-coding";
+
+.hidden-course-checklist {
+    .react-contexify__submenu {
+        max-height: 250px;
+        overflow-y: auto;
+
+        .hidden-course-option {
+            .visibility-indicator {
+                width: 20px;
+            }
+        }
+    }
+}

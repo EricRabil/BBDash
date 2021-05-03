@@ -1,5 +1,5 @@
 import { CourseContentItem, GradebookEntry, StreamEntry } from "@bbdash/shared";
-import { DataCellSpec, ENTRY_CONTENT_CATEGORY, ENTRY_COURSE_ID, ENTRY_DUE_DATE, ENTRY_EMPTY, ENTRY_TIME, ENTRY_TITLE } from "./spec";
+import { DataCellSpec, ENTRY_CONTENT_CATEGORY, ENTRY_DUE_DATE, ENTRY_EMPTY, ENTRY_TIME, ENTRY_TITLE } from "./spec";
 
 export enum DataSource {
     stream = "stream",
@@ -14,14 +14,14 @@ export type DataSourceSpecLedger = {
 export const DataSourceSpecs: DataSourceSpecLedger = {
     [DataSource.stream]: {
         sortables: [ENTRY_TIME, ENTRY_TITLE, ENTRY_DUE_DATE],
-        filterables: [ENTRY_DUE_DATE, ENTRY_COURSE_ID]
+        filterables: [ENTRY_DUE_DATE]
     },
     [DataSource.contents]: {
         sortables: [ENTRY_TIME, ENTRY_TITLE],
-        filterables: [ENTRY_CONTENT_CATEGORY, ENTRY_COURSE_ID]
+        filterables: [ENTRY_CONTENT_CATEGORY]
     },
     [DataSource.grades]: {
-        filterables: [ENTRY_EMPTY, ENTRY_COURSE_ID]
+        filterables: [ENTRY_EMPTY]
     }
 };
 

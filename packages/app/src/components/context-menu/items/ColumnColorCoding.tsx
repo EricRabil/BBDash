@@ -1,12 +1,23 @@
 import React from "react";
-import { usePreference } from "../../../contexts/column-settings-context";
+import { PreferenceConsumer } from "../../../contexts/column-settings-context";
 import LabeledColorPicker from "./support/LabeledColorPicker";
 
-export default function ColumnColorCoding() {
-    const [ headerColorIndex, setHeaderColorIndex ] = usePreference("headerColor");
-    const [ name, setName ] = usePreference("name");
-
+function ColumnNameEditor() {
     return (
-        <LabeledColorPicker label={<input className="no-coreui" type="text" value={name} onChange={e => setName(e.currentTarget.value)} />} colorIndex={headerColorIndex} setColorIndex={setHeaderColorIndex} />
+        <PreferenceConsumer preferenceKey="name">
+            {([ name, setName ]) => (
+                <input className="no-coreui" type="text" value={name} onChange={e => setName(e.currentTarget.value)} />
+            )}
+        </PreferenceConsumer>
+    );
+}
+
+export default function ColumnColorCoding() {
+    return (
+        <PreferenceConsumer preferenceKey="headerColor">
+            {([ headerColorIndex, setHeaderColorIndex ]) => (
+                <LabeledColorPicker label={<ColumnNameEditor />} colorIndex={headerColorIndex} setColorIndex={setHeaderColorIndex} />
+            )}
+        </PreferenceConsumer>
     );
 }

@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef } from "react";
+import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { DataCellData, ENTRY_CONTENT_CATEGORY, FilterableKey, SortableKey } from "../transformers/spec";
 import { SortOrder } from "../utils/data-presentation";
 import { CourseBlacklistProvider } from "./course-blacklist-context";
@@ -13,13 +13,13 @@ type FilterSetting<T extends string | boolean | undefined> =
 export interface ColumnSettings {
     sortBy?: SortableKey;
     sortOrder: SortOrder;
+    blacklistedCourses: string[];
     filters: {
         [Key in FilterableKey]?: FilterSetting<NonNullable<DataCellData["filterables"]>[Key]>;
     };
     name?: string;
     pinned: string[];
     hidden: string[];
-    blacklistedCourses: string[];
     headerColor: number;
 }
 
@@ -62,16 +62,20 @@ export interface ColumnSettingsProviderProps {
 }
 
 function ColumnBackedCourseBlacklistProvider({ children }: PropsWithChildren<{}>) {
-    const [ blacklistedCourses, setBlacklistedCourses ] = usePreference("blacklistedCourses");
-
     return (
-        <CourseBlacklistProvider blacklistedCourses={blacklistedCourses} setBlacklistedCourses={setBlacklistedCourses}>
-            {children}
-        </CourseBlacklistProvider>
+        <PreferenceConsumer preferenceKey="blacklistedCourses">
+            {([ blacklistedCourses, setBlacklistedCourses ]) => (
+                <CourseBlacklistProvider blacklistedCourses={blacklistedCourses} setBlacklistedCourses={setBlacklistedCourses}>
+                    {children}
+                </CourseBlacklistProvider>
+            )}
+        </PreferenceConsumer>
     );
 }
 
-export function usePreference<Key extends keyof ColumnSettings>(key: Key): [ColumnSettings[Key], (newValue: ColumnSettings[Key]) => void] {
+export type PreferenceView<Key extends keyof ColumnSettings> = [ColumnSettings[Key], (newValue: ColumnSettings[Key]) => void];
+
+export function usePreference<Key extends keyof ColumnSettings>(key: Key): PreferenceView<Key> {
     const { settings, setKey } = useContext(ColumnSettingsContext);
 
     const setValue = useCallback((newValue: ColumnSettings[Key]) => setKey(key, newValue), [setKey]);
@@ -79,14 +83,45 @@ export function usePreference<Key extends keyof ColumnSettings>(key: Key): [Colu
     return [settings[key], setValue];
 }
 
-function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) {
-    const [ hiddenItems, setHiddenItems ] = usePreference("hidden");
-    const [ pinnedItems, setPinnedItems ] = usePreference("pinned");
+type BulkPreferenceView<Keys extends keyof ColumnSettings> = {
+    [Key in Keys]: PreferenceView<Key>
+};
+
+export function usePreferences<Key extends keyof ColumnSettings>(keys: Key[]): BulkPreferenceView<Key> {
+    const { settings, setKey } = useContext(ColumnSettingsContext);
     
+    return useMemo(() => keys.reduce((acc, key) => {
+        acc[key] = [settings[key], (newValue) => setKey(key, newValue)];
+
+        return acc;
+    }, {} as BulkPreferenceView<Key>), keys.map(key => settings[key]));
+}
+
+export function PreferenceConsumer<Key extends keyof ColumnSettings>({ preferenceKey, children }: { preferenceKey: Key, children: (preference: PreferenceView<Key>) => React.ReactNode}) {
     return (
-        <ItemOrganizerProvider hiddenItems={hiddenItems} setHiddenItems={setHiddenItems} pinnedItems={pinnedItems} setPinnedItems={setPinnedItems}>
-            {children}
-        </ItemOrganizerProvider>
+        <>
+            {children(usePreference(preferenceKey))}
+        </>
+    );
+}
+
+export function BulkPreferenceConsumer<Key extends keyof ColumnSettings>({ preferenceKeys, children }: { preferenceKeys: Key[], children: (preference: BulkPreferenceView<Key>) => React.ReactNode}) {
+    return (
+        <>
+            {children(usePreferences(preferenceKeys))}
+        </>
+    );
+}
+
+function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) {
+    return (
+        <BulkPreferenceConsumer preferenceKeys={["hidden", "pinned"]}>
+            {({ hidden: [ hiddenItems, setHiddenItems ], pinned: [ pinnedItems, setPinnedItems ]}) => (
+                <ItemOrganizerProvider hiddenItems={hiddenItems} setHiddenItems={setHiddenItems} pinnedItems={pinnedItems} setPinnedItems={setPinnedItems}>
+                    {children}
+                </ItemOrganizerProvider>
+            )}
+        </BulkPreferenceConsumer>
     );
 }
 

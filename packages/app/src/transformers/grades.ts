@@ -3,7 +3,7 @@ import { TransformationOptions } from ".";
 import { courseLink } from "../utils/courses";
 import { BBURI } from "../utils/uri";
 import { TaggedGradebookEntries } from "./data-source-spec";
-import { DataCellData, ENTRY_COURSE_ID, ENTRY_EMPTY, RenderContentFormat } from "./spec";
+import { DataCellData, ENTRY_EMPTY, RenderContentFormat } from "./spec";
 
 function convertDisplayGrade(entry: GradebookEntry): number | null {
     if (!entry.displayGrade) return null;
@@ -51,8 +51,7 @@ export default function transformGradeEntries(courseGrades: TaggedGradebookEntri
                 uri: BBURI.fromGradebook({ courseID, grades }).toString()
             },
             filterables: {
-                [ENTRY_EMPTY]: localizedAverage === NO_GRADE,
-                [ENTRY_COURSE_ID]: course.id
+                [ENTRY_EMPTY]: localizedAverage === NO_GRADE
             }
         });
     }
