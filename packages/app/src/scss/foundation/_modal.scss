@@ -70,6 +70,7 @@
                 background: rgb(83, 87, 92);
                 padding: ($vertical-padding / 4) ($horizontal-padding / 2);
                 border-radius: 5px;
+                color: white;
 
                 &:not(:last-child) {
                     margin-right: 5px;
