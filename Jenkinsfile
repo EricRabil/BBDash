@@ -1,34 +1,30 @@
 node {
-	git 'https://github.com/EricRabil/BBDash'
-	
-	def build_env
+    env.NODEJS_HOME = "${tool 'Node 14.x'}"
+    env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
 
-	stage("Setup Docker") {
-		build_env = docker.build('bbdash:build', '.')
-	}
+    stage("Yarn") {
+        sh 'yarn'
+    }
 
-	build_env.inside("-u root") {
-		stage("Compile Support Libraries") {
-			sh 'cd /tmp/bbdash && yarn ts:build'
-		}
+    stage("Compile Support Libraries") {
+        sh 'yarn ts:build'
+    }
 
-		stage("Compile React") {
-			sh 'cd /tmp/bbdash && yarn app:build'
-		}
+    stage("Compile React") {
+        sh 'yarn app:build'
+    }
 
-		stage("Compile CRX") {
-			sh 'cd /tmp/bbdash && yarn crx:build'
-		}
-		
-		stage("Archive Artifacts") {
-			sh '''
-			cd /tmp/bbdash/packages/chrome-extension/dist
-			zip -r ../bbdash-${BUILD_NUMBER}-development.zip *
-			cd ../
-			rm -rf ${WORKSPACE}/*.zip
-			mv *.zip ${WORKSPACE}/
-			'''
-			archiveArtifacts artifacts: '*.zip'
-		}
-	}
+    stage("Compile CRX") {
+        sh 'yarn crx:build'
+    }
+
+    stage("Archive Artifacts") {
+        dir("packages/chrome-extension") {
+            dir("dist") {
+                sh "zip -r ../bbdash-${BUILD_NUMBER}-development.zip *"
+            }
+
+            archiveArtifacts artifacts: "bbdash-${BUILD_NUMBER}-development.zip"
+        }
+    }
 }
