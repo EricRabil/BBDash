@@ -1,35 +1,15 @@
-import React, { ReactNode, useLayoutEffect, useRef, useState } from "react";
+import React, { ReactNode, useContext, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { ModalContext } from "../../contexts/modal-context";
 
-type ModalContextArrayRepresentation = [ boolean, () => void ];
-export interface ModalContextObjectRepresentation {
-    isShowing: boolean;
-    toggleShowing(): void;
-}
-
-export type ModalContext = ModalContextObjectRepresentation & ModalContextArrayRepresentation;
-
-export function useModal(): ModalContext {
-    const [ isShowing, setIsShowing ] = useState(false);
-    
-    const toggleShowing = () => {
-        setIsShowing(!isShowing);
-    };
-
-    return Object.assign([ isShowing, toggleShowing ], {
-        isShowing,
-        toggleShowing
-    }) as ModalContext;
-}
-
-export interface ModalContentContext extends ModalContextObjectRepresentation {
+export interface ModalContentContext {
     isDisappearing: boolean;
     isAppearing: boolean;
     isTransitioning: boolean;
     didFinish(): void;
 }
 
-export interface ModalProps extends ModalContextObjectRepresentation {
+export interface ModalProps {
     children: (ctx: ModalContentContext) => ReactNode
 }
 
@@ -49,7 +29,8 @@ function useEffectAfterFirstRun(effect: React.EffectCallback, deps?: React.Depen
 /**
  * Helper for managing the transition of a Modal as it enters and exits
  */
-export default function Modal({ children, ...ctx }: ModalProps) {
+export default function Modal({ children }: ModalProps) {
+    const ctx = useContext(ModalContext);
     const [ didComplete, setDidComplete ] = useState(true);
     const [ isTransitioning, setIsTransitioning ] = useState(false);
     const [ isAppearing, setIsAppearing ] = useState(false);

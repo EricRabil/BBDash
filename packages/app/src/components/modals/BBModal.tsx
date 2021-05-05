@@ -1,12 +1,15 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { ReactNode, useRef } from "react";
-import Modal, { ModalContextObjectRepresentation } from "./Modal";
+import { ModalContext } from "../../contexts/modal-context";
+import Modal from "./Modal";
 
-export interface BBModalContentContext extends ModalContextObjectRepresentation {
+export interface BBModalContentContext {
     header?: ReactNode;
     footer?: ReactNode;
     className?: string;
     children: ReactNode;
     type?: AnyModalType;
+    onDismiss?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
 }
 
 type AnyModalType = "create" | "edit" | "alert" | "form" | "confirm";
@@ -29,40 +32,48 @@ function commitTextForModalType(type: AnyModalType): string {
 /**
  * Styled modal for other modals to implement. Comes with controls and a header.
  */
-export default function BBModal({ header, footer, children, className, type = "alert", ...ctx }: BBModalContentContext) {
+export default function BBModal({ header, footer, children, className, onDismiss, type = "alert" }: BBModalContentContext) {
     const innerContainer = useRef(null as HTMLElement | null);
 
-    function onclick(ev: React.MouseEvent) {
-        if (!innerContainer.current) return;
-        if (!innerContainer.current.contains(ev.target as Node) && ctx.isShowing) {
-            ctx.toggleShowing();
-        }
-    }
-
     return (
-        <Modal {...ctx}>
+        <Modal>
             {({ isTransitioning, isAppearing, isDisappearing, didFinish }) => (
-                <div className={`modal-container${className ? ` ${className}` : ""}`} onClick={onclick} attr-is-transitioning={isTransitioning.toString()} attr-is-appearing={isAppearing.toString()} attr-is-disappearing={isDisappearing.toString()} onAnimationEnd={didFinish}>
-                    <div className="modal" ref={el => innerContainer.current = el}>
-                        {
-                            header ? (
-                                <div className="modal-header">
-                                    {header}
+                <ModalContext.Consumer>
+                    {({ isShowing, toggleShowing, isBusy }) => (
+                        <div className={`modal-container${className ? ` ${className}` : ""}`} onClick={(ev: React.MouseEvent) => {
+                            if (!innerContainer.current) return;
+                            if (!innerContainer.current.contains(ev.target as Node) && isShowing) {
+                                toggleShowing();
+                            }
+                        }} attr-is-transitioning={isTransitioning.toString()} attr-is-appearing={isAppearing.toString()} attr-is-disappearing={isDisappearing.toString()} onAnimationEnd={didFinish}>
+                            <div className="modal" ref={el => innerContainer.current = el}>
+                                {
+                                    header ? (
+                                        <div className="modal-header">
+                                            {header}
+                                        </div>
+                                    ) : null
+                                }
+                                <div className="modal-body">
+                                    {children}
                                 </div>
-                            ) : null
-                        }
-                        <div className="modal-body">
-                            {children}
+                                <div className="modal-footer">
+                                    {footer}
+                                    <button className="modal-btn" onClick={onDismiss || (() => {
+                                        toggleShowing();
+                                    })}>
+                                        {
+                                            isBusy ? (
+                                                <FontAwesomeIcon icon="circle-notch" spin />
+                                            ) : commitTextForModalType(type)
+                                        }
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div className="modal-footer">
-                            {footer}
-                            <div className="modal-btn" onClick={() => ctx.toggleShowing()}>{commitTextForModalType(type)}</div>
-                        </div>
-                    </div>
-                </div>
+                    )}
+                </ModalContext.Consumer>
             )}
         </Modal>
     );
 }
-
-export { useModal } from "./Modal";

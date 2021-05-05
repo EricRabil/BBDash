@@ -6,9 +6,9 @@ import "tippy.js/dist/tippy.css";
 import BBTooltip from "./components/BBTooltip";
 import ColumnGrid from "./components/ColumnGrid";
 import FeedbackModal from "./components/modals/FeedbackModal";
-import { useModal } from "./components/modals/Modal";
 import SettingsModal from "./components/modals/SettingsModal";
 import { ColorCodingContext } from "./contexts/color-coding-context";
+import { ModalContextProvider } from "./contexts/modal-context";
 import { useColorPaletteCSSVariables } from "./hooks/useColorPaletteCSSVariables";
 import usePersistentColumns from "./hooks/usePersistentColumns";
 import useReloginWatcher from "./hooks/useReloginWatcher";
@@ -24,9 +24,6 @@ function SidebarItem({ ariaHidden = false, tooltip, popsUp = false, icon, click 
 
 export default function App() {
     const [,, { addColumn }] = usePersistentColumns();
-
-    const [ isSettingsShowing, toggleIsSettingsShowing ] = useModal();
-    const [ isFeedbackShowing, toggleIsFeedbackShowing ] = useModal();
 
     const { colorPaletteID, setColorPaletteID } = useContext(ColorCodingContext);
 
@@ -57,12 +54,24 @@ export default function App() {
                             <div className="sidebar-spacer" aria-hidden />
                             <ul role="menubar" className="sidebar-section" aria-label="App Controls">
                                 <SidebarItem ariaHidden tooltip={isDark ? "Light Mode" : "Dark Mode"} icon={isDark ? "sun" : "moon"} click={toggleTheme} />
-                                <SidebarItem popsUp tooltip="Report Bug" icon="exclamation-triangle" click={toggleIsFeedbackShowing} />
-                                <SidebarItem popsUp tooltip="Settings" icon="cog" click={toggleIsSettingsShowing} />
+                                <ModalContextProvider>
+                                    {({ toggleShowing }) => (
+                                        <>
+                                            <SidebarItem popsUp tooltip="Report Bug" icon="exclamation-triangle" click={toggleShowing} />
+                                            <FeedbackModal />
+                                        </>
+                                    )}
+                                </ModalContextProvider>
+                                <ModalContextProvider>
+                                    {({ toggleShowing }) => (
+                                        <>
+                                            <SidebarItem popsUp tooltip="Settings" icon="cog" click={toggleShowing} />
+                                            <SettingsModal />
+                                        </>
+                                    )}
+                                </ModalContextProvider>
                             </ul>
                         </nav>
-                        <SettingsModal isShowing={isSettingsShowing} toggleShowing={toggleIsSettingsShowing} />
-                        <FeedbackModal isShowing={isFeedbackShowing} toggleShowing={toggleIsFeedbackShowing} />
                         <ColumnGrid />
                     </div>
                 </>
