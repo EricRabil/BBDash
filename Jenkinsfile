@@ -2,6 +2,10 @@ node {
     env.NODEJS_HOME = "${tool 'Node 14.x'}"
     env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
 
+    stage("Pull") {
+        sh 'git pull https://github.com/EricRabil/BBDash master'
+    }
+
     stage("Yarn") {
         sh 'yarn'
     }
