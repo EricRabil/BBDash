@@ -8,6 +8,7 @@ export interface ColorPalette {
     textColors: string[];
     defaultCellColor: string;
     defaultTextColor: string;
+    columnHeaderColor: string;
     background: string;
     sidebarColor: string;
 }
@@ -31,12 +32,14 @@ export const ColorPalettes: Record<string, ColorPalette> = {
         colors: ["#caffbf","#fdffb6","#ffd6a5","#ffadad","#bdb2ff","#a0c4ff","#9bf6ff","#ddd6ff","#ffc6ff"],
         defaultCellColor: "#c5c9cc",
         sidebarColor: "#20303e",
+        columnHeaderColor: "#ffffff",
         background: "rgb(22,40,53)",
     }, -40),
     light: makeColorPalette({
         colors: ["#caffbf","#fdffb6","#ffd6a5","#ffadad","#bdb2ff","#a0c4ff","#9bf6ff","#ddd6ff","#ffc6ff"],
         defaultCellColor: "#e3e3e3",
         sidebarColor: "#385e80",
+        columnHeaderColor: "#000000",
         background: "#ffffff",
     }, 40)
 };

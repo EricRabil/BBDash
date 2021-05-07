@@ -2,7 +2,7 @@ import { useContext, useMemo } from "react";
 import { ColorCodingContext } from "../contexts/color-coding-context";
 
 export function useColorPaletteCSSVariables(): Record<string, string> {
-    const { courseColorPreferences, colors, secondaryColors, textColors, secondaryTextColors, defaultCellColor, defaultTextColor, background, sidebarColor } = useContext(ColorCodingContext);
+    const { courseColorPreferences, columnHeaderColor, colors, secondaryColors, textColors, secondaryTextColors, defaultCellColor, defaultTextColor, background, sidebarColor } = useContext(ColorCodingContext);
 
     const colorPaletteVariables = useMemo(() => {
         const backgroundVariables: [string, string][] = colors.map((color, index) => [`--palette-background-color-${index}`, color]);
@@ -14,9 +14,10 @@ export function useColorPaletteCSSVariables(): Record<string, string> {
             ["--palette-default-background-color", defaultCellColor],
             ["--palette-default-text-color", defaultTextColor],
             ["--palette-app-background-color", background],
-            ["--palette-app-sidebar-background-color", sidebarColor]
+            ["--palette-app-sidebar-background-color", sidebarColor],
+            ["--palette-column-header-text-color", columnHeaderColor]
         ]));
-    }, [colors, textColors]);
+    }, [colors, columnHeaderColor, textColors]);
 
     const courseColorVariables = useMemo(() => {
         const backgroundVariables: [string, string][] = Object.entries(courseColorPreferences).map(([ courseID, courseColorIndex ]) => [`--course-background-${courseID}`, `var(--palette-background-color-${courseColorIndex})`]);

@@ -96,9 +96,7 @@ $column-border-radius: 5px;
 
         width: calc(var(--item-width) - 20px);
 
-        @media screen and (prefers-color-scheme: dark) {
-            color: white;
-        }
+        color: var(--palette-column-header-text-color);
 
         .column-header--main {
             flex: 1;
