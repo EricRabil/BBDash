@@ -96,6 +96,10 @@ $column-border-radius: 5px;
 
         width: calc(var(--item-width) - 20px);
 
+        @media screen and (prefers-color-scheme: dark) {
+            color: white;
+        }
+
         .column-header--main {
             flex: 1;
             font-weight: 500;
