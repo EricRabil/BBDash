@@ -1,6 +1,7 @@
-import { AxiosError } from "axios";
+import { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import BlackboardAPI from ".";
 import { USER_AGENT } from "./constants";
+import { BatchResponse } from "./structs/layer";
 
 /**
  * Inspects the given object and determines if it is an Axios error
@@ -22,7 +23,6 @@ export async function makeStealthHeaders(api: BlackboardAPI) {
     let xsrf = await api.cookies.getXSRF();
 
     if (!xsrf) {
-        await api.delegate.xsrfInvalidated();
         xsrf = await api.cookies.getXSRF();
 
         if (!xsrf) {
@@ -30,21 +30,24 @@ export async function makeStealthHeaders(api: BlackboardAPI) {
         }
     }
 
-    headers["Host"] = api.instanceHost;
-    headers["Connection"] = "close";
-    headers["Origin"] = api.instanceOrigin;
-    headers["Prgama"] = "no-cache";
-    headers["Cache-Control"] = "no-cache";
     headers["X-Blackboard-XSRF"] = xsrf;
-    headers["Accept"] = "application/json, text/plain, */*";
-    headers["User-Agent"] = USER_AGENT;
-    headers["Sec-Fetch-Site"] = "same-origin";
-    headers["Sec-Fetch-Mode"] = "cors";
-    headers["Sec-Fetch-Dest"] = "empty";
-    headers["Referer"] = `${api.instanceOrigin}/ultra/stream`;
-    headers["Accept-Encoding"] = "gzip, deflate, br";
-    headers["Accept-Language"] = "en-US,en;q=0.9";
-    headers["Cookie"] = await api.cookies.jar.getCookieString(`${api.instanceOrigin}/learn/api`);
+
+    if (!api.options.inProcess) {
+        headers["Host"] = api.instanceHost;
+        headers["Connection"] = "close";
+        headers["Origin"] = api.instanceOrigin;
+        headers["Prgama"] = "no-cache";
+        headers["Cache-Control"] = "no-cache";
+        headers["Accept"] = "application/json, text/plain, */*";
+        headers["User-Agent"] = USER_AGENT;
+        headers["Sec-Fetch-Site"] = "same-origin";
+        headers["Sec-Fetch-Mode"] = "cors";
+        headers["Sec-Fetch-Dest"] = "empty";
+        headers["Referer"] = `${api.instanceOrigin}/ultra/stream`;
+        headers["Accept-Encoding"] = "gzip, deflate, br";
+        headers["Accept-Language"] = "en-US,en;q=0.9";
+        headers["Cookie"] = await api.cookies.jar.getCookieString(`${api.instanceOrigin}/learn/api`);
+    }
 
     return headers;
 }
@@ -182,5 +185,147 @@ export class SharedThrottle {
 
     public get full(): boolean {
         return this.#pending.size >= this.maxConcurrent;
+    }
+}
+
+export interface BatchRequest {
+    method: RequestMethod;
+    relativeUrl: string;
+}
+
+type RequestMethod = "GET" | "DELETE" | "POST" | "PUT" | "PATCH";
+
+const swizzleKeys: Array<"get" | "delete" | "post" | "put" | "patch"> = ["get", "delete", "post", "put", "patch"];
+
+type MethodStorage = Partial<AxiosInstance>;
+
+const methodStorage: Map<AxiosInstance, MethodStorage> = new Map();
+
+function backupAxios(axios: AxiosInstance) {
+    const storage: MethodStorage = {};
+
+    swizzleKeys.forEach(<K extends keyof AxiosInstance>(key: K) => {
+        storage[key] = axios[key];
+    });
+
+    methodStorage.set(axios, storage);
+}
+
+function restoreAxios(axios: AxiosInstance) {
+    if (!methodStorage.has(axios)) throw new Error("Axios was restored without being patched");
+
+    const storage = methodStorage.get(axios)!;
+
+    swizzleKeys.forEach(<K extends keyof AxiosInstance>(key: K) => {
+        if (!storage[key]) return;
+        axios[key] = storage[key] as any;
+    });
+}
+
+function patchAxios(axios: AxiosInstance, addRequest: (req: BatchRequest) => Promise<any>) {
+    if (!methodStorage.has(axios)) backupAxios(axios);
+
+    swizzleKeys.forEach(key => {
+        axios[key] = function<T = any, R = AxiosResponse<T>>(url: string, config?: AxiosRequestConfig): Promise<R> {
+            return addRequest({
+                relativeUrl: url,
+                method: key.toUpperCase() as unknown as RequestMethod
+            })
+        }
+    });
+}
+
+interface DetachedPromise<T = any> {
+    resolve(arg0: T): void;
+    reject(err: any): void;
+}
+
+class _AxiosError extends Error implements AxiosError {
+    config: AxiosRequestConfig;
+    code?: string | undefined;
+    request?: any;
+    response?: AxiosResponse<any> | undefined;
+    
+    isAxiosError: boolean = true;
+    toJSON() {
+        return {}
+    }
+}
+
+export class APIBatcher {
+    #requests: Array<BatchRequest> = [];
+    #resolutions: Map<BatchRequest, DetachedPromise> = new Map();
+
+    constructor(public axios: AxiosInstance) {
+
+    }
+
+    createDetachedPromise<T = any>(req: BatchRequest): Promise<T> {
+        this.#requests.push(req);
+        
+        return new Promise((resolve, reject) => {
+            this.#resolutions.set(req, {
+                resolve,
+                reject
+            });
+        });
+    }
+
+    private resolve(index: number, resolution: AxiosResponse) {
+        const [ request ] = this.#requests.splice(index, 1);
+        const { resolve } = this.#resolutions.get(request)!;
+
+        resolve(resolution);
+
+        this.#resolutions.delete(request);
+    }
+
+    private reject(index: number, err: AxiosError) {
+        const [ request ] = this.#requests.splice(index, 1);
+        const { reject } = this.#resolutions.get(request)!;
+
+        reject(err);
+
+        this.#resolutions.delete(request);
+    }
+
+    openContext() {
+        patchAxios(this.axios, req => this.createDetachedPromise(req));
+    }
+
+    closeContext() {
+        restoreAxios(this.axios);
+    }
+
+    async send() {
+        restoreAxios(this.axios);
+        
+        const { data } = await this.axios.put<BatchResponse<any>[]>("/utilities/batch?xb=1", this.#requests);
+
+        data.forEach(({ body, headers, statusCode }, index) => {
+            const response: AxiosResponse = {
+                data: body,
+                status: statusCode,
+                statusText: statusCode.toString(),
+                headers,
+                config: {}
+            };
+
+            if (statusCode < 400) {
+                this.resolve(index, response);
+            } else {
+                const err = new _AxiosError();
+
+                err.config = {};
+                err.code = statusCode.toString();
+                err.response = response;
+
+                this.reject(index, err);
+            }
+        });
+    }
+
+    get length(): number {
+        return this.#requests.length;
     }
 }

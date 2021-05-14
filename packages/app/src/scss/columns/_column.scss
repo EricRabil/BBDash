@@ -184,6 +184,11 @@ $column-border-radius: 5px;
 
                 border: 1px solid rgba(0, 0, 0, 0.2);
                 z-index: 1;
+
+                &::before {
+                    @include pseudo-init($sizing: 1);
+                    z-index: -1;
+                }
             }
 
             a {

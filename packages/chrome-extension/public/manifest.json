@@ -15,20 +15,26 @@
   },
 
   "content_scripts": [
-    
+    {
+      "matches": ["https://learn.dcollege.net/ultra/*"],
+      "js": ["js/vendor.js", "js/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+
+  "web_accessible_resources": [
+    "*"
   ],
 
   "background": {
     "scripts": ["js/vendor.js", "js/background.js"]
   },
 
-  "content_security_policy": "script-src-elem * 'unsafe-inline'; object-src 'self';",
+  "content_security_policy": "script-src-elem * 'unsafe-inline'; object-src 'self'; script-src 'self';",
 
   "permissions": [
     "storage",
     "cookies",
-    "webRequest",
-    "webRequestBlocking",
     "https://learn.dcollege.net/"
   ]
 }

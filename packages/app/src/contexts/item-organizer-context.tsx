@@ -113,7 +113,7 @@ export function ItemOrganizerProvider({ children, hiddenItems: locallyHiddenItem
             unpinAllItems,
             isDefault: false
         };
-    }, [hiddenItems, absolutePinnedItems, setHidden, locallyHiddenItems, globallyPinnedItems, unhideAllItems, pinnedItems, locallyPinnedItems, isRoot, setPinned, unpinAllItems]);
+    }, [hiddenItems, absoluteHiddenItems, absolutePinnedItems, setHidden, locallyHiddenItems, globallyPinnedItems, unhideAllItems, pinnedItems, locallyPinnedItems, isRoot, setPinned, unpinAllItems]);
 
     return (
         <ItemOrganizerContext.Provider value={api}>

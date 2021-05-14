@@ -9,7 +9,7 @@ interface CourseListingResult {
 
 type MembershipEnrollmentListing = PaginatedQuery<CourseEnrollment>;
 
-interface ParentItem {
+interface ParentItem extends CourseContentItem {
     availability: {
         available: "Yes" | "No";
     };
@@ -151,22 +151,17 @@ export class CourseLayer extends APILayer {
                         recursive: false
                     });
     
-                    const parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
+                    let parents = topLevel.filter(item => isParentItem(item)) as unknown as ParentItem[];
+                    parents = parents.filter(parent => parent.availability.available !== "No");
                     
-                    const subcontents = await Promise.all(parents.map(parent => {
-                        if (parent.availability.available === "No") return [];
-                        else return this.fetchSubcontents({
-                            contentID: parent.id,
-                            ...query
-                        }).catch(() => [] as CourseContentItem[]);
-                    }));
-                    
-                    return subcontents.reduce((acc, c) => acc.concat(c), []).concat(topLevel);
+                    const subcontents = await this.batch<{ results: CourseContentItem[] }, ParentItem>(parents, parent => `v1/courses/${query.courseID}/contents/${parent.id}/children`);
+
+                    return subcontents.reduce((acc, c) => acc.concat(c.body.results), [] as CourseContentItem[]).concat(topLevel);
                 } else throw e;
             }
         })();
 
-        if (stripStyles) result.forEach(r => r.body = r.body?.replace(/\s?(width|float|clear|height|font-size|(margin|padding)(-(top|left|bottom|right))?):\s?[\d|\w|%|.]+;?/g, ""));
+        if (stripStyles) result.forEach(r => r.body = r.body?.replace?.(/\s?(width|float|clear|height|font-size|(margin|padding)(-(top|left|bottom|right))?):\s?[\d|\w|%|.]+;?/g, ""));
 
         return this.cache.contents[query.courseID] = result;
     }
@@ -203,16 +198,45 @@ export class CourseLayer extends APILayer {
     async allContents(activeCourses = true, query: Cachable<BaseContentsQuery> = {}): Promise<Record<string, CourseContentItem[]>> {
         const courses = await (activeCourses ? this.activeCourses() : this.all());
 
-        const contents = await Promise.all(courses.map(async course => {
-            const contents = await this.contents({
-                courseID: course.id,
-                ...query
-            });
+        const results: Record<string, CourseContentItem[]> = courses.reduce((acc, course) => {
+            acc[course.id] = [];
+            return acc;
+        }, {} as Record<string, CourseContentItem[]>);
 
-            return [course.id, contents] as [string, CourseContentItem[]];
-        }));
+        const contents = await this.batch<PaginatedQuery<CourseContentItem>, Course>(courses, course => `v1/courses/${course.id}/contents?recursive=true`);
 
-        return contents.reduce((acc, [id, contents]) => Object.assign(acc, {[id]: contents}), {} as Record<string, CourseContentItem[]>)
+        const needsRecurse: Course[] = [];
+
+        for (const [ index, result ] of contents.entries()) {
+            if (result.statusCode === 200 && result.body.results.length) {
+                results[result.body.results[0].courseId].push(...result.body.results);
+            } else if (result.statusCode === 403) {
+                needsRecurse.push(courses[index]);
+            }
+        }
+
+        const shallowContents = await this.batch<PaginatedQuery<CourseContentItem>, Course>(needsRecurse, course => `v1/courses/${course.id}/contents`);
+
+        const processItems = async (items: CourseContentItem[]) => {
+            const needsMore: ParentItem[] = [];
+
+            for (const item of items) {
+                results[item.courseId].push(item);
+                if (isParentItem(item) && item.availability.available !== "No") {
+                    needsMore.push(item);
+                }
+            }
+
+            if (needsMore.length) {
+                const children = await this.batch<PaginatedQuery<CourseContentItem>, ParentItem>(needsMore, parent => `v1/courses/${parent.courseId}/contents/${parent.id}/children`);
+
+                await processItems(children.reduce((acc, c) => acc.concat(c.body.results), [] as CourseContentItem[]));
+            }
+        }
+
+        await processItems(shallowContents.reduce((acc, c) => acc.concat(c.body.results), [] as CourseContentItem[]));
+
+        return results;
     }
 
     /**

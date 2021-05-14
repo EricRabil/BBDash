@@ -51,6 +51,7 @@ export interface CourseContentItem {
     modified?: string;
     position: number;
     title: string;
+    courseId: string;
 }
 
 export interface CourseEnrollment {

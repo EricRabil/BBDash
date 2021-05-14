@@ -71,15 +71,23 @@ export class CookieManager {
      * Parses the BbRouter cookie, returning its pairs in a flat object.
      */
     private async parseRouterCookie(): Promise<Record<string, string>> {
-        const cookies = await this.jar.getCookies(this.api.options.instanceURL);
+        let cookieValue: string | null = null;
+
+        if (this.api.options.inProcess) {
+            const cookies: Record<string, string> = await new Promise(resolve => chrome.runtime.sendMessage("api-cookies", resolve));
+
+            cookieValue = cookies["BbRouter"] || null;
+        } else {
+            const cookies = await this.jar.getCookies(this.api.options.instanceURL);
         
-        const cookie = cookies.find(cookie => cookie.key === "BbRouter");
-    
-        if (!cookie) {
-            return {};
+            const cookie = cookies.find(cookie => cookie.key === "BbRouter");
+
+            cookieValue = cookie?.value || null;
         }
+
+        if (!cookieValue) return {};
     
-        return cookie.value.split(",").map(str => str.split(":")).reduce((acc, [k,v]) => Object.assign(acc, { [k]:v }), {});
+        return cookieValue.split(",").map(str => str.split(":")).reduce((acc, [k,v]) => Object.assign(acc, { [k]:v }), {});
     }
 
     puppeteer = new PuppeteerCookieIntegration(this)

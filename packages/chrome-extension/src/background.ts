@@ -1,41 +1,23 @@
-import { RemoteObjectServer } from "@bbdash/chrome-remote-objects";
-import { IntegrationAPI } from "@bbdash/shared";
-import BackgroundController from "./background-src/controller";
-import { setupCookieWatcher } from "./background-src/cookie-watcher";
-import { setupHeaderInjector } from "./background-src/header-injector";
-import ReauthController from "./background-src/reauth-controller";
+async function getCookies() {
+  const cookies: chrome.cookies.Cookie[] = await new Promise(resolve => chrome.cookies.getAll({
+    url: `https://learn.dcollege.net/learn/api`
+  }, cookies => resolve(cookies)));
 
-const controller = BackgroundController.shared
-
-controller.reload();
-
-setupCookieWatcher(controller);
-setupHeaderInjector(controller);
-
-const server = new RemoteObjectServer(controller.api);
-server.listen();
-
-const integrationImplementation: IntegrationAPI = {
-  auth: {
-    relogin: () => ReauthController.shared.relogin(),
-    loggedOut: async () => controller.loginObservers.isOpen || !controller.userID,
-    onIsLoggedOut: async fn => ReauthController.shared.watchLogin(fn),
-    confirmRelogin: () => ReauthController.shared.userRequestedRelogin(),
-    rejectRelogin: () => ReauthController.shared.userDeniedRelogin()
-  }
+  return cookies.reduce((acc, cookie) => {
+      acc[cookie.name] = cookie.value;
+      return acc;
+  }, {} as Record<string, string>);
 }
 
-const integration_server = new RemoteObjectServer(integrationImplementation, "integration");
-integration_server.listen();
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message === "api-cookies") {
+    getCookies().then(cookies => {
+      console.log(cookies);
+      sendResponse(cookies);
+    });
 
-server.middleware.push(() => {
-  if (controller.loginObservers.isOpen) {
-    return controller.loginObservers.observe();
-  } else if (!controller.userID) {
-    return controller.reloadUserID();
-  } else {
-    return Promise.resolve();
+    return true;
   }
-});
+})
 
-Object.assign(window, {controller})
+export const x = true;

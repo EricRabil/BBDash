@@ -1,4 +1,4 @@
-import { GradebookEntry, GradeMapping, PaginatedQuery } from "@bbdash/shared";
+import { Course, GradebookEntry, GradeMapping, PaginatedQuery } from "@bbdash/shared";
 import APILayer from "../structs/layer";
 import { SharedThrottle } from "../util";
 
@@ -41,13 +41,13 @@ export class GradesLayer extends APILayer {
 
         const gradeMapping: GradeMapping = {};
 
-        await Promise.all(courses.map(async course => {
-            try {
-                gradeMapping[course.id] = await this.forCourse(course.id, cached);
-            } catch {
-                gradeMapping[course.id] = [];
-            }
-        }));
+        const gradeResults = await this.batch<GradeListing, Course>(courses, course => `v1/courses/${course.id}/gradebook/grades?isExcludedFromCourseUserActivity=true&limit=100&userId=${this.api.userID}`)
+
+        for (const { body: { results } } of gradeResults) {
+            if (!results.length) continue;
+            const [ { courseId } ] = results;
+            gradeMapping[courseId] = results;
+        }
 
         return gradeMapping;
     }

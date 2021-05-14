@@ -45,6 +45,10 @@ export interface BlackboardAPIOptions extends CookieManagerOptions {
      * Whether to omit cookie injection
      */
     noCookies?: boolean;
+    /**
+     * Whether the API client is running in a Blackboard process
+     */
+    inProcess?: boolean;
 }
 
 /**
@@ -88,7 +92,9 @@ export class BlackboardAPI {
             baseURL: `${origin}/learn/api/v1/`
         });
 
-        if (!options.noCookies) axiosCookieJarSupport(this.axios);
+        if (!options.inProcess) {
+            if (!options.noCookies) axiosCookieJarSupport(this.axios);
+        }
 
         this.cookies = new CookieManager(this);
 
