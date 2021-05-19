@@ -8,7 +8,7 @@
     width: 100vw;
 
     display: grid;
-    grid-template-columns: 60px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 60px;
     column-gap: 5px;
 
     background-color: var(--palette-app-background-color);

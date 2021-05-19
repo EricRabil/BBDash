@@ -8,8 +8,7 @@ module.exports = {
     //   popup: path.join(srcDir, 'popup.tsx'),
       options: path.join(srcDir, 'options.tsx'),
       background: path.join(srcDir, 'background.ts'),
-      content: path.join(srcDir, 'content.ts')
-    //   content_script: path.join(srcDir, 'content_script.tsx'),
+      content: path.join(srcDir, 'content.tsx')
     },
     output: {
         path: path.join(__dirname, "../dist/js"),
@@ -47,6 +46,11 @@ module.exports = {
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js"],
+        alias: { 
+            "react": "preact/compat",
+            "react-dom/test-utils": "preact/test-utils",
+            "react-dom": "preact/compat"
+        }
     },
     plugins: [
         new CopyPlugin({

@@ -1,8 +1,13 @@
+import { ColumnSettingsContext, PreferenceConsumer } from "@contexts/column-settings-context";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { DataSource } from "@transformers/data-source-spec";
+import { BBURI } from "@utils/uri";
 import classnames from "classnames";
+import BBTooltip from "components/BBTooltip";
 import React, { CSSProperties, PropsWithoutRef, useContext, useMemo } from "react";
-import { ColumnSettingsContext, PreferenceConsumer } from "../../contexts/column-settings-context";
-import { DataSource } from "../../transformers/data-source-spec";
-import { BBURI } from "../../utils/uri";
+import { useSelector } from "react-redux";
+import { reloadOne } from "store/connection";
+import { selectSyncStateForSource } from "store/reducers/data";
 import CTXPortal from "../context-menu/CTXPortal";
 import { useDataCellContextMenuHandler } from "../context-menu/DataCellContextMenu";
 import DataColumnContextmenuController from "./DataColumnContextmenuController";
@@ -34,6 +39,8 @@ export default React.forwardRef(function DataColumn<DataSourceType extends DataS
 
     const columnURI = useMemo(() => BBURI.forColumn(id).toString(), [id]);
 
+    const syncing = useSelector(selectSyncStateForSource(dataSource));
+
     const headerLabelID = `${id}-label`;
 
     return (
@@ -51,6 +58,15 @@ export default React.forwardRef(function DataColumn<DataSourceType extends DataS
                                 </PreferenceConsumer>
                             </div>
 
+                            <BBTooltip content={<span>{syncing ? "Syncing" : "Sync"}</span>}>
+                                <button onClick={() => {
+                                    if (syncing) return;
+                                    reloadOne(dataSource);
+                                }} className="column-header-button">
+                                    <FontAwesomeIcon icon="sync" spin={syncing} />
+                                </button>
+                            </BBTooltip>
+                            
                             <DataColumnPreferences dataSource={dataSource} />
                         </div>
                         <div className="column-body" role="presentation">

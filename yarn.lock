@@ -2294,10 +2294,13 @@ __metadata:
     "@bbdash/bb-api": "workspace:*"
     "@bbdash/chrome-remote-objects": "workspace:*"
     "@bbdash/shared": "workspace:*"
+    "@fortawesome/fontawesome-svg-core": ^1.2.35
+    "@fortawesome/free-solid-svg-icons": ^5.15.3
+    "@fortawesome/react-fontawesome": ^0.1.14
     "@types/chrome": 0.0.100
     copy-webpack-plugin: ^6.1.0
     css-loader: ^5.0.1
-    tough-cookie-web-storage-store: "https://github.com/EricRabil/tough-cookie-web-storage-store"
+    preact: ^10.5.13
     ts-loader: ^6.2.1
     typescript: "~3.8.3 "
     webpack: ^4.x.x
@@ -2632,6 +2635,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-common-types@npm:^0.2.35":
+  version: 0.2.35
+  resolution: "@fortawesome/fontawesome-common-types@npm:0.2.35"
+  checksum: d8a25c567cb4949ea63fd63ad320ca1ccd95094ec2e011215af7e415fc6108afa64719cefa3f85b8cf65abf2d349b76fefdb368418ba3c27cc7ba23fcbf4d485
+  languageName: node
+  linkType: hard
+
 "@fortawesome/fontawesome-svg-core@npm:^1.2.34":
   version: 1.2.34
   resolution: "@fortawesome/fontawesome-svg-core@npm:1.2.34"
@@ -2641,12 +2651,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-svg-core@npm:^1.2.35":
+  version: 1.2.35
+  resolution: "@fortawesome/fontawesome-svg-core@npm:1.2.35"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": ^0.2.35
+  checksum: 2457135c46ff06c32b8dd88cc3e1df96e8d9175657cb57cb74c3e26e7047cd3989a2c76c2d784a37d1edc724e1f3b9ac10e82bf7cc06d74a6a438370b4deac2b
+  languageName: node
+  linkType: hard
+
 "@fortawesome/free-solid-svg-icons@npm:^5.15.2":
   version: 5.15.2
   resolution: "@fortawesome/free-solid-svg-icons@npm:5.15.2"
   dependencies:
     "@fortawesome/fontawesome-common-types": ^0.2.34
   checksum: 7fe1cc0287170a1c39d4157e2830064bfcd986d3e1c350b2230f8145375118837229c0e54fbe3516bb3a5810a44520ad6087e4a08e4b36789de93e6b7a98c5e8
+  languageName: node
+  linkType: hard
+
+"@fortawesome/free-solid-svg-icons@npm:^5.15.3":
+  version: 5.15.3
+  resolution: "@fortawesome/free-solid-svg-icons@npm:5.15.3"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": ^0.2.35
+  checksum: dd5c7e006ad8794ec40da55eb2af4a160ddfaff6ea95dba12e95a0a8a88eb7fae6376f1a0be494a8b4012ef60c52aee3caa353896678f2042141bfb5957be1c7
   languageName: node
   linkType: hard
 
@@ -13058,7 +13086,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"lodash@npm:>=3.5 <5, lodash@npm:^4.17.11, lodash@npm:^4.17.12, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.5, lodash@npm:^4.2.1, lodash@npm:^4.6.1":
+"lodash@npm:>=3.5 <5, lodash@npm:^4.17.11, lodash@npm:^4.17.12, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.5, lodash@npm:^4.2.1":
   version: 4.17.20
   resolution: "lodash@npm:4.17.20"
   checksum: c62101d2500c383b5f174a7e9e6fe8098149ddd6e9ccfa85f36d4789446195f5c4afd3cfba433026bcaf3da271256566b04a2bf2618e5a39f6e67f8c12030cb6
@@ -16077,6 +16105,13 @@ fsevents@^1.2.7:
     nanoid: ^3.1.20
     source-map: ^0.6.1
   checksum: 31dcc6632589e5b0d06ae3854122073a38952f3a25280511fa4bd8c2bc254c05d1d1db0913848ed3171c84d41b233ec3fe5d7349de4700f624a16fa93553ccac
+  languageName: node
+  linkType: hard
+
+"preact@npm:^10.5.13":
+  version: 10.5.13
+  resolution: "preact@npm:10.5.13"
+  checksum: 9433cd19eb7497b60920301fea52e17a815fbf501f2c52f46b2a51609d456a95978ee4457b717c2e3dc19b9fc177c1bf73ef29be7cedc2b6632a08165c5d1af3
   languageName: node
   linkType: hard
 
@@ -19332,17 +19367,6 @@ resolve@^2.0.0-next.3:
   version: 1.0.0
   resolution: "toidentifier@npm:1.0.0"
   checksum: 95720e8a0f98f1525f50ccbecbc2a23f0a1b4e448de03819dbbeda03adf0d2010fe64525fbc9d549765242550d341bb891672e4ac0b2cac58613cdd742324255
-  languageName: node
-  linkType: hard
-
-"tough-cookie-web-storage-store@https://github.com/EricRabil/tough-cookie-web-storage-store":
-  version: 1.0.0
-  resolution: "tough-cookie-web-storage-store@https://github.com/EricRabil/tough-cookie-web-storage-store.git#commit=27af57de64ee02de87034cb402b55412211976e4"
-  dependencies:
-    lodash: ^4.6.1
-  peerDependencies:
-    tough-cookie: "*"
-  checksum: 7a4780aee8e380cb01575d3983aaebb2ee854acdb71e38392b736299bc4fecba5864527f83e309e403ed91a3b952dccd8e1e1afda48ccdf33c8b68cfc3c5c6e6
   languageName: node
   linkType: hard
 

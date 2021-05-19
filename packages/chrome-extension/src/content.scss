@@ -1,0 +1,119 @@
+.bbdash-presentation-controller {
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    &::before {
+        content: 'BBDash';
+        padding: 10px 5px;
+        background-color: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.8);
+        border-radius: 5px;
+    }
+}
+
+html {
+    overflow-x: hidden;
+}
+
+#bbdash-host {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: calc(100vw - 200px);
+    height: 100vh;
+    z-index: 1000000;
+    border: 0;
+    transition: transform 200ms ease-in;
+    background-color: rgba(0, 0, 0, 0.3);
+    will-change: transform;
+
+    animation: none 100ms 1;
+    animation-fill-mode: forwards;
+
+    --offset: calc(100vw + 5px);
+
+    overflow: visible;
+    transform: translateX(var(--offset));
+
+    border-left: 1px solid #697179;
+
+    @keyframes bbdash-enter {
+        0% {
+            transform: translateX(var(--offset));
+        }
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes bbdash-leave {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(var(--offset));
+        }
+    }
+}
+
+.bbdash-trigger-root {
+    display: flex;
+    flex-flow: row-reverse;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100vw - 10px);
+    z-index: 1000001;
+    margin-right: 10px !important;
+    margin-top: 10px !important;
+    pointer-events: none;
+
+    input[type=checkbox] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+        cursor: pointer;
+    }
+
+    .bbdash-trigger {
+        color: black;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 1;
+        cursor: pointer;
+        
+        min-width: 1em;
+
+        display: flex;
+        flex-flow: row;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 0 5px;
+        border-radius: 5px;
+        user-select: none;
+
+        pointer-events: all;
+
+        span {
+            max-width: 100px;
+            transition: max-width 100ms linear, margin-left 100ms linear;
+            overflow: hidden;
+            display: block;
+            margin-left: 5px;
+        }
+
+        &:not([attr-checked=checked]):not(:hover) {
+            span {
+                max-width: 0px;
+                margin-left: 0;
+            }
+        }
+
+        &[attr-checked=checked] {
+            
+        }
+    }
+}

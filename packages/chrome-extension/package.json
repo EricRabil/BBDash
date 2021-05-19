@@ -14,7 +14,10 @@
     "@bbdash/bb-api": "workspace:*",
     "@bbdash/chrome-remote-objects": "workspace:*",
     "@bbdash/shared": "workspace:*",
-    "tough-cookie-web-storage-store": "https://github.com/EricRabil/tough-cookie-web-storage-store"
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "preact": "^10.5.13"
   },
   "devDependencies": {
     "@types/chrome": "0.0.100",

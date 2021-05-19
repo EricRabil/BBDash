@@ -104,9 +104,24 @@ $column-border-radius: 5px;
             font-size: 1.25em;
         }
 
-        .column-prefs-toggle {
+        @mixin header-icon {
             @include palette-property-transition(opacity, 0.6);
+        }
+
+        .column-header-button {
+            @include header-icon;
             cursor: pointer;
+            background: none;
+            border: 0;
+            color: white;
+
+            &:first-child {
+                margin-left: -6px;
+            }
+
+            &:last-child {
+                margin-right: -6px;
+            }
 
             &:hover, &:focus {
                 opacity: 0.8;

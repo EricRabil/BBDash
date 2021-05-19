@@ -6,16 +6,16 @@
     @include palette-property-transition(background-color);
 
     display: flex;
-    flex-flow: column;
-    padding: 20px 10px;
+    flex-flow: row;
+    padding: 10px 20px;
     justify-items: center;
     --icon-size: 45%;
     margin: 0;
 
     .sidebar-section {
         display: flex;
-        flex-flow: column;
-        row-gap: 20px;
+        flex-flow: row;
+        column-gap: 20px;
         padding: 0;
         margin: 0;
     }
@@ -31,7 +31,7 @@
     }
 
     & svg {
-        width: var(--icon-size);
+        width: 18px;
         height: auto;
         color: white;
         cursor: pointer;

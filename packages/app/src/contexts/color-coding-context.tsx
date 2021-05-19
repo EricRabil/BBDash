@@ -31,14 +31,14 @@ export const ColorPalettes: Record<string, ColorPalette> = {
         // colors: ["#78bb5d","#ecd747","#f1a340","#d9644f","#b87bda","#3477ba","#57bedc","#ee80c7","#854196"],
         colors: ["#caffbf","#fdffb6","#ffd6a5","#ffadad","#bdb2ff","#a0c4ff","#9bf6ff","#ddd6ff","#ffc6ff"],
         defaultCellColor: "#c5c9cc",
-        sidebarColor: "#20303e",
+        sidebarColor: "#07294d",
         columnHeaderColor: "#ffffff",
         background: "rgb(22,40,53)",
     }, -40),
     light: makeColorPalette({
         colors: ["#caffbf","#fdffb6","#ffd6a5","#ffadad","#bdb2ff","#a0c4ff","#9bf6ff","#ddd6ff","#ffc6ff"],
         defaultCellColor: "#e3e3e3",
-        sidebarColor: "#385e80",
+        sidebarColor: "#07294d",
         columnHeaderColor: "#000000",
         background: "#ffffff",
     }, 40)

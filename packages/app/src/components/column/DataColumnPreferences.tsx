@@ -28,9 +28,9 @@ export default function DataColumnPreferences({ dataSource }: PropsWithoutRef<{ 
                 <>
 
                     <BBTooltip content={<span>Configure Column</span>}>
-                        <span className="column-prefs-toggle" tabIndex={0} onClick={toggleShowing}>
+                        <button className="column-header-button" tabIndex={0} onClick={toggleShowing}>
                             <FontAwesomeIcon icon="cog" />
-                        </span>
+                        </button>
                     </BBTooltip>
 
                     <BBModal className="settings-cell" footer={

@@ -10,19 +10,7 @@ function applyStyles(element: HTMLElement, styles: Partial<CSSStyleDeclaration>)
 function createBBDashHost(callback: (message: AnyBridgePayload, sender: Window) => void) {
     const frame = document.createElement("iframe");
     frame.src = chrome.extension.getURL("index.html");
-
-    applyStyles(frame, {
-        position: "absolute",
-        top: "0",
-        right: "0",
-        width: "calc(100vw - 200px)",
-        height: "100vh",
-        zIndex: "1000000",
-        border: "0",
-        transition: "transform 200ms ease-in",
-        transform: "translateX(100vw)",
-        backgroundColor: "rgba(0, 0, 0, 0.3)"
-    });
+    frame.id = "bbdash-host";
 
     window.addEventListener("message", message => {
         if (message.source !== frame.contentWindow) {
@@ -44,6 +32,24 @@ function createBBDashHost(callback: (message: AnyBridgePayload, sender: Window) 
     return frame;
 }
 
+const requestSingleAnimationFrame = (function requestSingleAnimationFrame() {
+    let pending: number | null = null;
+    let abortLast: (() => void) | null = null;
+
+    return (cb: () => void, abort: (() => void) | null = null) => {
+        if (pending !== null) {
+            abortLast?.();
+            cancelAnimationFrame(pending);
+        }
+
+        abortLast = abort;
+        pending = requestAnimationFrame(() => {
+            cb();
+            pending = null;
+        });
+    };
+})();
+
 export const BBPresentationController = new class BBPresentationController {
     #showing = false;
     #host: HTMLIFrameElement = createBBDashHost((payload, window) => BridgeServer.handlePayload(payload, window));
@@ -56,28 +62,13 @@ export const BBPresentationController = new class BBPresentationController {
         return this.#showing;
     }
 
-    #processing = false;
     set showing(showing: boolean) {
-        if (this.#processing) return;
-        this.#processing = true;
         this.#showing = showing;
 
         if (showing) {
-            requestAnimationFrame(() => {
-                this.#host.style.transform = "translateX(0)"
-                this.#processing = false;
-            });
+            this.#host.style.animationName = "bbdash-enter";
         } else if (!showing && this.#host.isConnected) {
-            requestAnimationFrame(() => {
-                this.#host.style.transform = "translateX(100vw)";
-            });
-
-            this.#host.ontransitionend = () => {
-                this.#processing = false;
-                this.#host.ontransitionend = null;
-            }
-        } else {
-            this.#processing = false;
+            this.#host.style.animationName = "bbdash-leave";
         }
     }
 }
