@@ -6,9 +6,6 @@
         },
         {
             "path": "packages/bb-api"
-        },
-        {
-            "path": "packages/chrome-remote-objects"
         }
     ]
 }
