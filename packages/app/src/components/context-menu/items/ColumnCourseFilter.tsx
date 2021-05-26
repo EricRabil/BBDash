@@ -7,7 +7,7 @@ import { ModifierKeyContext } from "../../../contexts/modifier-key-context";
 
 export default function ColumnCourseFilter() {
     return (
-        <Submenu label="Hidden Courses" className="hidden-course-checklist">
+        <Submenu label="Course Visibility" className="hidden-course-checklist">
             <CourseConsumer>
                 {({ courses, courseIDs }) => (
                     <ModifierKeyContext.Consumer>
