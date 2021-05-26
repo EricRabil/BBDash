@@ -126,7 +126,7 @@ function ColumnBackedItemOrganizerProvider({ children }: PropsWithChildren<{}>) 
 }
 
 export function ColumnSettingsProvider({ children, columnUID: id, deleteColumn, settings, setSettings }: PropsWithChildren<ColumnSettingsProviderProps>) {
-    const setKey: ColumnSettingsState["setKey"] = useCallback((key, value) => setSettings(Object.assign({}, settings, { [key]: value })), [setSettings]);
+    const setKey: ColumnSettingsState["setKey"] = useCallback((key, value) => setSettings(Object.assign({}, settings, { [key]: value })), [setSettings, settings]);
 
     return (
         <ColumnSettingsContext.Provider value={{ settings, id, deleteColumn, setSettings, setKey }}>
