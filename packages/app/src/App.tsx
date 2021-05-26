@@ -5,12 +5,11 @@ import ColumnGrid from "./components/ColumnGrid";
 import Sidebar from "./components/Sidebar";
 import { ColorCodingContext } from "./contexts/color-coding-context";
 import { useColorPaletteCSSVariables } from "./hooks/useColorPaletteCSSVariables";
-import usePersistentColumns from "./hooks/usePersistentColumns";
+import useDataCaching from "@hooks/useDataCaching";
 
 export default function App() {
-    const [,, { addColumn }] = usePersistentColumns();
-
     const colorPaletteCSSVariables = useColorPaletteCSSVariables();
+    useDataCaching();
 
     return (
         <ColorCodingContext.Consumer>

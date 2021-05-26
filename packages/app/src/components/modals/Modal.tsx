@@ -1,6 +1,7 @@
 import React, { ReactNode, useContext, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ModalContext } from "../../contexts/modal-context";
+import useEffectAfterFirstRun from "@hooks/useEffectAfterFirstRun";
 
 export interface ModalContentContext {
     isDisappearing: boolean;
@@ -11,19 +12,6 @@ export interface ModalContentContext {
 
 export interface ModalProps {
     children: (ctx: ModalContentContext) => ReactNode
-}
-
-function useEffectAfterFirstRun(effect: React.EffectCallback, deps?: React.DependencyList | undefined) {
-    const isFirstRun = useRef(true);
-
-    return useLayoutEffect(() => {
-        if (isFirstRun.current) {
-            isFirstRun.current = false;
-            return;
-        }
-
-        effect();
-    }, deps);
 }
 
 /**

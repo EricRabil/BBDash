@@ -1,9 +1,9 @@
-import React, { PropsWithRef, useMemo } from "react";
+import React, { PropsWithRef, useCallback, useMemo } from "react";
 import GridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { AutoSizer } from "react-virtualized";
-import { ColumnSettingsProvider, ColumnSettingsProviderProps } from "../contexts/column-settings-context";
+import { ColumnSettings, ColumnSettingsProvider, ColumnSettingsProviderProps } from "../contexts/column-settings-context";
 import usePersistentColumns, { ColumnItem } from "../hooks/usePersistentColumns";
 import { findColumnDefinitionByDataSource } from "../utils/column-definitions";
 

@@ -2,6 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "..";
 import { DataSource, DataSourceMapping } from "../../transformers/data-source-spec";
 
+function unarchiveDataSource<DataSourceType extends DataSource>(source: DataSourceType): Record<string, DataSourceMapping[DataSourceType]> {
+    const cached = localStorage.getItem(`${source}--cache`);
+    if (!cached) return {};
+    return JSON.parse(cached);
+}
+
 export type DataState = {
     [K in DataSource]: Record<string, DataSourceMapping[K]>;
 } & {
@@ -29,9 +35,9 @@ const idKeys: {
 };
 
 const initialState: DataState = {
-    stream: {},
-    contents: {},
-    grades: {},
+    stream: unarchiveDataSource(DataSource.stream),
+    contents: unarchiveDataSource(DataSource.contents),
+    grades: unarchiveDataSource(DataSource.grades),
     syncState: {
         stream: false,
         contents: false,
@@ -70,6 +76,7 @@ function curriedSelector<T, R>(cb: (arg0: T) => (state: RootState) => R): (arg0:
 export const selectStreamData = (state: RootState) => Object.values(state.data[DataSource.stream]);
 export const selectCourseContents = (state: RootState) => Object.values(state.data[DataSource.contents]);
 export const selectGrades = (state: RootState) => Object.values(state.data[DataSource.grades]);
+export const selectObjectDataForSource = curriedSelector(<T extends DataSource>(dataSource: T) => (state: RootState): Record<string, DataSourceMapping[T]> => state.data[dataSource] as Record<string, DataSourceMapping[T]>);
 export const selectDataForSource = curriedSelector(<T extends DataSource>(dataSource: T) => (state: RootState): DataSourceMapping[T][] => Object.values(state.data[dataSource]));
 export const selectSyncStateForSource = curriedSelector(<T extends DataSource>(dataSource: T) => (state: RootState): boolean => state.data.syncState[dataSource]);
 export const selectSyncState = (state: RootState) => state.data.syncState;
