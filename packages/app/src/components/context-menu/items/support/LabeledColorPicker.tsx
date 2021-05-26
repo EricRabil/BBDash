@@ -16,7 +16,12 @@ export default function LabeledColorPicker({ label, colorIndex, setColorIndex }:
             <ColorCodingContext.Consumer>
                 {({ colors }) => (
                     <CirclePicker colors={colors} color={colors[colorIndex!]} circleSpacing={7} circleSize={21} width={"252px"} onChangeComplete={({ hex }) => {
-                        setColorIndex(colors.indexOf(hex));
+                        const index = colors.indexOf(hex);
+                        if (index === colorIndex) {
+                            // selected the already-selected index, unset color
+                            setColorIndex(-1);
+                        }
+                        else setColorIndex(colors.indexOf(hex));
                     }} />
                 )}
             </ColorCodingContext.Consumer>
