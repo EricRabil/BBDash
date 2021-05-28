@@ -94,7 +94,7 @@ export function usePreferences<Key extends keyof ColumnSettings>(keys: Key[]): B
         acc[key] = [settings[key], (newValue) => setKey(key, newValue)];
 
         return acc;
-    }, {} as BulkPreferenceView<Key>), keys.map(key => settings[key]));
+    }, {} as BulkPreferenceView<Key>), keys.map(key => settings[key] as any).concat(setKey));
 }
 
 export function PreferenceConsumer<Key extends keyof ColumnSettings>({ preferenceKey, children }: { preferenceKey: Key, children: (preference: PreferenceView<Key>) => React.ReactNode}) {
