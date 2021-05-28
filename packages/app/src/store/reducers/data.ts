@@ -1,11 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { unarchiveObject } from "@utils/persist";
 import { RootState } from "..";
 import { DataSource, DataSourceMapping } from "../../transformers/data-source-spec";
 
 function unarchiveDataSource<DataSourceType extends DataSource>(source: DataSourceType): Record<string, DataSourceMapping[DataSourceType]> {
-    const cached = localStorage.getItem(`${source}--cache`);
-    if (!cached) return {};
-    return JSON.parse(cached);
+    return unarchiveObject(`${source}--cache`);
 }
 
 export type DataState = {

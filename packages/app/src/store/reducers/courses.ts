@@ -1,10 +1,13 @@
 import { Course } from "@bbdash/shared";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { unarchiveObject } from "@utils/persist";
+import { getPersistentValue, VersionedValueWithStateAdapter } from "react-use-persistent";
 import { RootState } from "..";
 
 export type CoursesState = Record<string, Course>;
 
-const initialState: CoursesState = {};
+const COURSES_CACHE_KEY = "courses--cache";
+const initialState: CoursesState = unarchiveObject(COURSES_CACHE_KEY);
 
 export const coursesSlice = createSlice({
     name: "courses",
@@ -14,6 +17,8 @@ export const coursesSlice = createSlice({
             for (const course of courses) {
                 state[course.id] = course;
             }
+
+            localStorage.setItem(COURSES_CACHE_KEY, JSON.stringify(state));
         }
     }
 });
