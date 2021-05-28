@@ -19,6 +19,8 @@ export default function DataColumnCell({ data, rootRef, isPinned = false, isHidd
 
     const course = courses[data.attributes.courseID];
 
+    if (!course) return null;
+
     return (
         <div ref={el => rootRef && (rootRef.current = el)} style={{
             "--cellBackground": course ? `var(--course-background-${course.id})` : "",
