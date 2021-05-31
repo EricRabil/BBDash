@@ -21,7 +21,7 @@ export default function LabeledColorPicker({ label, colorIndex, setColorIndex }:
                             // selected the already-selected index, unset color
                             setColorIndex(-1);
                         }
-                        else setColorIndex(colors.indexOf(hex));
+                        else setColorIndex(index);
                     }} />
                 )}
             </ColorCodingContext.Consumer>

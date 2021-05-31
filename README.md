@@ -3,6 +3,30 @@ BBDash is an app that aims to aggregate commonly accessed data from Blackboard i
 
 Wanna chat? Hop into our [Discord](https://discord.gg/mf2UrHFvRb)!
 
+![](.assets/bbdash.png)
+
+## Features
+
+- Contents Column, Activity Stream Column, Grades Column
+- Pin items and courses, either per-column or globally
+- Hide items and courses, either per-column or globally
+- Sort columns by various item attributes in ascending or descending order
+- Move columns around
+- Rename columns
+- Color coding for columns and courses
+- Refreshing columns
+- Content caching
+- Discrete toggle in the top right of Blackboard
+
+### Color Coding
+
+Columns and items can be color coded by right-clicking them. A menu will be presented where you can change their color, or remove the color by selecting the active color.
+
+![Color palette for column headers](.assets/column-context-menu.png)
+![Color palette for column items](.assets/item-context-menu.png)
+
+[System Manual](MANUAL.md)
+
 ## Developing
 
 ### Prerequisites
